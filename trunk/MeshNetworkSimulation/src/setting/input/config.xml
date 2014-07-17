@@ -38,8 +38,8 @@
 		<Add Key="2" Value=".2714" />
 		<Add Key="3" Value=".0375" />
 		<Add Key="4" Value=".0054" />
-		<Add Key="5" Value="0" /><!--".0008" />-->
-		<Add Key="6" Value="0"/><!--".0002" />-->
+		<Add Key="5" Value=".0008" />
+		<Add Key="6" Value=".0002" />
 		<Add Key="7" Value="0" />
 		<Add Key="8" Value="0" />
 		<Add Key="9" Value="0" />
