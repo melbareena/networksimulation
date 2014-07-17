@@ -16,6 +16,7 @@ import common.FileGenerator;
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
+import dataStructure.LinkType;
 import dataStructure.TCUnit;
 import dataStructure.Triple;
 import dataStructure.Vertex;
@@ -24,7 +25,7 @@ public class TransmissionConfiguration
 {
 	Map<Integer, Vertex> nodes = ApplicationSettingFacade.Nodes.getNodes();
 	private Map<Vertex, Integer> MARK;
-	boolean forceIncomingEnlarge = false;
+	LinkType forceGatewayLinks = LinkType.Incoming;
 	private LinkTrafficMap LinksTraffic = TrafficEstimatingFacade.getLinksTraffic();
 	private final float BETA = ApplicationSettingFacade.SINR.getBeta();
 	private int numberOfLinks = TrafficEstimatingFacade.getOptimalLinks().size(); 
@@ -36,7 +37,8 @@ public class TransmissionConfiguration
 	}
 		
 	protected List<TCUnit> Configuring()
-	{		
+	{
+		
 		TCUnit tConfUnit;
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
 		List<TCUnit> TT = new ArrayList<>();
@@ -84,85 +86,21 @@ public class TransmissionConfiguration
 				{
 					if(tConfUnit.getCounter_g(g) == 0)
 					{
-						for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,forceIncomingEnlarge))
-						{							
-							TCUnit modifiedTC = checkAdd(link, tConfUnit.Clone());
-							if(modifiedTC != null)
-							{
-								tConfUnit = modifiedTC;
-								//System.out.println("Step 2..... Phase 1");
-								break; // next g;
-							}
-								
-						}
+						tConfUnit = addGatewayLinks(tConfUnit, g);
 					}
+					System.out.println(tConfUnit.getCounter_g(g));
 					if(tConfUnit.getCounter_g(g) == 0)
 					{
-						ArrayList<Triple<Link, List<Link>, Double>> tripleLists = new ArrayList<>();
-						Triple<Link, List<Link>, Double> triple;
-						boolean small_sinr = true;
-						while(small_sinr)
-						{
-							for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,forceIncomingEnlarge))
-							{
-								for(Link lprime : tConfUnit.getLinks())
-								{
-									List<Link> links = tConfUnit.getLinks();
-									links.remove(lprime);
-									links.add(link);
-									double sinr = SINR.calc(lprime, links);
-										
-									if(sinr < BETA)
-									{
-										triple = new Triple<>(link, links, sinr);
-										tripleLists.add(triple);
-									}
-								}
-								if(tripleLists.size() == 0)
-								{
-									double sinr = SINR.calc(link, tConfUnit.getLinks());
-									tConfUnit.put(link, computeRate(sinr).getRate()); 
-									small_sinr = false;
-									break;
-								}
-								else
-								{
-									double minSINR = Double.MAX_VALUE;
-									Triple<Link, List<Link>, Double> minTriple = null;
-									for (Triple<Link, List<Link>, Double> currentTriple : tripleLists)
-									{
-										if(minSINR > currentTriple.getC())
-										{
-											minSINR = currentTriple.getC();
-											minTriple = currentTriple;
-										}
-									}
-									tConfUnit.removeLink(minTriple.getA());
-									ConsiderLinks.remove(minTriple.getA());
-									tConfUnit.put(link, computeRate(minSINR).getRate());
-									Vertex isGatway = isEndpointsGateway(link);
-									if(isGatway != null)
-										tConfUnit.addLinktoGatway(g, link);
-									
-									
-									System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-									
-									small_sinr = false;
-								}
-							
-								tripleLists.clear();
-								if(!small_sinr)
-									break;
-							}
-						}//end of while
+						tConfUnit = exchangeLinks(tConfUnit, g);
 					}
+					System.out.println(tConfUnit.getCounter_g(g));
 				} 
 			}	
 		
 			
 			//*******************************************SETP 3****************************************************
-			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.
-			tConfUnit = Enlarge(tConfUnit);			
+			//tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.
+			//tConfUnit = Enlarge(tConfUnit);			
 			//*******************************************SETP 4****************************************************
 			tConfUnit = calcDataRate(tConfUnit);	
 			//*****************************************************************************************************		
@@ -174,6 +112,75 @@ public class TransmissionConfiguration
 		FileGenerator.TransmissionConfige(TT);
 		FileGenerator.DataRate(TT);
 		return TT;
+	}
+	
+	private TCUnit addGatewayLinks(TCUnit tConfUnit, Vertex g)
+	{
+		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,forceGatewayLinks))
+		{							
+			TCUnit modifiedTC = checkAdd(link, tConfUnit.Clone());
+			if(modifiedTC != null)
+			{
+				tConfUnit = modifiedTC;
+				//System.out.println("Step 2..... Phase 1");
+				break; // next g;
+			}
+				
+		}
+		return tConfUnit;
+	}
+
+	private TCUnit exchangeLinks(TCUnit tConfUnit, Vertex g)
+	{
+		
+			ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
+			Triple<Link,Link, Double> triple; // add,remove, sinr
+			//boolean small_sinr = true;
+			//while(small_sinr)
+			//{
+				for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,forceGatewayLinks))
+				{
+					for(Link lprime : tConfUnit.getLinks())
+					{
+						List<Link> links = tConfUnit.getLinks();
+						links.remove(lprime);
+						links.add(link);
+						double sinr = SINR.calc(lprime, links);
+							
+						if(sinr >= BETA)
+						{
+							triple = new Triple<>(link, lprime, sinr);
+							tripleLists.add(triple);
+						}
+					}
+				}
+				if(tripleLists.size() > 0)
+				{
+					double max = 0d;
+					Triple<Link, Link, Double> maxTriple = null;
+					for (Triple<Link, Link, Double> currentTriple : tripleLists)
+					{
+						if(max < currentTriple.getC().doubleValue())
+						{
+							max = currentTriple.getC().doubleValue();
+							maxTriple = currentTriple;
+						}
+					}
+					tConfUnit.removeLink(maxTriple.getB());
+					ConsiderLinks.remove(maxTriple.getB());
+					tConfUnit.put(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
+					Vertex isGatway = isEndpointsGateway(maxTriple.getA());
+					if(isGatway != null)
+						tConfUnit.addLinktoGatway(g, maxTriple.getA());
+											
+					System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+					
+				//	small_sinr = false;
+				}
+			//}//end of while
+			
+			return tConfUnit;
+		
 	}
 	
 	
@@ -244,8 +251,8 @@ public class TransmissionConfiguration
 		/* Get the number of gateway links */
 		int numberOfGatewaysLink = 0;
 		for(Vertex g : gateways) {
-			numberOfGatewaysLink += TrafficEstimatingFacade.getOptimalLinks(g, true).size();
-			numberOfGatewaysLink += TrafficEstimatingFacade.getOptimalLinks(g, false).size();
+			numberOfGatewaysLink += TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Incoming).size();
+			numberOfGatewaysLink += TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Outgoing).size();
 		}
 		
 		/* */
@@ -253,8 +260,8 @@ public class TransmissionConfiguration
 			TCUnit tcu = new TCUnit();
 			/* For each gateway */
 			for(Vertex g : gateways) {
-				List<Link> downlinks = TrafficEstimatingFacade.getOptimalLinks(g, false);
-				List<Link> uplinks = TrafficEstimatingFacade.getOptimalLinks(g, true);
+				List<Link> downlinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Outgoing);
+				List<Link> uplinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Incoming);
 				
 				boolean reverseOrder = false; 
 				// Alternate the link sorting by traffic
@@ -448,8 +455,8 @@ public class TransmissionConfiguration
 		int downlinksNumber = 0;
 		int uplinksNumber = 0;
 		for(Vertex g : gateways) {
-			List<Link> downlinks = TrafficEstimatingFacade.getOptimalLinks(g, false);
-			List<Link> uplinks = TrafficEstimatingFacade.getOptimalLinks(g, true);
+			List<Link> downlinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Outgoing);
+			List<Link> uplinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Incoming);
 			
 			Set<Link> downlinksKeySet = LinksTraffic.Sort().descendingKeySet();
 			// Retain only the concerned downlinks from the set
@@ -643,9 +650,9 @@ public class TransmissionConfiguration
 	private Vertex isEndpointsGateway(Link l)
 	{
 		
-		if(!forceIncomingEnlarge && ApplicationSettingFacade.Gateway.isGateway(l.getSource()))
+		if(forceGatewayLinks == LinkType.Outgoing && ApplicationSettingFacade.Gateway.isGateway(l.getSource()))
 			return l.getSource();
-		if(forceIncomingEnlarge && ApplicationSettingFacade.Gateway.isGateway(l.getDestination()))
+		if(forceGatewayLinks == LinkType.Incoming && ApplicationSettingFacade.Gateway.isGateway(l.getDestination()))
 			return l.getDestination();
 		return null;
 	}

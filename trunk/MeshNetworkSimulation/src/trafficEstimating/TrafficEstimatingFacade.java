@@ -9,6 +9,7 @@ import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
 import dataStructure.BufferMap;
 import dataStructure.DownlinkTraffic;
+import dataStructure.LinkType;
 import dataStructure.Packet;
 import dataStructure.Path;
 import dataStructure.TopologyGraph;
@@ -123,13 +124,13 @@ public class TrafficEstimatingFacade
 		}
 		return optimalLinks;
 	}
-	public static List<Link> getOptimalLinks(Vertex v, boolean isIncoming)
+	public static List<Link> getOptimalLinks(Vertex v, LinkType lt)
 	{
 		List<Link> result = new ArrayList<>();
 		
 		List<Link> optimalLink = getOptimalLinks();
 		Vector<Link> links = null;
-		if(isIncoming)
+		if(lt == LinkType.Incoming)
 			links = TopologyGraphFacade.getIncomingLinks().get(v);
 		else
 			links = TopologyGraphFacade.getOutcomingLinks().get(v);
@@ -139,8 +140,6 @@ public class TrafficEstimatingFacade
 			if(optimalLink.contains(link))
 				result.add(link);
 		}
-		
-		
 		
 		return result;
 		
