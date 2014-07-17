@@ -1,0 +1,18 @@
+
+Important Node
+
+ If you want use configuration file please see ApplicationSettingFacade class in ConfigurationFacade package
+
+*************************************************************************************************************
+
+If you want to add new configuration you have to follow below structure:
+
+1- first add new class.
+2- inheriting it from BaseConfiguration class.
+3- override the FetchConfig method.
+4- call the FetchConfig method in the new class's constructor.
+4- for access to the configuration you must use ApplicationSetting in ConfigurationFacade..
+
+
+
+
