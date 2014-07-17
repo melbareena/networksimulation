@@ -204,7 +204,7 @@ public class HistogramViewer extends JFrame
 		
 		System.out.println("Finished (max index "+index+"), displaying...");
 		 
-		chart = ChartFactory.createXYLineChart("Throughput", "",
+		chart = ChartFactory.createXYLineChart("Throughput "+GraphViewer.optionsTitle, "",
 		"Throughput", dataset, PlotOrientation.VERTICAL, false, true, false);
 		
 		XYPlot plot = chart.getXYPlot();
