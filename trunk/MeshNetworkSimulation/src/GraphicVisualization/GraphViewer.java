@@ -161,7 +161,16 @@ public class GraphViewer extends JFrame {
 	 * @param throughputData 
 	 */
 	public GraphViewer(Vector<Double> throughputData) {
-		super("GraphViewer");
+		super();
+		
+		String title = "Mesh Network Simulation (" + ((TCFacade.newAlgortihm) ? "new algo." : "origin. algo.")
+				+ " ; ratio " + TCFacade.downOverUpRatio
+				+ ((TCFacade.alternateOrder) ? " ; alt. order" : "")
+				+ ((TCFacade.repeatLinksToRespectRatio) ? " ; repeat links" : "")
+				+ ((TCFacade.enlargeByGateways) ? " ; enlarge by gw" : "")
+				+ ")";
+		
+		this.setTitle(title);
 		
 		this.histogramViewerFrame = new HistogramViewer(throughputData);
  
