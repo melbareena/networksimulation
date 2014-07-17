@@ -20,6 +20,7 @@ public class Program
 	}
 	
 	public static void showStartDialog() {
+		System.gc();
 		StartOptionsDialog startOptionDialog = new StartOptionsDialog();
 		startOptionDialog.setVisible(true);
 	}
