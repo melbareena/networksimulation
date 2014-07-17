@@ -1,0 +1,67 @@
+<AppConfiguration>
+
+
+	<Environment X="1000" Y="1000" />
+	<OutputFolder Path="src/output/" GenerateFileAsOutput="true" IntermidiateConsoleOutput="false" />
+	<!--
+	<Gateways Number="4" TypeOfGeneration="file" Address="src/setting/input/gateway.txt" />
+	-->
+	
+	
+	<!--<Traffic Generator="Random" />-->
+	<Traffic Generator="File" AddressUp="src/setting/input/trafficUp.txt" AddressDown="src/setting/input/trafficDown.txt"/> 
+	
+	
+	<Gateways Radio="4" Number="4" TypeOfGeneration="StatiC">
+		<Add x="100" y="100" />
+		<Add x="500" y="100" />
+		<Add x="100" y="500" />
+		<Add x="500" y="500" />
+	</Gateways>
+	
+	<DataRate>
+		<Add SINR="8.15" Rate="6" />
+		<Add SINR="10.71" Rate="9" />
+		<Add SINR="13.48" Rate="12" />
+		<Add SINR="21.37" Rate="18" />
+		<Add SINR="50.70" Rate="24" />
+		<Add SINR="134.89" Rate="36" />
+		<Add SINR="269.15" Rate="48" />
+		<Add SINR="429.57" Rate="54" />
+	</DataRate>
+	
+	
+	
+	<IFactor>
+		<Add Key="0" Value="1" />
+		<Add Key="1" Value=".7272" />
+		<Add Key="2" Value=".2714" />
+		<Add Key="3" Value=".0375" />
+		<Add Key="4" Value=".0054" />
+		<Add Key="5" Value=".0008" />
+		<Add Key="6" Value=".0002" />
+		<Add Key="7" Value="0" />
+		<Add Key="8" Value="0" />
+		<Add Key="9" Value="0" />
+		<Add Key="10" Value="0" />
+	</IFactor>
+ <!--
+	<Routers Radio="2" Number="170" TypeOfGeneration="Random" Seed="542154620485108"  MinDistance="50" SaftyTest="500" TransmissionRate="200"/> 
+		-->	
+	<Routers Radio="2"  TypeOfGeneration="File" Address="src/setting/input/routers.txt" MinDistance="50" TransmissionRate="200">
+	</Routers>
+
+	<SINR Alpha="4" W="20" Power="25" Beta="8.51" Mue="0.000000001" />
+	<!--	
+	<Channels Mode="Partially">
+		<Add Value="1" />
+		<Add Value="2" />
+		<Add Value="4" />
+	</Channels>
+	
+	-->
+		<Channels Mode="All" />
+		<ChannelAssignment Strategy="SINRSterategy" />
+
+	
+</AppConfiguration>
