@@ -553,7 +553,7 @@ public class FileGenerator
 		} 
 		catch (Exception ex)
 		{
-			System.err.println("Affectance/FileGenerator/Message:" + ex.getMessage());
+			//System.err.println("Affectance/FileGenerator/Message:" + ex.getMessage());
 		}
 		
 		

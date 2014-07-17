@@ -252,10 +252,8 @@ public class GraphViewer extends JFrame {
 				(int)Math.ceil(this.graph.getGraphBounds().getHeight()+270));
 		
 		updateShowingLinks();
-    
-		//displayModel((mxCell) parent,"");
 		
-		//setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -273,12 +271,13 @@ public class GraphViewer extends JFrame {
 						colorViewerDialog.dispose();
 						histogramViewerFrame.dispose();
 						dispose();
-						Program.showStartDialog();
+						Program.restartApplication();
 						break;
 					case JOptionPane.NO_OPTION:
 						System.exit(0);
 						break;
-					default:
+					case JOptionPane.CANCEL_OPTION:
+						break;
 				}
 			}
 		});
@@ -656,7 +655,7 @@ public class GraphViewer extends JFrame {
 				colorViewerDialog.dispose();
 				histogramViewerFrame.dispose();
 				dispose();
-				Program.showStartDialog();
+				Program.restartApplication();
 			}
 		});
 		mnFile.add(mntmReset);
