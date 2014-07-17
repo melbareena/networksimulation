@@ -219,8 +219,7 @@ public class TransmissionConfiguration
 		List<TCUnit> patterns = gatewaysStep(gateways, downOverUpRatio, alternateOrder,
 				selectedLinksSet, repeatLinksToRespectRatio);
 		
-		System.out.println("\n\n\nNumber of patterns: "+patterns.size()
-				+"\n\n\n");
+		System.out.println("Number of patterns: "+patterns.size());
 		
 		List<TCUnit> finalList = remainingLinksStep(patterns, selectedLinksSet, enlargeByGateways,
 				gateways, downOverUpRatio);
@@ -337,7 +336,8 @@ public class TransmissionConfiguration
 		while(newLinkAdded && (numberOfLinksAdded < numberOfLinksToAdd)) {
 			newLinkAdded = false;
 			for(Link l : linksSet) {
-				if(!selectedLinksSet.contains(l) || evenIfAlreadySelected) {
+				if((!selectedLinksSet.contains(l) || evenIfAlreadySelected)
+						&& !tcu.containsKey(l)) {
 					TCUnit modifiedTC = checkAdd(l, tcu.Clone());
 					// Check if the link can be added to the current TCU
 					if(modifiedTC != null) {

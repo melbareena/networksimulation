@@ -1,99 +1,44 @@
 package launcher;
 
+import java.io.File;
+import java.lang.management.ManagementFactory;
+
 import scheduling.RoundRobinSchedulingStrategy;
 import scheduling.SchedulingStrategy;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.StartOptionsDialog;
 
-public class Program
-{
+public class Program {
 	
-	/*TODO
-	 * Mettre un titre au images sauvees en fonction des parametres de debut
-	 * Essayer de regarder le reset...
-	 * */
+	
+	public static void restartApplication() {
+		try {
+			StringBuilder cmd = new StringBuilder();
+	        cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
+	        for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
+	            cmd.append(jvmArg + " ");
+	        }
+	        cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
+	        cmd.append(Program.class.getName()).append(" ");
+	        /*for (String arg : args) {
+	            cmd.append(arg).append(" ");
+	        }*/
+	        Runtime.getRuntime().exec(cmd.toString());
+	        System.exit(0);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	public static void main(String[] args) throws Exception {
+		StartOptionsDialog startOptionDialog = new StartOptionsDialog();
+		startOptionDialog.setVisible(true);
+	}
 	
 	public static void launch() {
 		SchedulingStrategy s = new RoundRobinSchedulingStrategy();
 		s.scheduling();
 		new GraphViewer(s.getThroughput());
 	}
-	
-	public static void showStartDialog() {
-		System.gc();
-		StartOptionsDialog startOptionDialog = new StartOptionsDialog();
-		startOptionDialog.setVisible(true);
-	}
 
-	public static void main(String[] args) throws Exception
-	{
-
-		showStartDialog();
-		
-		/*TrafficEstimatingFacade.getSourceBuffers();
-		
-		List<TCUnit> configs = TCFacade.getConfigurations();
-		
-		for (TCUnit tc : configs)
-		{
-			
-			for (Entry<Link, Integer> link : tc.entrySet() )
-			{
-				print(link.getKey().getId() + "\t" + link.getValue());
-			}
-			print("*******************************************************************");
-		}
-		
-		print("**********NUMBER OF LINKS In transmission configuration**********");
-		for (TCUnit tc : configs)
-			print(tc.getLinks().size()+"");		
-		
-		print("*****************************NUMBER OF CHENNELS*************************");
-		
-		for (Entry<Channel, Integer> chOccurrance :  ChannelAssignmentFacade.getChannelOccurance().entrySet())
-		{
-			print(chOccurrance.getKey() + " : " + chOccurrance.getValue());
-		}
-		/* /*
-		print("*****************************Scheduling*************************");
-		
-		/*List<DataRate> dataRate = ApplicationSettingFacade.DataRate.getDataRate();
-		
-		for (DataRate dr : dataRate)
-		{
-			print(dr.toString());
-		}
-		
-		
-		
-		
-		
-		LinkTrafficMap traffic = TrafficEstimatingFacade.getLinksTraffic();
-
-		for (Entry<Link, Float> links : traffic.Sort().entrySet())
-		{
-			print(links.getKey().getId() + " " + channelMap.get(links.getKey()));	
-		}
-		for (Entry<Vertex, List<Path>> paths : TrafficEstimatingFacade.getOptimalUplinkPath().entrySet())
-		{
-			String p = "";
-			
-			
-			for (Path pa : paths.getValue())
-			{
-				p += pa.toString(false,true) + "\n";
-			}
-			
-			p += "\n *************************************************************";
-			
-			print(p);
-		}*/
-
-	}
-
-	private static void print(String str)
-	{
-		System.out.println(str);
-
-	}
 }

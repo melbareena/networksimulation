@@ -45,7 +45,7 @@ public abstract class SchedulingStrategy
 	{
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfiguraions = null;
-		System.err.println( sourceBuffers.trafficSize()) ;
+		//System.err.println( sourceBuffers.trafficSize()) ;
 		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 )
 		{
 			this.calcWeight(true);
@@ -54,7 +54,7 @@ public abstract class SchedulingStrategy
 			double slotThroughtput = 0;
 
  			transmissionConfiguraions = matching(selectedBuffers);
- 			System.out.println( sourceBuffers.trafficSize()) ;
+ 			//System.out.println( sourceBuffers.trafficSize()) ;
  			for (TCUnit tcunit : transmissionConfiguraions)
 			{
 				slotThroughtput = 0;
@@ -80,7 +80,7 @@ public abstract class SchedulingStrategy
  			selectedBuffers = getBufferStrategy(false);
  			
  			transmissionConfiguraions = matching(selectedBuffers);
- 			System.err.println(transmitBuffers.trafficSize()) ;
+ 			//System.err.println(transmitBuffers.trafficSize()) ;
  			for (TCUnit tcunit : transmissionConfiguraions)
 			{
 				slotThroughtput = 0;
