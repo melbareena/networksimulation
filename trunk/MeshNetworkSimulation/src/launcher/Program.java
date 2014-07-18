@@ -3,6 +3,8 @@ package launcher;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 
+import javax.swing.UIManager;
+
 import scheduling.RoundRobinSchedulingStrategy;
 import scheduling.SchedulingStrategy;
 import GraphicVisualization.GraphViewer;
@@ -31,6 +33,11 @@ public class Program {
 	}
 
 	public static void main(String[] args) throws Exception {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			System.err.println("Unable to set the UI look and feel...");
+		}	
 		StartOptionsDialog startOptionDialog = new StartOptionsDialog();
 		startOptionDialog.setVisible(true);
 	}
@@ -38,6 +45,13 @@ public class Program {
 	public static void launch() {
 		SchedulingStrategy s = new RoundRobinSchedulingStrategy();
 		s.scheduling();
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (Exception e) {
+			System.err.println("Unable to set the UI look and feel...");
+		}	
+		
 		new GraphViewer(s.getThroughput());
 	}
 
