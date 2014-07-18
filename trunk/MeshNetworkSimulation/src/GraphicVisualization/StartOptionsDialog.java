@@ -2,6 +2,7 @@ package GraphicVisualization;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -30,8 +31,16 @@ import net.miginfocom.swing.MigLayout;
 import transConf.TCFacade;
 
 import javax.swing.JTextField;
+
 import java.awt.Font;
 
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class StartOptionsDialog extends JDialog
 {
 
@@ -62,20 +71,38 @@ public class StartOptionsDialog extends JDialog
 	private final JLabel lblOverUplinks = new JLabel("over Uplinks:");
 	private final JPanel panel = new JPanel();
 	private final JLabel lblOutput = new JLabel("Output:");
-	private final JButton button = new JButton("...");
+	private final JButton btnOutput = new JButton("...");
 	private final JPanel outputPanel = new JPanel();
 	private final JTextField outputFolderPathTextField = new JTextField();
 	private final JCheckBox chckbxGenerateFiles = new JCheckBox("Generate files");
 	private final JLabel lblTraffic = new JLabel("Traffic:");
+	private final JPanel trafficPanel = new JPanel();
+	private final JLabel lblGenerator = new JLabel("Generator:");
+	private final JComboBox comboBox = new JComboBox();
+	private final JTextField upTrafficTextField = new JTextField();
+	private final JButton btnUpTraffic = new JButton("...");
+	private final JLabel lblU = new JLabel("U:");
+	private final JButton btnDownTraffic = new JButton("...");
+	private final JTextField downTrafficTextField = new JTextField();
+	private final JLabel lblD = new JLabel("D:");
+	private final JLabel lblSetDefaults = new JLabel("Set defaults...");
 
 	/**
 	 * Create the dialog.
 	 */
 	public StartOptionsDialog() {
+		downTrafficTextField.setText(".../trafficDown.txt");
+		downTrafficTextField.setToolTipText("/setting/input/trafficDown.txt");
+		downTrafficTextField.setEditable(false);
+		downTrafficTextField.setColumns(10);
+		upTrafficTextField.setText("...ut/trafficUp.txt");
+		upTrafficTextField.setToolTipText("/setting/input/trafficUp.txt");
+		upTrafficTextField.setEditable(false);
+		upTrafficTextField.setColumns(10);
 		outputFolderPathTextField.setFont(new Font("Tahoma", Font.ITALIC, 11));
 		outputFolderPathTextField.setText("Output folder...");
 		outputFolderPathTextField.setEditable(false);
-		outputFolderPathTextField.setColumns(10);		
+		outputFolderPathTextField.setColumns(10);	
 		setIconImage(Toolkit.getDefaultToolkit().getImage(StartOptionsDialog.class.getResource("/com/sun/java/swing/plaf/windows/icons/Computer.gif")));
 		setTitle("Parameters");
 		setResizable(false);
@@ -84,7 +111,7 @@ public class StartOptionsDialog extends JDialog
 		getContentPane().setLayout(borderLayout);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new MigLayout("", "[95px]10[157px]", "[min!][min!][][min!][min!]"));
+		contentPanel.setLayout(new MigLayout("", "[95px]10[157px,grow]", "[min!]10[min!]20[grow]10[min!]10[min!]"));
 		lblEnvironment.setHorizontalAlignment(SwingConstants.TRAILING);
 		contentPanel.add(lblEnvironment, "cell 0 0,grow");
 		
@@ -104,7 +131,7 @@ public class StartOptionsDialog extends JDialog
 		outputPanel.setLayout(new MigLayout("insets 0 0 0 0", "[5][150px][min!]", "[][23px]"));
 		chckbxGenerateFiles.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				button.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+				btnOutput.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 				outputFolderPathTextField.setText("Output folder...");
 				outputFolderPathTextField.setToolTipText("");
 			}
@@ -113,16 +140,72 @@ public class StartOptionsDialog extends JDialog
 		outputPanel.add(chckbxGenerateFiles, "cell 0 0 3 1,grow");
 		
 		outputPanel.add(outputFolderPathTextField, "cell 1 1,grow");
-		button.addActionListener(new ActionListener() {
+		btnOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showFileChooser();
+				showFileChooser(outputFolderPathTextField, "output", true);
 			}
 		});
-		button.setEnabled(false);
-		outputPanel.add(button, "cell 2 1,growx,aligny top");
+		btnOutput.setEnabled(false);
+		outputPanel.add(btnOutput, "cell 2 1,growx,aligny top");
 		lblTraffic.setHorizontalAlignment(SwingConstants.TRAILING);
 		
 		contentPanel.add(lblTraffic, "cell 0 2,grow");
+		
+		contentPanel.add(trafficPanel, "cell 1 2,grow");
+		trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[][grow][min!][grow][min!]", "[grow][grow][grow][][grow]"));
+		
+		trafficPanel.add(lblGenerator, "cell 0 0 2 1,grow");
+		comboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				boolean select = ((String)comboBox.getSelectedItem()).equals("File");
+				btnDownTraffic.setEnabled(select);
+				btnUpTraffic.setEnabled(select);
+				lblSetDefaults.setEnabled(select);
+			}
+		});
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"File", "Random"}));
+		comboBox.setSelectedIndex(0);
+		
+		trafficPanel.add(comboBox, "cell 3 0 3 1,grow");
+		
+		trafficPanel.add(lblU, "cell 0 1,alignx trailing");
+		
+		trafficPanel.add(upTrafficTextField, "cell 1 1 3 1,growx");
+		btnUpTraffic.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				showFileChooser(upTrafficTextField, "uplink traffic", false);
+			}
+		});
+		
+		trafficPanel.add(btnUpTraffic, "cell 4 1,growx");
+		
+		trafficPanel.add(lblD, "cell 0 2,alignx trailing");
+		
+		trafficPanel.add(downTrafficTextField, "cell 1 2 3 1,growx");
+		
+		trafficPanel.add(btnDownTraffic, "cell 4 2");
+		btnDownTraffic.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				showFileChooser(downTrafficTextField, "downlink traffic", false);
+			}
+		});
+		
+		lblSetDefaults.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(lblSetDefaults.isEnabled()) {
+					upTrafficTextField.setText("...ut/trafficUp.txt");
+					upTrafficTextField.setToolTipText("/setting/input/trafficUp.txt");
+					downTrafficTextField.setText(".../trafficDown.txt");
+					downTrafficTextField.setToolTipText("/setting/input/trafficDown.txt");
+				}
+			}
+		});
+		lblSetDefaults.setCursor(new Cursor(java.awt.Cursor.HAND_CURSOR));
+		lblSetDefaults.setForeground(new Color(0, 0, 255));
+		lblSetDefaults.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		
+		trafficPanel.add(lblSetDefaults, "cell 3 3 2 1,alignx right");
 		
 		lblAlgorithm.setHorizontalAlignment(SwingConstants.TRAILING);
 		contentPanel.add(lblAlgorithm, "cell 0 3,grow");
@@ -216,17 +299,16 @@ public class StartOptionsDialog extends JDialog
 
 	}
 	
-	private void showFileChooser() {
+	private void showFileChooser(JTextField source, String title, boolean folder) {
 		final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fileChooser.setDialogTitle("Select the folder for the output data");
+		fileChooser.setFileSelectionMode(((folder) ? JFileChooser.DIRECTORIES_ONLY :JFileChooser.FILES_ONLY));
+		fileChooser.setDialogTitle("Select the "+((folder) ? "folder" : "file")+" for the "+title);
 		fileChooser.setMultiSelectionEnabled(false);
 		int retVal = fileChooser.showDialog(null, "Choose");
 		if(retVal == JFileChooser.APPROVE_OPTION) {	
 			String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-			outputFolderPathTextField.setText("..."+
-					filePath.substring(filePath.length()-15, filePath.length()));
-			outputFolderPathTextField.setToolTipText(filePath);
+			source.setText("..."+filePath.substring(filePath.length()-15, filePath.length()));
+			source.setToolTipText(filePath);
 		} else {
 			/*TODO*/
 		}
