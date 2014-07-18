@@ -2,11 +2,12 @@ package setting;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+
 import org.w3c.dom.Document;
 
 import common.PrintConsole;
 
-import java.io.File;
+import java.io.InputStream;
 
 class XMLParser
 {
@@ -14,14 +15,14 @@ class XMLParser
 	private static DocumentBuilder _documentBuilder;
 	
 	
-	private static final String CONFIGFILE = "src/setting/input/config.xml";
+	private static final String CONFIGFILE = "/setting/input/config.xml";
 	
 	public static Document Parser()
 	{
 			
 			try
 			{
-				File fXmlFile = new File(CONFIGFILE);
+				InputStream fXmlFile = XMLParser.class.getResourceAsStream(CONFIGFILE);
 				if(_documentBuilder == null)
 				{
 					

@@ -2,14 +2,14 @@
 
 
 	<Environment X="1000" Y="1000" />
-	<OutputFolder Path="src/output/" GenerateFileAsOutput="true" IntermidiateConsoleOutput="false" />
+	<OutputFolder Path="/output/" GenerateFileAsOutput="true" IntermidiateConsoleOutput="false" />
 	<!--
 	<Gateways Number="4" TypeOfGeneration="file" Address="src/setting/input/gateway.txt" />
 	-->
 	
 	
 	<!--<Traffic Generator="Random" />-->
-	<Traffic Generator="File" AddressUp="src/setting/input/trafficUp.txt" AddressDown="src/setting/input/trafficDown.txt"/> 
+	<Traffic Generator="File" AddressUp="/setting/input/trafficUp.txt" AddressDown="/setting/input/trafficDown.txt"/> 
 	
 	
 	<Gateways Radio="4" Number="4" TypeOfGeneration="StatiC">
@@ -48,7 +48,7 @@
  <!--
 	<Routers Radio="2" Number="170" TypeOfGeneration="Random" Seed="542154620485108"  MinDistance="50" SaftyTest="500" TransmissionRate="200"/> 
 		-->	
-	<Routers Radio="2"  TypeOfGeneration="File" Address="src/setting/input/routers.txt" MinDistance="50" TransmissionRate="200">
+	<Routers Radio="2"  TypeOfGeneration="File" Address="/setting/input/routers.txt" MinDistance="50" TransmissionRate="200">
 	</Routers>
 
 	<SINR Alpha="4" W="20" Power="25" Beta="8.51" Mue="0.000000001" />

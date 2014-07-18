@@ -1,11 +1,13 @@
 package trafficGenerator;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
+
 import common.FileGenerator;
 import common.PrintConsole;
 import dataStructure.DownlinkTraffic;
@@ -37,8 +39,8 @@ public class StaticTraffic
 		try
 		{
 		
-		
-			BufferedReader reader = new BufferedReader(new FileReader(ApplicationSettingFacade.Traffic.getAddressUp()));
+			InputStream in = StaticTraffic.class.getResourceAsStream(ApplicationSettingFacade.Traffic.getAddressUp());
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			while((var=reader.readLine())!=null)
 			{
 				tokens = var.split("[ ]");
@@ -119,7 +121,8 @@ public class StaticTraffic
 		try
 		{
 			TreeMap<Vertex, Float> grMap = new TreeMap<>();
-			BufferedReader reader = new BufferedReader(new FileReader(ApplicationSettingFacade.Traffic.getAddressDown()));
+			InputStream in = StaticTraffic.class.getResourceAsStream(ApplicationSettingFacade.Traffic.getAddressDown());
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			while((var=reader.readLine())!=null)
 			{
 				

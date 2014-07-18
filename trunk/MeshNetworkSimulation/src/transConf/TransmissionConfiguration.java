@@ -21,8 +21,7 @@ import dataStructure.TCUnit;
 import dataStructure.Triple;
 import dataStructure.Vertex;
 
-public class TransmissionConfiguration
-{
+public class TransmissionConfiguration {
 	Map<Integer, Vertex> nodes = ApplicationSettingFacade.Nodes.getNodes();
 	private Map<Vertex, Integer> MARK;
 	LinkType forceGatewayLinks = LinkType.Incoming;
@@ -31,8 +30,7 @@ public class TransmissionConfiguration
 	private int numberOfLinks = TrafficEstimatingFacade.getOptimalLinks().size(); 
 	private Map<Link, Boolean> ConsiderLinks;
 	
-	protected TransmissionConfiguration()
-	{
+	protected TransmissionConfiguration() {
 		InitiateVariable();
 	}
 		
@@ -186,7 +184,7 @@ public class TransmissionConfiguration
 	
 	/*----------------------------------------------------------------------------------------------------------*/
 	/*----------------------------------------------------------------------------------------------------------*/
-	
+
 	
 	/** Create a list of transmission configurations, as short as possible.
 	 * Based on 2 main steps :
@@ -717,10 +715,5 @@ public class TransmissionConfiguration
 		}
 		return false;
 	}
-	
-	
-
-	
-	
 	
 }
