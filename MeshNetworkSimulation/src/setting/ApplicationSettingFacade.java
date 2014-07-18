@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import setting.BaseConfiguration.TypeOfGenerationEnum;
-
 import dataStructure.IFactorMap;
 import dataStructure.Vertex;
 

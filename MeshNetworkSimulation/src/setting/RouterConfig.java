@@ -2,7 +2,8 @@ package setting;
 
 import java.awt.Point;
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -14,7 +15,6 @@ import org.w3c.dom.NodeList;
 
 import common.PrintConsole;
 import dataStructure.Vertex;
-
 import topology.BaseTopology;
 import topology.RandomTopology;
 import topology.StaticTopology;
@@ -211,7 +211,8 @@ class RouterConfig extends BaseConfiguration
 		{
 			int size = 0;
 			BufferedReader reader =  null;
-			reader =new BufferedReader(new FileReader(fileAddress));
+			InputStream in = getClass().getResourceAsStream(fileAddress);
+			reader =new BufferedReader(new InputStreamReader(in));
 			String var = "";
 			String[] Pos;
 			Vector<Point> staticRouters = new Vector<Point>();

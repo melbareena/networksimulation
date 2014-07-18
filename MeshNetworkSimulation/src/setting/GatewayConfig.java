@@ -10,7 +10,8 @@ import dataStructure.Vertex;
 
 import java.awt.Point;
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
@@ -143,7 +144,8 @@ class GatewayConfig extends BaseConfiguration
 		{
 			BufferedReader reader =  null;
 			int Id = 0;
-			reader =new BufferedReader(new FileReader(fileAddress));
+			InputStream in = getClass().getResourceAsStream(fileAddress);
+			reader =new BufferedReader(new InputStreamReader(in));
 			String var = "";
 			String[] Pos;
 			gatways = new TreeMap<>();
