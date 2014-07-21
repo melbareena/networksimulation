@@ -39,16 +39,22 @@ import javax.swing.DefaultComboBoxModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.AbstractListModel;
+
+import GraphicVisualization.editDialog.*;
 
 /**
  * @author Benjamin
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class StartOptionsDialog extends JDialog {
 
 	private static final long	serialVersionUID	= -8488459792255899186L;
+
+	public static final int MaxChannelNumber = 11;
 	
 	private final JPanel	contentPanel	= new JPanel();
 	private final JPanel chckbxPanel = new JPanel();
@@ -113,18 +119,26 @@ public class StartOptionsDialog extends JDialog {
 	private final JScrollPane channelScrollPane = new JScrollPane();
 	private final JLabel lblSelected = new JLabel("Selected");
 	private final JLabel lblStrategy = new JLabel("Strategy:");
-	private final JComboBox comboBox_1 = new JComboBox();
+	private final JComboBox channelStrategyComboBox = new JComboBox();
+	private final JLabel lbluseCtrlTo = new JLabel("(use Ctrl to select mutiples)");
+	
+	private GatewaysEditOptionDialog gatewaysDialog;
 
 	/**
 	 * Create the dialog.
 	 */
 	public StartOptionsDialog() {
+		gatewaysDialog = new GatewaysEditOptionDialog(this);
+		
+		
+		
 		SINRTextField.setEditable(false);
 		SINRTextField.setColumns(10);
 		dataratesTextField.setEditable(false);
 		dataratesTextField.setColumns(10);
 		routersTextField.setEditable(false);
 		routersTextField.setColumns(10);
+		gatewaysTextField.setText("Static: 4 gateways...");
 		gatewaysTextField.setEditable(false);
 		gatewaysTextField.setColumns(10);
 		downTrafficTextField.setText(".../trafficDown.txt");
@@ -168,6 +182,11 @@ public class StartOptionsDialog extends JDialog {
 		gatewaysPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 		
 		gatewaysPanel.add(gatewaysTextField, "cell 0 0,grow");
+		gatewaysButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gatewaysDialog.showDialog(true);
+			}
+		});
 		gatewaysPanel.add(gatewaysButton, "cell 1 0,alignx center,aligny center");
 		
 		contentPanel.add(lblOutput, "cell 0 1,alignx trailing,aligny center");
@@ -187,7 +206,7 @@ public class StartOptionsDialog extends JDialog {
 		outputPanel.add(outputFolderPathTextField, "cell 1 1,grow");
 		btnOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showFileChooser(outputFolderPathTextField, "output", true);
+				showFileChooser(outputFolderPathTextField, "output", true, 15);
 			}
 		});
 		btnOutput.setEnabled(false);
@@ -228,7 +247,7 @@ public class StartOptionsDialog extends JDialog {
 		trafficPanel.add(upTrafficTextField, "cell 1 1 3 1,growx");
 		btnUpTraffic.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				showFileChooser(upTrafficTextField, "uplink traffic", false);
+				showFileChooser(upTrafficTextField, "uplink traffic", false, 15);
 			}
 		});
 		
@@ -241,7 +260,7 @@ public class StartOptionsDialog extends JDialog {
 		trafficPanel.add(btnDownTraffic, "cell 4 2");
 		btnDownTraffic.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				showFileChooser(downTrafficTextField, "downlink traffic", false);
+				showFileChooser(downTrafficTextField, "downlink traffic", false, 15);
 			}
 		});
 		
@@ -349,6 +368,12 @@ public class StartOptionsDialog extends JDialog {
 		channelsPanel.setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
 		
 		channelsPanel.add(lblMode, "cell 0 0,alignx trailing");
+		channelModeComboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				channelList.setEnabled(channelModeComboBox.getSelectedIndex() != 0);
+				lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() != 0);
+			}
+		});
 		channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Partially"}));
 		channelModeComboBox.setSelectedIndex(0);
 		
@@ -361,13 +386,32 @@ public class StartOptionsDialog extends JDialog {
 		channelsPanel.add(lblChannels_1, "cell 0 1,growx");
 		
 		channelsPanel.add(channelScrollPane, "cell 1 1,grow");
+		channelList.setEnabled(false);
+		channelList.setModel(new AbstractListModel() {
+			public int getSize() {
+				return StartOptionsDialog.MaxChannelNumber;
+			}
+			public Object getElementAt(int index) {
+				return ((index < StartOptionsDialog.MaxChannelNumber) ? index+1 : null);
+			}
+		});
 		channelList.setVisibleRowCount(3);
 		channelScrollPane.setViewportView(channelList);
+		
+		lbluseCtrlTo.setVisible(false);
+		lbluseCtrlTo.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		lbluseCtrlTo.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		channelScrollPane.setColumnHeaderView(lbluseCtrlTo);
 		lblStrategy.setHorizontalAlignment(SwingConstants.TRAILING);
 		
 		channelsPanel.add(lblStrategy, "cell 0 2,growx");
+		channelStrategyComboBox.setModel(new DefaultComboBoxModel(
+				new String[] {"All Balancing", "Orthogonal Balancing", "Non Orthogonal Blancing", "Original",
+						"Select Min Randomly", "SINR"}));
+		channelStrategyComboBox.setSelectedIndex(3);
 		
-		channelsPanel.add(comboBox_1, "cell 1 2,grow");
+		channelsPanel.add(channelStrategyComboBox, "cell 1 2,grow");
 
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -410,10 +454,11 @@ public class StartOptionsDialog extends JDialog {
 		});
 		
 		pack();
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 	}
 	
-	private void showFileChooser(JTextField source, String title, boolean folder) {
+	public static void showFileChooser(JTextField source, String title, boolean folder, int textSize) {
 		final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 		fileChooser.setFileSelectionMode(((folder) ? JFileChooser.DIRECTORIES_ONLY :JFileChooser.FILES_ONLY));
 		fileChooser.setDialogTitle("Select the "+((folder) ? "folder" : "file")+" for the "+title);
@@ -421,12 +466,25 @@ public class StartOptionsDialog extends JDialog {
 		int retVal = fileChooser.showDialog(null, "Choose");
 		if(retVal == JFileChooser.APPROVE_OPTION) {	
 			String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-			source.setText("..."+filePath.substring(filePath.length()-15, filePath.length()));
+			source.setText("..."+filePath.substring(filePath.length()-textSize, filePath.length()));
 			source.setToolTipText(filePath);
 		} else {
 			/*TODO*/
 		}
 		
+	}
+	
+	public void updateOnOptionDialogCompleted(String identifier) {
+		switch(identifier) {
+		case "gateways" :
+			if(gatewaysDialog.getResults().containsKey("nbOfGateways")) {
+				gatewaysTextField.setText("Static: "+gatewaysDialog.getResults().get("nbOfGateways")+" gateways...");
+			} else {
+				String filePath = (String) gatewaysDialog.getResults().get("file");
+				gatewaysTextField.setText("File: ..."+filePath.substring(filePath.length()-20, filePath.length()));
+			}
+			break;
+		}
 	}
 
 }
