@@ -15,6 +15,7 @@ import dataStructure.Vertex;
  * @author Mahdi Negahi
  *
  */
+@SuppressWarnings("null")
 public class ApplicationSettingFacade
 {
 	private static EnvironmentConfig _eConf = EnvironmentConfig.Initiating();

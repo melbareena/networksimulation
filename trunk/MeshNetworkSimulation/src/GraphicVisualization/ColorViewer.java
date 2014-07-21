@@ -16,6 +16,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 
+/**
+ * @author Benjamin
+ *
+ */
 public class ColorViewer extends JDialog {
 
 	private static final long serialVersionUID = 1670390005809658314L;

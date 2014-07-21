@@ -70,6 +70,10 @@ import dataStructure.Path;
 import dataStructure.TCUnit;
 import dataStructure.Vertex;
  
+/**
+ * @author Benjamin
+ *
+ */
 public class GraphViewer extends JFrame {
  
 	/** serialVersionUID */
@@ -1052,8 +1056,10 @@ public class GraphViewer extends JFrame {
 		}
 	}	
 	
-	/** Save the graphComponent as an Image.
-	 * Show a save dialog, and handle the user request. 
+	/** Save the <code>component</code> as an Image : JPEG, PNG or BMP.
+	 * Show a save dialog, and handle the user request.
+	 * @param component the component to save
+	 * @param title the title for the save window (Save the ... as)
 	 */
 	public static void saveImage(Component component, String title) {
 		BufferedImage im = new BufferedImage(component.getWidth(), component.getHeight(),

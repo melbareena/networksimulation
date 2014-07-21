@@ -30,6 +30,7 @@ import topology.StaticTopology;
  * @author Mahdi Negahi
  *
  */
+@SuppressWarnings("null")
 class RouterConfig extends BaseConfiguration
 {
 	private BaseTopology topologyBuilder;
