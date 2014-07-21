@@ -134,6 +134,7 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 		    }
 			
 		});
+		/*TODO ajouter listener pour desactiver le bouton remove*/
 		
 		scrollPane.setViewportView(table);
 		
