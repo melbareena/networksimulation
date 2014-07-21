@@ -39,6 +39,8 @@ import javax.swing.DefaultComboBoxModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
 
 /**
  * @author Benjamin
@@ -105,6 +107,12 @@ public class StartOptionsDialog extends JDialog {
 	private final JTextField SINRTextField = new JTextField();
 	private final JPanel channelsPanel = new JPanel();
 	private final JLabel lblMode = new JLabel("Mode:");
+	private final JComboBox channelModeComboBox = new JComboBox();
+	private final JList channelList = new JList();
+	private final JLabel lblChannels_1 = new JLabel("Channels:");
+	private final JScrollPane channelScrollPane = new JScrollPane();
+	private final JLabel lblSelected = new JLabel("Selected");
+	private final JLabel lblStrategy = new JLabel("Strategy:");
 	private final JComboBox comboBox_1 = new JComboBox();
 
 	/**
@@ -338,13 +346,28 @@ public class StartOptionsDialog extends JDialog {
 		contentPanel.add(lblChannels, "cell 2 5,growx,aligny center");
 		
 		contentPanel.add(channelsPanel, "cell 3 5,grow");
-		channelsPanel.setLayout(new MigLayout("", "[][grow]", "[]"));
+		channelsPanel.setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
 		
 		channelsPanel.add(lblMode, "cell 0 0,alignx trailing");
-		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Partially"}));
-		comboBox_1.setSelectedIndex(0);
+		channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Partially"}));
+		channelModeComboBox.setSelectedIndex(0);
 		
-		channelsPanel.add(comboBox_1, "cell 1 0,grow");
+		channelsPanel.add(channelModeComboBox, "cell 1 0,grow");
+		lblSelected.setHorizontalAlignment(SwingConstants.TRAILING);
+		
+		channelsPanel.add(lblSelected, "flowy,cell 0 1,growx");
+		lblChannels_1.setHorizontalAlignment(SwingConstants.TRAILING);
+		
+		channelsPanel.add(lblChannels_1, "cell 0 1,growx");
+		
+		channelsPanel.add(channelScrollPane, "cell 1 1,grow");
+		channelList.setVisibleRowCount(3);
+		channelScrollPane.setViewportView(channelList);
+		lblStrategy.setHorizontalAlignment(SwingConstants.TRAILING);
+		
+		channelsPanel.add(lblStrategy, "cell 0 2,growx");
+		
+		channelsPanel.add(comboBox_1, "cell 1 2,grow");
 
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
