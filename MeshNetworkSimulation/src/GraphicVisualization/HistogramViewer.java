@@ -30,8 +30,11 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 
-public class HistogramViewer extends JFrame
-{
+/**
+ * @author Benjamin
+ *
+ */
+public class HistogramViewer extends JFrame {
 
 	private static final long	serialVersionUID	= 14167619475087338L;
 	
