@@ -47,10 +47,12 @@ class DownlinkEstimating
 	{
 		DownlinkPaths = TopologyGraphFacade.downlinkShortestPath(gtd);
 
-		Map<Vertex, TreeMap<Vertex, Float>> staticTraffic = StaticTraffic.getDownlinkTraffic().getDownLinkTraffic();
+		//Map<Vertex, TreeMap<Vertex, Float>> staticTraffic = StaticTraffic.getDownlinkTraffic().getTraffic();
 		
 		OptimizeDownlinkPaths();
 	
+		Map<Vertex, TreeMap<Vertex, Float>> staticTraffic = StaticTraffic.getDownlinkTraffic(DownlinkPaths).getTraffic();
+		
 		for (Entry<Vertex, List<Path>> dlPaths : DownlinkPaths.entrySet())
 		{
 			for (Path path : dlPaths.getValue())

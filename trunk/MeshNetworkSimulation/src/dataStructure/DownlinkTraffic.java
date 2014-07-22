@@ -14,15 +14,15 @@ public final class DownlinkTraffic
 		downLinkTraffic.put(gateway, value);;
 	}
 	
-	public  Map<Vertex, TreeMap<Vertex, Float>> getDownLinkTraffic()
+	public  Map<Vertex, TreeMap<Vertex, Float>> getTraffic()
 	{
 		return downLinkTraffic;
 	}
-	public  Float getDownLinkTraffic(Vertex g, Vertex v)
+	public  Float getTraffic(Vertex g, Vertex v)
 	{
 		return downLinkTraffic.get(g).get(v);
 	}
-	public boolean hasDownLinkTraffic(Vertex v)
+	public boolean hasTraffic(Vertex v)
 	{
 		return downLinkTraffic.containsKey(v);
 	}

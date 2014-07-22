@@ -66,10 +66,12 @@ public class TrafficEstimatingFacade
 	{
 		
 		BufferMap bfMap = new BufferMap();
-		UplinkTraffic uplinkTraffic = trafficGenerator.StaticTraffic.getUplinkTraffic();
-		DownlinkTraffic downlinkTraffic = trafficGenerator.StaticTraffic.getDownlinkTraffic();
+		
+		
 		PathMap uplinks = getOptimalUplinkPath();
+		UplinkTraffic uplinkTraffic = trafficGenerator.StaticTraffic.getUplinkTraffic(uplinks);
 		PathMap downlinkPaths = getDownlinkPath();
+		DownlinkTraffic downlinkTraffic = trafficGenerator.StaticTraffic.getDownlinkTraffic(downlinkPaths);
 		for (Entry<Integer, Vertex> vertexList : ApplicationSettingFacade.Nodes.getNodes().entrySet())
 		{
 			
@@ -86,11 +88,11 @@ public class TrafficEstimatingFacade
 				}
 			}
 			
-			if(downlinkTraffic.hasDownLinkTraffic(v))
+			if(downlinkTraffic.hasTraffic(v))
 			{
 				for (Path p : downlinkPaths.get(v))
 				{
-					float downTraffic = downlinkTraffic.getDownLinkTraffic(p.getSource(), p.getDestination());
+					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
 					Packet newPacket = new Packet(p, downTraffic);
 					bfMap.put( p.getEdgePath().getFirst(), newPacket);
 				}

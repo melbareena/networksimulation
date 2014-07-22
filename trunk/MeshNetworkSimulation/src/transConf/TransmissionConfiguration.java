@@ -1,5 +1,4 @@
 package transConf;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,12 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
-
 import common.FileGenerator;
-
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
@@ -24,7 +20,7 @@ import dataStructure.Vertex;
 public class TransmissionConfiguration {
 	Map<Integer, Vertex> nodes = ApplicationSettingFacade.Nodes.getNodes();
 	private Map<Vertex, Integer> MARK;
-	LinkType forceGatewayLinks = LinkType.Incoming;
+	LinkType forceGatewayLinks = LinkType.Outgoing;
 	private LinkTrafficMap LinksTraffic = TrafficEstimatingFacade.getLinksTraffic();
 	private final float BETA = ApplicationSettingFacade.SINR.getBeta();
 	private int numberOfLinks = TrafficEstimatingFacade.getOptimalLinks().size(); 
@@ -57,12 +53,7 @@ public class TransmissionConfiguration {
 						setMark(l.getDestination());
 						setMark(l.getSource());
 						tConfUnit.put(l, setting.ApplicationSettingFacade.DataRate.getMax());
-						
-						Vertex isGatway = isEndpointsGateway(l);
-						
-						if(isGatway != null)
-							tConfUnit.addLinktoGatway(isGatway, l);
-						
+								
 						ConsiderLinks.put(l,true);
 					}
 					else 
@@ -82,23 +73,59 @@ public class TransmissionConfiguration {
 				
 				for(Vertex g : ApplicationSettingFacade.Gateway.getGateway().values())
 				{
-					if(tConfUnit.getCounter_g(g) == 0)
+					if(tConfUnit.getCounter_g(g, LinkType.Incoming) == 0)				
+						tConfUnit = addIncomingLinks(tConfUnit, g);
+					
+					if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0)
+						tConfUnit = addOutgoingLinks(tConfUnit, g);
+					
+					/*if(tConfUnit.getCounter_g(g) == 0)
 					{
-						tConfUnit = addGatewayLinks(tConfUnit, g);
-					}
-					System.out.println(tConfUnit.getCounter_g(g));
-					if(tConfUnit.getCounter_g(g) == 0)
-					{
-						tConfUnit = exchangeLinks(tConfUnit, g);
-					}
-					System.out.println(tConfUnit.getCounter_g(g));
-				} 
-			}	
+						ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
+						Triple<Link, Link, Double> triple; //add, remove, sinr					
+						for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,forceGatewayLinks))
+						{
+							for(Link lprime : tConfUnit.getLinks())
+							{
+								//if(isEndpointsGateway(lprime) != null) continue;  
+								List<Link> links = tConfUnit.getLinks();
+								links.remove(lprime);
+								links.add(link);
+								double sinr = SINR.calc(lprime, links);
+										
+								if(sinr > BETA)
+								{
+									triple = new Triple<>(link, lprime, sinr);
+									tripleLists.add(triple);
+								}
+							}
+						}
+						if(tripleLists.size() > 0)
+						{
+							double maxSINR = 0;
+							Triple<Link, Link, Double> maxTriple = null;
+							for (Triple<Link,Link, Double> currentTriple : tripleLists)
+							{
+								if(maxSINR <= currentTriple.getC())
+								{
+									maxSINR = currentTriple.getC();
+									maxTriple = currentTriple;
+								}
+							}
+							tConfUnit.removeLink(maxTriple.getB());
+							ConsiderLinks.remove(maxTriple.getB());
+							tConfUnit.put(maxTriple.getA(), computeRate(maxSINR).getRate());
+							System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+							tripleLists.clear();
+						}
+				}*/
+			} 
+		}	
 		
 			
 			//*******************************************SETP 3****************************************************
-			//tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.
-			//tConfUnit = Enlarge(tConfUnit);			
+			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.
+			tConfUnit = Enlarge(tConfUnit);			
 			//*******************************************SETP 4****************************************************
 			tConfUnit = calcDataRate(tConfUnit);	
 			//*****************************************************************************************************		
@@ -110,6 +137,35 @@ public class TransmissionConfiguration {
 		FileGenerator.TransmissionConfige(TT);
 		FileGenerator.DataRate(TT);
 		return TT;
+	}
+
+	private TCUnit addIncomingLinks(TCUnit tConfUnit, Vertex g)
+	{
+		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Incoming))
+		{							
+			TCUnit modifiedTC = checkAdd(link, tConfUnit.Clone());
+			if(modifiedTC != null)
+			{
+				tConfUnit = modifiedTC;
+				break; // next g;
+			}
+				
+		}
+		return tConfUnit;
+	}
+	private TCUnit addOutgoingLinks(TCUnit tConfUnit, Vertex g)
+	{
+		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing))
+		{							
+			TCUnit modifiedTC = checkAdd(link, tConfUnit.Clone());
+			if(modifiedTC != null)
+			{
+				tConfUnit = modifiedTC;
+				break; // next g;
+			}
+				
+		}
+		return tConfUnit;
 	}
 	
 	private TCUnit addGatewayLinks(TCUnit tConfUnit, Vertex g)
@@ -167,9 +223,6 @@ public class TransmissionConfiguration {
 					tConfUnit.removeLink(maxTriple.getB());
 					ConsiderLinks.remove(maxTriple.getB());
 					tConfUnit.put(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
-					Vertex isGatway = isEndpointsGateway(maxTriple.getA());
-					if(isGatway != null)
-						tConfUnit.addLinktoGatway(g, maxTriple.getA());
 											
 					System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
 					
@@ -207,7 +260,8 @@ public class TransmissionConfiguration {
 	 * @return the list of transmission configurations created
 	 */
 	protected List<TCUnit> ConfiguringBenjamin(int downOverUpRatio, boolean alternateOrder,
-			boolean repeatLinksToRespectRatio, boolean enlargeByGateways) {
+			boolean repeatLinksToRespectRatio, boolean enlargeByGateways) 
+	{
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
 		
 		List<Vertex> gateways = new ArrayList<Vertex>(ApplicationSettingFacade.Gateway.getGateway().values());
@@ -222,6 +276,8 @@ public class TransmissionConfiguration {
 		List<TCUnit> finalList = remainingLinksStep(patterns, selectedLinksSet, enlargeByGateways,
 				gateways, downOverUpRatio);
 		
+		FileGenerator.TransmissionConfige(finalList);
+		FileGenerator.DataRate(finalList);
 		return finalList;
 	}
 
@@ -526,16 +582,8 @@ public class TransmissionConfiguration {
 			setMark(newLink.getDestination());
 			setMark(newLink.getSource());
 			//this.tConfUnit.put(newLink, newConfUnit.getRate(newLink));
-			tPrime.setGatewayLink(tConfig.getGatewayLink());
-			Vertex isGatway = isEndpointsGateway(newLink);
-			if(isGatway != null)
-				tPrime.addLinktoGatway(isGatway, newLink);
 			return tPrime;
-		} else if (add && (tPrime.getTCAP() <= tConfig.getTCAP())) {
-			//System.out.println("\tTCAP too low");
-		}
-		
-		
+		} 	
 		return null;
 	}
 	
@@ -645,7 +693,7 @@ public class TransmissionConfiguration {
 		return tConfUnit;
 	}
 
-	private Vertex isEndpointsGateway(Link l)
+	private Vertex isEndpointsGateway2(Link l)
 	{
 		
 		if(forceGatewayLinks == LinkType.Outgoing && ApplicationSettingFacade.Gateway.isGateway(l.getSource()))

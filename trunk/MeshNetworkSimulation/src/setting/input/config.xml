@@ -52,14 +52,14 @@
 	</Routers>
 
 	<SINR Alpha="4" W="20" Power="25" Beta="8.51" Mue="0.000000001" />
-	<!--	
-	<Channels Mode="Partially">
+		
+	<!--<Channels Mode="Partially">
 		<Add Value="1" />
-		<Add Value="2" />
-		<Add Value="4" />
-	</Channels>
+    <Add Value="6" />
+   <Add Value="11" />
+  </Channels>-->
 	
-	-->
+	
 		<Channels Mode="All" />
 		<ChannelAssignment Strategy="OriginalSterategy" />
 

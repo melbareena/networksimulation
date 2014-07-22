@@ -3,13 +3,14 @@ package cAssignment;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import dataStructure.Channel;
 
 /**
  * 
  * @author Mahdi
- * this orginal of this algorithm is belong to Aravind and Professor.
+ * this orginal of this algorithm is based on the Aravind's algorithm.
  */
 public class OriginalSterategy extends AssigningSterategy
 {
@@ -28,9 +29,10 @@ public class OriginalSterategy extends AssigningSterategy
 	protected Channel getMinAffectance(Map<Channel, Double> channelAffectSet)
 	{
 		
-		
 		double affectanceValue = Collections.max(channelAffectSet.values());
 		Channel min = null;
+		
+	
 		for (Entry<Channel, Double> channelAff : channelAffectSet.entrySet())
 		{
 			if(channelAff.getValue() >= 0 && affectanceValue > channelAff.getValue())
@@ -38,6 +40,13 @@ public class OriginalSterategy extends AssigningSterategy
 				affectanceValue  = channelAff.getValue();
 				min = channelAff.getKey();
 			}
+		}
+		if(min == null)
+		{
+			Channel[] c = new Channel[channelAffectSet.size()];
+			c = channelAffectSet.keySet().toArray(c);
+			Random rand = new Random();
+			return c[rand.nextInt(channelAffectSet.size())];
 		}
 		return min;
 	}

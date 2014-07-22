@@ -18,38 +18,6 @@ public class TCUnit
 {	
 	private Map<Link, Integer> collection = new HashMap<Link, Integer>();
 	
-	//private int counter_g = 0;
-	
-	private Map<Vertex, List<Link>> gatewayLinks = new HashMap<>();
-	public Map<Vertex, List<Link>> getGatewayLink()
-	{
-		return gatewayLinks;
-	}
-	public void setGatewayLink( Map<Vertex, List<Link>> val)
-	{
-		gatewayLinks = val;
-	}
-	
-	public void addLinktoGatway(Vertex g , Link l)
-	{
-		if(l.getDestination() == g || l.getSource() == g)
-		{
-			if(!gatewayLinks.containsKey(g))
-			{
-				ArrayList<Link> links = new ArrayList<>();
-				links.add(l);
-				gatewayLinks.put(g, links );
-			}
-			else
-			{
-				List<Link> links =  gatewayLinks.get(g);
-				links.add(l);
-				gatewayLinks.put(g, links);
-				
-			}
-		}
-	}
-	
 	private Map<Link,Double> linkWeight = new HashMap<Link, Double>();
 	
 	public Map<Link,Double> getLinkWeight()
@@ -127,11 +95,29 @@ public class TCUnit
 		
 		return is;
 	}
-	public int getCounter_g(Vertex g)
+	
+	
+	public int getCounter_g(Vertex g , LinkType ty)
 	{
-		if(!gatewayLinks.containsKey(g))
-			return 0;
-		return gatewayLinks.get(g).size();
+		int counter = 0; 
+		if(ty == LinkType.Incoming)
+		{
+			for (Link l : collection.keySet())
+			{
+				if(l.getDestination() == g)
+					counter++;
+			}
+		}
+		else if(ty == LinkType.Outgoing)
+		{
+			for (Link l : collection.keySet())
+			{
+				if(l.getSource() == g)
+					counter++;
+			}
+		}
+		return counter;
+		
 	}
 	public void put(Link l, int rate)
 	{
@@ -207,7 +193,6 @@ public class TCUnit
 		{
 			copy.put(currentLink.getKey(), currentLink.getValue());
 		}	
-		copy.setGatewayLink(this.getGatewayLink());
 		return copy;
 	}
 	public void setTCAPZero()

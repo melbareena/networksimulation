@@ -136,12 +136,8 @@ public  class AssigningSterategy
 		
 		
 		
-		int linkid = currentLink.getId();
+		
 		double distance = getDistance(currentLink);
-		if(linkid == 2 || linkid == 159 )
-		{
-			System.out.println("Hello");
-		}
 		Map<Channel,Double> channelAffectSet = new TreeMap<Channel, Double>();
 		double affect = 0;
 		for(Channel chan : availableChannels)
