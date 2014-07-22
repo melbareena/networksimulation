@@ -14,7 +14,7 @@
 	
 	<Gateways Radio="4" Number="4" TypeOfGeneration="StatiC">
 		<Add x="100" y="100" />
-		<Add x="500" y="100" />
+		<Add x="500" y="100" />"C:/Users/Benjamin/Desktop/test.xml"
 		<Add x="100" y="500" />
 		<Add x="500" y="500" />
 	</Gateways>

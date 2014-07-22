@@ -1,18 +1,16 @@
 package setting;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 
 import common.PrintConsole;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-class XMLParser
+public class XMLParser
 {
 
 	private static DocumentBuilder _documentBuilder;
@@ -22,7 +20,7 @@ class XMLParser
 	public static String CONFIGFILE;
 	
 	public static Document Parser() {
-		String path = (CONFIGFILE == null) ? DEFAULTCONFIGFILE : CONFIGFILE;
+		String path = (XMLParser.CONFIGFILE == null) ? DEFAULTCONFIGFILE : CONFIGFILE;
 		return Parser(path);
 	}
 	

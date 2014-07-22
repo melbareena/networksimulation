@@ -4,47 +4,53 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
 
+import javax.swing.AbstractListModel;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import launcher.Program;
 import net.miginfocom.swing.MigLayout;
+import setting.XMLParser;
+import setting.XMLWriter;
 import transConf.TCFacade;
-
-import javax.swing.JTextField;
-
-import java.awt.Font;
-
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.AbstractListModel;
-
-import GraphicVisualization.editDialog.*;
+import GraphicVisualization.editDialog.DatarateEditOptionDialog;
+import GraphicVisualization.editDialog.GatewaysEditOptionDialog;
+import GraphicVisualization.editDialog.IFactorEditOptionDialog;
+import GraphicVisualization.editDialog.RoutersEditOptionDialog;
+import GraphicVisualization.editDialog.SINREditOptionDialog;
 
 /**
  * @author Benjamin
@@ -66,8 +72,8 @@ public class StartOptionsDialog extends JDialog {
 	private final JLabel lblAlgorithm = new JLabel("Algorithm:");
 	private final JLabel lblEnvironment = new JLabel("Environment:");
 	private final JPanel environmentPanel = new JPanel();
-	private final JSpinner spinner = new JSpinner();
-	private final JSpinner spinner_1 = new JSpinner();
+	private final JSpinner envXSpinner = new JSpinner();
+	private final JSpinner envYSpinner = new JSpinner();
 	private final JLabel lblX = new JLabel(" X: ");
 	private final JLabel lblY = new JLabel(" Y: ");
 	private final JLabel lblNewLabel = new JLabel("Other parameters:");
@@ -82,7 +88,7 @@ public class StartOptionsDialog extends JDialog {
 	private final JLabel lblTraffic = new JLabel("Traffic:");
 	private final JPanel trafficPanel = new JPanel();
 	private final JLabel lblGenerator = new JLabel("Generator:");
-	private final JComboBox comboBox = new JComboBox();
+	private final JComboBox trafficComboBox = new JComboBox();
 	private final JTextField upTrafficTextField = new JTextField();
 	private final JButton btnUpTraffic = new JButton("...");
 	private final JLabel lblU = new JLabel("U:");
@@ -127,6 +133,8 @@ public class StartOptionsDialog extends JDialog {
 	private IFactorEditOptionDialog ifactorDialog;
 	private DatarateEditOptionDialog datarateDialog;
 	private SINREditOptionDialog sinrDialog;
+	
+	private String configFile;
 
 	/**
 	 * Create the dialog.
@@ -177,11 +185,11 @@ public class StartOptionsDialog extends JDialog {
 		environmentPanel.setLayout(new MigLayout("insets 0 0 0 0", "[min!][150px]", "[25px][25px]"));
 		environmentPanel.add(lblX);
 		
-		spinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
-		environmentPanel.add(spinner, "wrap,grow");
+		envXSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
+		environmentPanel.add(envXSpinner, "wrap,grow");
 		environmentPanel.add(lblY);
-		spinner_1.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
-		environmentPanel.add(spinner_1, "grow");
+		envYSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
+		environmentPanel.add(envYSpinner, "grow");
 		lblGateways.setHorizontalAlignment(SwingConstants.TRAILING);
 		
 		contentPanel.add(lblGateways, "cell 2 0,grow");
@@ -241,18 +249,18 @@ public class StartOptionsDialog extends JDialog {
 		trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[][grow][min!][grow][min!]", "[grow][grow][grow][][grow]"));
 		
 		trafficPanel.add(lblGenerator, "cell 0 0 2 1,grow");
-		comboBox.addItemListener(new ItemListener() {
+		trafficComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				boolean select = ((String)comboBox.getSelectedItem()).equals("File");
+				boolean select = ((String)trafficComboBox.getSelectedItem()).equals("File");
 				btnDownTraffic.setEnabled(select);
 				btnUpTraffic.setEnabled(select);
 				lblSetDefaults.setEnabled(select);
 			}
 		});
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"File", "Random"}));
-		comboBox.setSelectedIndex(0);
+		trafficComboBox.setModel(new DefaultComboBoxModel(new String[] {"File", "Random"}));
+		trafficComboBox.setSelectedIndex(0);
 		
-		trafficPanel.add(comboBox, "cell 3 0 3 1,grow");
+		trafficPanel.add(trafficComboBox, "cell 3 0 3 1,grow");
 		
 		trafficPanel.add(lblU, "cell 0 1,alignx trailing");
 		
@@ -440,9 +448,10 @@ public class StartOptionsDialog extends JDialog {
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
-
-		JButton okButton = new JButton("OK");
-		okButton.addActionListener(new ActionListener() {
+		
+		JButton defaultButton = new JButton("Use Default and Run");
+		defaultButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Properties24.gif")));
+		defaultButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
@@ -451,14 +460,61 @@ public class StartOptionsDialog extends JDialog {
 				TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 				/* Write config_auto.xml */
+				configFile = "/setting/input/config.xml";
 				dispose();
+				XMLParser.CONFIGFILE = configFile;
 				Program.launch();
 			}
 		});
-		buttonPane.add(okButton);
-		getRootPane().setDefaultButton(okButton);
+		buttonPane.add(defaultButton);
+		
+		JButton loadConfigButton = new JButton("Load and Run");
+		loadConfigButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
+		loadConfigButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
+				TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
+				TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
+				TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
+				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+				/* Write config_auto.xml */
+				JTextField blank = new JTextField();
+				showFileChooser(blank, "configuration to load", false, 10);
+				configFile = blank.getToolTipText();
+				if(configFile != null) {
+					XMLParser.CONFIGFILE = configFile;
+					Program.launch();
+					dispose();
+				}
+			}
+		});
+		buttonPane.add(loadConfigButton);
 
-		JButton cancelButton = new JButton("Cancel");
+		JButton saveAndRunButton = new JButton("Save and Run");
+		saveAndRunButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play24.gif")));
+		saveAndRunButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
+				TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
+				TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
+				TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
+				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+				/* Write config_auto.xml */
+				writeConfiguration();
+				if(configFile != null) {
+					XMLParser.CONFIGFILE = configFile;
+					dispose();
+					Program.launch();
+				}
+			}
+		});
+		buttonPane.add(saveAndRunButton);
+		getRootPane().setDefaultButton(saveAndRunButton);
+
+		JButton cancelButton = new JButton("Exit");
+		cancelButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop24.gif")));
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -540,6 +596,145 @@ public class StartOptionsDialog extends JDialog {
 			System.out.println(sinrDialog.getResults());
 			break;
 		}
+	}
+	
+	private void writeConfiguration() {
+		XMLWriter.Initialize();
+		
+		String channelAssignment = "";
+		switch(channelStrategyComboBox.getSelectedItem().toString()) {
+		case "All Balancing" :
+			channelAssignment = "AllBalancingSterategy";
+			break;
+		case "Orthogonal Balancing" :
+			channelAssignment = "OrthogonalBalancingSterategy";
+			break;
+		case "Non Orthogonal Blancing" :
+			channelAssignment = "NonOrthogonalBalancingSterategy";
+			break;
+		case "Original" :
+			channelAssignment = "OriginalSterategy";
+			break;
+		case "Select Min Randomly" :
+			channelAssignment = "SelectMinRandomlySterategy";
+			break;
+		case "SINR" :
+			channelAssignment = "SINRSterategy";
+			break;
+		}
+		XMLWriter.writeChannelAssignment(channelAssignment);
+		
+		HashSet<Integer> channelSet = new HashSet<Integer>();
+		for(int i : channelList.getSelectedIndices()) {
+			channelSet.add(i+1);
+		}
+		XMLWriter.writeChannels(((channelModeComboBox.getSelectedIndex() == 0) ? "All" : "Partially"),
+				channelSet);
+		
+		XMLWriter.writeDatarates((HashMap<Double, Integer>) datarateDialog.getResults().get("datarate"));
+		
+		XMLWriter.writeEnvironment((int) envXSpinner.getValue(), (int) envYSpinner.getValue());
+		
+		HashMap<String, Object> gatewaysResult = gatewaysDialog.getResults();
+		String gatewayGenerator = gatewaysResult.get("generation").toString();
+		if(gatewayGenerator == "File") {
+			XMLWriter.writeGateways((int)gatewaysResult.get("radio"), 0,
+					gatewayGenerator, gatewaysResult.get("file").toString(), null);
+		} else {
+			XMLWriter.writeGateways((int) gatewaysResult.get("radio"), (int) gatewaysResult.get("nbOfGateways"),
+					gatewayGenerator, "", (int[][]) gatewaysResult.get("gateways"));
+		}
+		
+		XMLWriter.writeIFactor((double[]) ifactorDialog.getResults().get("ifactor"));
+		
+		XMLWriter.writeOutputFolder(outputFolderPathTextField.getToolTipText()+"", chckbxGenerateFiles.isSelected());
+		
+		HashMap<String, Object> routersResult = routersDialog.getResults();
+		String routersGenerator = routersResult.get("generation").toString();
+		if(routersGenerator == "File") {
+			XMLWriter.writeRouters((int) routersResult.get("radio"), routersGenerator,
+					(int) routersResult.get("minDistance"), (int) routersResult.get("transmissionRate"),
+					routersResult.get("file").toString(), null, 0, 0, 0);
+		} else if(routersGenerator == "Static") {
+			XMLWriter.writeRouters((int) routersResult.get("radio"), routersGenerator,
+					(int) routersResult.get("minDistance"), (int) routersResult.get("transmissionRate"),
+					"", (int[][]) routersResult.get("routers"), (int) routersResult.get("nbOfRouters"), 0, 0);
+		} else if(routersGenerator == "Random") {
+			XMLWriter.writeRouters((int) routersResult.get("radio"), routersGenerator,
+					(int) routersResult.get("minDistance"), (int) routersResult.get("transmissionRate"),
+					"", null, (int) routersResult.get("nbOfRouters"), (int) routersResult.get("safetyTest"),
+					(long) routersResult.get("seed"));
+		}
+		
+		HashMap<String, Object> sinrResult = sinrDialog.getResults();
+		XMLWriter.writeSINR((int) sinrResult.get("alpha"), (int) sinrResult.get("w"),
+				(int) sinrResult.get("power"), (double) sinrResult.get("beta"),
+				(double) sinrResult.get("mu"));
+		
+		XMLWriter.writeTraffic(trafficComboBox.getSelectedItem().toString(),
+				upTrafficTextField.getToolTipText()+"",
+				downTrafficTextField.getToolTipText()+"");
+
+		File f = saveConfiguration();
+		if(f != null) {
+			configFile = f.getAbsolutePath();
+			XMLWriter.write(f);
+		}
+	}
+	
+	public static File saveConfiguration() {
+		try {
+			final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir")){
+				private static final long serialVersionUID = 5313190094648329448L;
+				@Override
+			    public void approveSelection(){
+			        File f = getSelectedFile();
+			        if(f.exists() && getDialogType() == SAVE_DIALOG){
+			            int result = JOptionPane.showConfirmDialog(this,
+			            		"The file "+f.getName()+" already exists.\n\n"
+			            				+ "Do you want to overwrite it?",
+			            		"Existing file",
+			            		JOptionPane.YES_NO_CANCEL_OPTION);
+			            switch(result){
+			                case JOptionPane.YES_OPTION:
+			                    super.approveSelection();
+			                    return;
+			                case JOptionPane.NO_OPTION:
+			                    return;
+			                case JOptionPane.CLOSED_OPTION:
+			                    return;
+			                case JOptionPane.CANCEL_OPTION:
+			                    cancelSelection();
+			                    return;
+			            }
+			        }
+			        super.approveSelection();
+			    }
+			};
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fileChooser.setDialogTitle("Save the configuration file as...");
+			fileChooser.setMultiSelectionEnabled(false);
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filterXML = new FileNameExtensionFilter(
+			        "XML Document", "xml");
+			fileChooser.addChoosableFileFilter(filterXML);
+			fileChooser.setFileFilter(filterXML);
+			int returnVal = fileChooser.showSaveDialog(null);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File selectedFile = fileChooser.getSelectedFile();
+				File file = null;
+				if(!selectedFile.getAbsolutePath().toLowerCase().endsWith(".xml") &&
+						!selectedFile.getAbsolutePath().toLowerCase().endsWith(".xml")) {
+					file = new File(selectedFile.getAbsolutePath()+".xml");
+				} else {
+					file = selectedFile;
+				}
+				return file;
+			}
+		} catch (Exception e) {
+			GraphViewer.showErrorDialog(e.getMessage());
+		}
+		return null;
 	}
 
 }
