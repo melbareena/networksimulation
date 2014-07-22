@@ -69,7 +69,7 @@ public class StartOptionsDialog extends JDialog {
 	private final JCheckBox chckbxRepeatLinksTo = new JCheckBox("Repeat links to ensure ratio");
 	private final JCheckBox chckbxEnlargeByGateways = new JCheckBox("Enlarge by gateways");
 	private final JRadioButton rdbtnNewAlgorithm = new JRadioButton("New algorithm");
-	private final JLabel lblAlgorithm = new JLabel("Algorithm:");
+	private final JLabel lblAlgorithm = new JLabel("TC Algorithms:");
 	private final JLabel lblEnvironment = new JLabel("Environment:");
 	private final JPanel environmentPanel = new JPanel();
 	private final JSpinner envXSpinner = new JSpinner();
