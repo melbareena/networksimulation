@@ -43,7 +43,7 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 	
 	protected ArrayList<Object> options;
 
-	public AbstractEditOptionDialog(StartOptionsDialog parent, String title) {
+	public AbstractEditOptionDialog(final StartOptionsDialog parent, String title) {
 		super(parent, title, true);
 		this.parent = parent;
 		this.results = new HashMap<String, Object>();
@@ -108,7 +108,7 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 		return results;
 	}
 	
-	protected JPanel buildTablePanel(Vector<String> columnHeaders, Vector<Class<?>> columnTypes) {
+	protected JPanel buildTablePanel(Vector<String> columnHeaders, final Vector<Class<?>> columnTypes) {
 		JPanel centerPanel = new JPanel();
 		centerPanel.setLayout(new BorderLayout(0, 0));
 		JScrollPane scrollPane = new JScrollPane();
@@ -164,7 +164,7 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 		});
 		panel.add(btnAddRow);
 
-		JButton btnRemoveRow = new JButton("Remove row");
+		final JButton btnRemoveRow = new JButton("Remove row");
 		btnRemoveRow.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
