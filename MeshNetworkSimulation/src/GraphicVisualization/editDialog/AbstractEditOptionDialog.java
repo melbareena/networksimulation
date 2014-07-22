@@ -19,6 +19,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -44,8 +48,7 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 		this.parent = parent;
 		this.results = new HashMap<String, Object>();
 		this.options = new ArrayList<Object>();
-		
-		//this.setLocationRelativeTo(parent);
+
 		this.setResizable(false);
 		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 		
@@ -54,7 +57,7 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
-		
+	
 		JButton okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
 			@Override
@@ -69,6 +72,15 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 		});
 		buttonPane.add(okButton);
 		getRootPane().setDefaultButton(okButton);
+		
+		JButton resetButton = new JButton("Reset");
+		resetButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setDefault();
+			}
+		});
+		buttonPane.add(resetButton);
 
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
@@ -85,6 +97,8 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 	protected abstract String getIdentifier();
 	
 	protected abstract void collectResults();
+	
+	protected abstract void setDefault();
 	
 	protected abstract boolean areOptionsValid();
 	
@@ -134,7 +148,6 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 		    }
 			
 		});
-		/*TODO ajouter listener pour desactiver le bouton remove*/
 		
 		scrollPane.setViewportView(table);
 		
@@ -161,7 +174,21 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 				}
 			}
 		});
+		btnRemoveRow.setEnabled(false);
 		panel.add(btnRemoveRow);
+		
+		((DefaultTableModel)table.getModel()).addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				btnRemoveRow.setEnabled((table.getRowCount() > 0) && !table.getSelectionModel().isSelectionEmpty());
+			}
+		});
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				btnRemoveRow.setEnabled((table.getRowCount() > 0) && !table.getSelectionModel().isSelectionEmpty());
+			}
+		});
 
 		return centerPanel;
 	}
@@ -173,6 +200,7 @@ public abstract class AbstractEditOptionDialog extends JDialog {
 					GraphViewer.showErrorDialog("No row in table",
 							"The table doesn't contain any row.\n"
 							+ "Add at least one row.");
+					return false;
 				}
 			} else {
 				for(int i = 0; i < this.table.getRowCount(); i++) {
