@@ -450,6 +450,7 @@ public class StartOptionsDialog extends JDialog {
 				TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
 				TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+				/* Write config_auto.xml */
 				dispose();
 				Program.launch();
 			}

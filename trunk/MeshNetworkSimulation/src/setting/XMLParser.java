@@ -7,22 +7,34 @@ import org.w3c.dom.Document;
 
 import common.PrintConsole;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 class XMLParser
 {
 
 	private static DocumentBuilder _documentBuilder;
 	
+	private static final String DEFAULTCONFIGFILE = "/setting/input/config.xml";
 	
-	private static final String CONFIGFILE = "/setting/input/config.xml";
+	public static String CONFIGFILE;
 	
-	public static Document Parser()
+	public static Document Parser() {
+		String path = (CONFIGFILE == null) ? DEFAULTCONFIGFILE : CONFIGFILE;
+		return Parser(path);
+	}
+	
+	public static Document Parser(String path)
 	{
 			
 			try
 			{
-				InputStream fXmlFile = XMLParser.class.getResourceAsStream(CONFIGFILE);
+				InputStream fXmlFile = XMLParser.class.getResourceAsStream(path);
+				if(fXmlFile == null) {
+					fXmlFile = new FileInputStream(path);
+				}
 				if(_documentBuilder == null)
 				{
 					

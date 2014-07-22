@@ -25,10 +25,6 @@ class DataRateConfig extends BaseConfiguration
 		FetchConfig();
 	}
 
-	
-	
-
-
 	private static final String TAG = "DataRate";
 	private static final String SINRATT = "SINR";
 	private static final String RATEATT = "Rate";
