@@ -31,7 +31,7 @@ public class IFactorEditOptionDialog extends AbstractEditOptionDialog {
 		columnHeaders.add("Channel distance");
 		columnHeaders.add("IFactor");
 		
-		Vector<Class<?>> columnTypes = new Vector<Class<?>>();
+		final Vector<Class<?>> columnTypes = new Vector<Class<?>>();
 		columnTypes.add(Integer.class);
 		columnTypes.add(Double.class);
 		
