@@ -96,7 +96,8 @@ public class GatewaysEditOptionDialog extends AbstractEditOptionDialog {
 		collectResults();
 	
 		pack();
-
+		
+		this.setLocationRelativeTo(null);
 	}
 
 	@Override 
@@ -114,16 +115,14 @@ public class GatewaysEditOptionDialog extends AbstractEditOptionDialog {
 		pack();
 	}
 	
-	/*TODO
-	 * Regarder pourquoi des fois 6 rangees dans la table...
-	 * */
-	private void setDefault() {
+	@Override
+	protected void setDefault() {
 		setCenterPanel(false);
 		if(this.table != null) {
-			for(int i = 0; i < this.table.getRowCount(); i++) {
-				((DefaultTableModel)table.getModel()).removeRow(i);
-			}
 			DefaultTableModel model = (DefaultTableModel)table.getModel();
+			while(model.getRowCount() > 0) {
+				model.removeRow(0);
+			}
 			model.addRow(new Object[] {0, 100, 100});
 			model.addRow(new Object[] {0, 500, 100});
 			model.addRow(new Object[] {0, 100, 500});
@@ -146,11 +145,11 @@ public class GatewaysEditOptionDialog extends AbstractEditOptionDialog {
 		if(comboBox.getSelectedIndex() == 0) {
 			this.results.put("file", pathTextField.getToolTipText());
 		} else {
-			int[][] gateways = new int[this.table.getRowCount()][this.table.getColumnCount()];
+			int[][] gateways = new int[this.table.getRowCount()][this.table.getColumnCount()-1];
 			int i;
 			for(i = 0; i < this.table.getRowCount(); i++) {
 				for(int j = 1; j < this.table.getColumnCount(); j++) {
-					gateways[i][j] = (int) table.getValueAt(i, j);
+					gateways[i][j-1] = (int) table.getValueAt(i, j);
 				}
 			}
 			this.results.put("nbOfGateways", i);

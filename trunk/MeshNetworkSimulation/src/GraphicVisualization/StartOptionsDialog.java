@@ -104,13 +104,13 @@ public class StartOptionsDialog extends JDialog {
 	private final JLabel lblSinr = new JLabel("SINR:");
 	private final JPanel IFactorPanel = new JPanel();
 	private final JButton IFactorButton = new JButton("Edit");
-	private final JTextField IFactorTextField = new JTextField();
+	private final JTextField IFactorTextField = new JTextField("11 IFactors set...");
 	private final JPanel dataratesPanel = new JPanel();
 	private final JButton dataratesButton = new JButton("Edit");
-	private final JTextField dataratesTextField = new JTextField();
+	private final JTextField dataratesTextField = new JTextField("8 datarates set...");
 	private final JPanel SINRPanel = new JPanel();
 	private final JButton SINRButton = new JButton("Edit");
-	private final JTextField SINRTextField = new JTextField();
+	private final JTextField SINRTextField = new JTextField("SINR set...");
 	private final JPanel channelsPanel = new JPanel();
 	private final JLabel lblMode = new JLabel("Mode:");
 	private final JComboBox channelModeComboBox = new JComboBox();
@@ -123,19 +123,27 @@ public class StartOptionsDialog extends JDialog {
 	private final JLabel lbluseCtrlTo = new JLabel("(use Ctrl to select mutiples)");
 	
 	private GatewaysEditOptionDialog gatewaysDialog;
+	private RoutersEditOptionDialog routersDialog;
+	private IFactorEditOptionDialog ifactorDialog;
+	private DatarateEditOptionDialog datarateDialog;
+	private SINREditOptionDialog sinrDialog;
 
 	/**
 	 * Create the dialog.
 	 */
 	public StartOptionsDialog() {
 		gatewaysDialog = new GatewaysEditOptionDialog(this);
-		
-		
+		routersDialog = new RoutersEditOptionDialog(this);
+		ifactorDialog = new IFactorEditOptionDialog(this);
+		datarateDialog = new DatarateEditOptionDialog(this);
+		sinrDialog = new SINREditOptionDialog(this);
 		
 		SINRTextField.setEditable(false);
 		SINRTextField.setColumns(10);
 		dataratesTextField.setEditable(false);
 		dataratesTextField.setColumns(10);
+		String filePath = "/setting/input/routers.txt";
+		routersTextField.setText("File: ..."+filePath.substring(filePath.length()-20, filePath.length()));
 		routersTextField.setEditable(false);
 		routersTextField.setColumns(10);
 		gatewaysTextField.setText("Static: 4 gateways...");
@@ -219,7 +227,11 @@ public class StartOptionsDialog extends JDialog {
 		routersPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 		
 		routersPanel.add(routersTextField, "cell 0 1,grow");
-		
+		routersButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				routersDialog.showDialog(true);
+			}
+		});
 		routersPanel.add(routersButton, "cell 1 1");
 		lblTraffic.setHorizontalAlignment(SwingConstants.TRAILING);
 		
@@ -290,7 +302,11 @@ public class StartOptionsDialog extends JDialog {
 		IFactorPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 		
 		IFactorPanel.add(IFactorTextField, "cell 0 0,grow");
-		
+		IFactorButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ifactorDialog.showDialog(true);
+			}
+		});
 		IFactorPanel.add(IFactorButton, "cell 1 0,growx");
 		lblDatarates.setHorizontalAlignment(SwingConstants.TRAILING);
 		
@@ -300,7 +316,11 @@ public class StartOptionsDialog extends JDialog {
 		dataratesPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 		
 		dataratesPanel.add(dataratesTextField, "cell 0 0,grow");
-		
+		dataratesButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				datarateDialog.showDialog(true);
+			}
+		});
 		dataratesPanel.add(dataratesButton, "cell 1 0,growx");
 		
 		lblAlgorithm.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -327,7 +347,11 @@ public class StartOptionsDialog extends JDialog {
 		SINRPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 		
 		SINRPanel.add(SINRTextField, "cell 0 0,grow");
-		
+		SINRButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sinrDialog.showDialog(true);
+			}
+		});
 		SINRPanel.add(SINRButton, "cell 1 0,growx");
 		newAlgoPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "New algorithm parameters", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		
@@ -466,7 +490,11 @@ public class StartOptionsDialog extends JDialog {
 		int retVal = fileChooser.showDialog(null, "Choose");
 		if(retVal == JFileChooser.APPROVE_OPTION) {	
 			String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-			source.setText("..."+filePath.substring(filePath.length()-textSize, filePath.length()));
+			if(filePath.length() > textSize) {
+				source.setText("..."+filePath.substring(filePath.length()-textSize, filePath.length()));
+			} else {
+				source.setText(filePath);
+			}
 			source.setToolTipText(filePath);
 		} else {
 			/*TODO*/
@@ -477,12 +505,38 @@ public class StartOptionsDialog extends JDialog {
 	public void updateOnOptionDialogCompleted(String identifier) {
 		switch(identifier) {
 		case "gateways" :
+			System.out.println(gatewaysDialog.getResults());
 			if(gatewaysDialog.getResults().containsKey("nbOfGateways")) {
 				gatewaysTextField.setText("Static: "+gatewaysDialog.getResults().get("nbOfGateways")+" gateways...");
 			} else {
 				String filePath = (String) gatewaysDialog.getResults().get("file");
 				gatewaysTextField.setText("File: ..."+filePath.substring(filePath.length()-20, filePath.length()));
 			}
+			break;
+		case "routers" :
+			System.out.println(routersDialog.getResults());
+			if(routersDialog.getResults().containsKey("nbOfRouters")) {
+				String head = "";
+				if(routersDialog.getResults().containsKey("seed")) {
+					head += "Random: ";
+				} else {
+					head += "Static: ";
+				}
+				routersTextField.setText(head+routersDialog.getResults().get("nbOfRouters")+" routers...");
+			} else {
+				String filePath = (String) routersDialog.getResults().get("file");
+				routersTextField.setText("File: ..."+filePath.substring(filePath.length()-20, filePath.length()));
+			}
+			break;
+		case "ifactor" :
+			System.out.println(ifactorDialog.getResults());
+			break;
+		case "datarate" :
+			System.out.println(datarateDialog.getResults());
+			dataratesTextField.setText(datarateDialog.getResults().get("nbOfDatarates")+" datarates set...");
+			break;
+		case "sinr" :
+			System.out.println(sinrDialog.getResults());
 			break;
 		}
 	}
