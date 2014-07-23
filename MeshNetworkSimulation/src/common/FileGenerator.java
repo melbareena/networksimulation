@@ -393,7 +393,11 @@ public class FileGenerator
 		{
 			
 			//int filenumber = 0;
-			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "throughtput.txt"));
+			String path = FILEOUTPUTPATH;
+			if(FILEOUTPUTPATH == null) {
+				path = "/setting/output/";
+			}
+			BufferedWriter writer = new BufferedWriter(new FileWriter(path + "throughtput.txt"));
 			//int timeIndex = 0;
 			for (Double th : throughput)
 			{
@@ -477,6 +481,8 @@ public class FileGenerator
 
 	public static void optimalDownlink(PathMap paths)
 	{
+		if(!ISFILEENABLE) return;
+		
 		try
 		{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "optimalDownlinkPaths(LinkID).txt" ));
