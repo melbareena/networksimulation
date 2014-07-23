@@ -1,9 +1,15 @@
 package topology2graph;
 
+import java.util.Vector;
+import java.util.Map.Entry;
+
+import setting.ApplicationSettingFacade;
 import dataStructure.IncomingLinksMap;
+import dataStructure.Link;
 import dataStructure.OutcomingLinksMap;
 import dataStructure.TopologyGraph;
 import dataStructure.PathMap;
+import dataStructure.Vertex;
 
 public class TopologyGraphFacade
 {
@@ -50,5 +56,25 @@ public class TopologyGraphFacade
 	public static IncomingLinksMap getIncomingLinks()
 	{
 		return topology.incomingLinks;
+	}
+	public boolean isIncomingLinkToGateway(Link l)
+	{
+		Vector<Link> links = new Vector<Link>();
+		
+		for (Entry<Integer, Vertex> gateways : ApplicationSettingFacade.Gateway.getGateway().entrySet())
+		{
+			links.addAll(getIncomingLinks().get(gateways.getValue()));
+		}
+		return links.contains(l);
+	}
+	public boolean isOutgoingLinkToGateway(Link l)
+	{
+		Vector<Link> links = new Vector<Link>();
+		
+		for (Entry<Integer, Vertex> gateways : ApplicationSettingFacade.Gateway.getGateway().entrySet())
+		{
+			links.addAll(getOutcomingLinks().get(gateways.getValue()));
+		}
+		return links.contains(l);
 	}
 }

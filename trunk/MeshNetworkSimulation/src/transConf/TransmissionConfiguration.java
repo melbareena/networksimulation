@@ -69,68 +69,44 @@ public class TransmissionConfiguration {
 			//*****STEP TWO**************************************************************************
 			if(tConfUnit.size() > 0)
 			{
-				//-------------------------PHASE 1---------------------------------------
+				
 				
 				for(Vertex g : ApplicationSettingFacade.Gateway.getGateway().values())
 				{
+					
+					//-------------------------PHASE 1----------------------------------------
 					if(tConfUnit.getCounter_g(g, LinkType.Incoming) == 0)				
 						tConfUnit = addIncomingLinks(tConfUnit, g);
 					
 					if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0)
 						tConfUnit = addOutgoingLinks(tConfUnit, g);
+					//------------------------------------------------------------------------
 					
-					/*if(tConfUnit.getCounter_g(g) == 0)
-					{
-						ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
-						Triple<Link, Link, Double> triple; //add, remove, sinr					
-						for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,forceGatewayLinks))
-						{
-							for(Link lprime : tConfUnit.getLinks())
-							{
-								//if(isEndpointsGateway(lprime) != null) continue;  
-								List<Link> links = tConfUnit.getLinks();
-								links.remove(lprime);
-								links.add(link);
-								double sinr = SINR.calc(lprime, links);
-										
-								if(sinr > BETA)
-								{
-									triple = new Triple<>(link, lprime, sinr);
-									tripleLists.add(triple);
-								}
-							}
-						}
-						if(tripleLists.size() > 0)
-						{
-							double maxSINR = 0;
-							Triple<Link, Link, Double> maxTriple = null;
-							for (Triple<Link,Link, Double> currentTriple : tripleLists)
-							{
-								if(maxSINR <= currentTriple.getC())
-								{
-									maxSINR = currentTriple.getC();
-									maxTriple = currentTriple;
-								}
-							}
-							tConfUnit.removeLink(maxTriple.getB());
-							ConsiderLinks.remove(maxTriple.getB());
-							tConfUnit.put(maxTriple.getA(), computeRate(maxSINR).getRate());
-							System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-							tripleLists.clear();
-						}
-				}*/
+					
+					
+					//-------------------------PHASE 2----------------------------------------
+					if(tConfUnit.getCounter_g(g, LinkType.Incoming) == 0 )
+						tConfUnit = exchangeIncoming(tConfUnit, g);
+					if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0 )
+						tConfUnit = exchangeOutgoing(tConfUnit, g);
+					//---------------------------------------------------------------------------
 			} 
 		}	
 		
 			
 			//*******************************************SETP 3****************************************************
 			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.
-			tConfUnit = Enlarge(tConfUnit);			
+			//tConfUnit = Enlarge(tConfUnit);			
 			//*******************************************SETP 4****************************************************
 			tConfUnit = calcDataRate(tConfUnit);	
 			//*****************************************************************************************************		
 			TT.add(tConfUnit);
 			resetMARK();
+			
+			if(TT.size() == 30)
+			{
+				int i =19;
+			}
 		}	
 		
 		
@@ -139,6 +115,107 @@ public class TransmissionConfiguration {
 		return TT;
 	}
 
+	private TCUnit exchangeOutgoing(TCUnit tConfUnit, Vertex g)
+	{
+		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
+		Triple<Link,Link, Double> triple; // add,remove, sinr
+		
+		boolean canRemoveIncomingLink = false;
+		if(tConfUnit.getCounter_g(g, LinkType.Incoming) > 1)
+			canRemoveIncomingLink = true;
+		
+		List<Link> incmoimgLinks = TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Incoming);
+		
+		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing))
+		{
+			for(Link lprime : tConfUnit.getLinks())
+			{
+				if(!canRemoveIncomingLink && incmoimgLinks.contains(lprime)) continue;
+				List<Link> links = tConfUnit.getLinks();
+				links.remove(lprime);
+				links.add(link);
+				double sinr = SINR.calc(link, links);
+					
+				if(sinr <= BETA)
+				{
+					triple = new Triple<>(link, lprime, sinr);
+					tripleLists.add(triple);
+				}
+			}
+		}
+		
+		if(tripleLists.size() > 0 )
+		{
+			Triple<Link, Link, Double> Triple = minimizing(tripleLists);
+			tConfUnit.removeLink(Triple.getB());
+			ConsiderLinks.remove(Triple.getB());
+			tConfUnit.put(Triple.getA(), computeRate(Triple.getC()).getRate());
+									
+			System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE22222222");
+		}
+		
+		return tConfUnit;
+	}
+
+	
+
+	private TCUnit exchangeIncoming(TCUnit tConfUnit, Vertex g)
+	{
+		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
+		Triple<Link,Link, Double> triple; // add,remove, sinr
+		
+		boolean canRemoveOutgoinglink = false;
+		if(tConfUnit.getCounter_g(g, LinkType.Outgoing) > 1)
+			canRemoveOutgoinglink = true;
+		
+		List<Link> outgoingLinks = TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing);
+		
+		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Incoming))
+		{
+			for(Link lprime : tConfUnit.getLinks())
+			{
+				if(!canRemoveOutgoinglink && outgoingLinks.contains(lprime)) continue;
+				List<Link> links = tConfUnit.getLinks();
+				links.remove(lprime);
+				links.add(link);
+				double sinr = SINR.calc(link, links);
+					
+				if(sinr <= BETA)
+				{
+					triple = new Triple<>(link, lprime, sinr);
+					tripleLists.add(triple);
+				}
+			}
+		}
+		
+		if(tripleLists.size() > 0 )
+		{
+			Triple<Link, Link, Double> maxTriple = minimizing(tripleLists);
+			tConfUnit.removeLink(maxTriple.getB());
+			ConsiderLinks.remove(maxTriple.getB());
+			tConfUnit.put(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
+									
+			System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+		}
+		
+		return tConfUnit;
+	}
+
+	private Triple<Link, Link, Double> minimizing(
+			ArrayList<Triple<Link, Link, Double>> tripleLists)
+	{
+		double min = Double.MAX_VALUE;
+		Triple<Link, Link, Double> minTriple = null;
+		for (Triple<Link, Link, Double> currentTriple : tripleLists)
+		{
+			if(min > currentTriple.getC().doubleValue())
+			{
+				min = currentTriple.getC().doubleValue();
+				minTriple = currentTriple;
+			}
+		}
+		return minTriple;
+	}
 	private TCUnit addIncomingLinks(TCUnit tConfUnit, Vertex g)
 	{
 		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Incoming))
@@ -168,71 +245,8 @@ public class TransmissionConfiguration {
 		return tConfUnit;
 	}
 	
-	private TCUnit addGatewayLinks(TCUnit tConfUnit, Vertex g)
-	{
-		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,forceGatewayLinks))
-		{							
-			TCUnit modifiedTC = checkAdd(link, tConfUnit.Clone());
-			if(modifiedTC != null)
-			{
-				tConfUnit = modifiedTC;
-				//System.out.println("Step 2..... Phase 1");
-				break; // next g;
-			}
-				
-		}
-		return tConfUnit;
-	}
 
-	private TCUnit exchangeLinks(TCUnit tConfUnit, Vertex g)
-	{
-		
-			ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
-			Triple<Link,Link, Double> triple; // add,remove, sinr
-			//boolean small_sinr = true;
-			//while(small_sinr)
-			//{
-				for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,forceGatewayLinks))
-				{
-					for(Link lprime : tConfUnit.getLinks())
-					{
-						List<Link> links = tConfUnit.getLinks();
-						links.remove(lprime);
-						links.add(link);
-						double sinr = SINR.calc(lprime, links);
-							
-						if(sinr >= BETA)
-						{
-							triple = new Triple<>(link, lprime, sinr);
-							tripleLists.add(triple);
-						}
-					}
-				}
-				if(tripleLists.size() > 0)
-				{
-					double max = 0d;
-					Triple<Link, Link, Double> maxTriple = null;
-					for (Triple<Link, Link, Double> currentTriple : tripleLists)
-					{
-						if(max < currentTriple.getC().doubleValue())
-						{
-							max = currentTriple.getC().doubleValue();
-							maxTriple = currentTriple;
-						}
-					}
-					tConfUnit.removeLink(maxTriple.getB());
-					ConsiderLinks.remove(maxTriple.getB());
-					tConfUnit.put(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
-											
-					System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-					
-				//	small_sinr = false;
-				}
-			//}//end of while
-			
-			return tConfUnit;
-		
-	}
+	
 	
 	
 	/*----------------------------------------------------------------------------------------------------------*/
@@ -548,11 +562,6 @@ public class TransmissionConfiguration {
 		if(this.checkRadio(newLink))
 		{
 			
-			
-			/*for (Entry<Link, Integer> linkRate : tConfig.entrySet())
-			{
-				tPrime.put(linkRate.getKey(), 0);
-			}*/
 			tPrime.put(newLink, 0);
 			tPrime.setTCAPZero();
 			

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Vector;
+
+import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
+
 import common.FileGenerator;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
@@ -146,6 +149,7 @@ public class TrafficEstimatingFacade
 		return result;
 		
 	}
+	
 	private static LinkTrafficMap LinksTraffic;
 	
 	
