@@ -123,10 +123,10 @@ public class IFactorEditOptionDialog extends AbstractEditOptionDialog {
 		model.addRow(new Object[] {0, 1.0});
 		model.addRow(new Object[] {0, 0.7272});
 		model.addRow(new Object[] {0, 0.2714});
+		model.addRow(new Object[] {0, 0.0375});
 		model.addRow(new Object[] {0, 0.0054});
 		model.addRow(new Object[] {0, 0.0008});
 		model.addRow(new Object[] {0, 0.0002});
-		model.addRow(new Object[] {0, 0.0});
 		model.addRow(new Object[] {0, 0.0});
 		model.addRow(new Object[] {0, 0.0});
 		model.addRow(new Object[] {0, 0.0});
