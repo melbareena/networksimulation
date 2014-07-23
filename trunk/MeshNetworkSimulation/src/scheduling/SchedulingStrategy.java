@@ -8,10 +8,9 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import common.FileGenerator;
-
+import common.PrintConsole;
 import trafficEstimating.TrafficEstimatingFacade;
 import transConf.TCFacade;
-
 import dataStructure.Buffer;
 import dataStructure.BufferMap;
 import dataStructure.Link;
@@ -102,6 +101,9 @@ public abstract class SchedulingStrategy
 				}
 				throughput.add(slotThroughtput);
 			}
+ 			
+ 			PrintConsole.print(sourceBuffers.trafficSize() + "");
+ 			PrintConsole.printErr(sourceBuffers.trafficSize() + "");
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);

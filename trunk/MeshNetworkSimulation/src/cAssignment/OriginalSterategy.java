@@ -41,13 +41,7 @@ public class OriginalSterategy extends AssigningSterategy
 				min = channelAff.getKey();
 			}
 		}
-		if(min == null)
-		{
-			Channel[] c = new Channel[channelAffectSet.size()];
-			c = channelAffectSet.keySet().toArray(c);
-			Random rand = new Random();
-			return c[rand.nextInt(channelAffectSet.size())];
-		}
+		
 		return min;
 	}
 

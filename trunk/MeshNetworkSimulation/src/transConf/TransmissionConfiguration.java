@@ -87,8 +87,8 @@ public class TransmissionConfiguration {
 					//-------------------------PHASE 2----------------------------------------
 					if(tConfUnit.getCounter_g(g, LinkType.Incoming) == 0 )
 						tConfUnit = exchangeIncoming(tConfUnit, g);
-					if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0 )
-						tConfUnit = exchangeOutgoing(tConfUnit, g);
+					//if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0 )
+					//	tConfUnit = exchangeOutgoing(tConfUnit, g);
 					//---------------------------------------------------------------------------
 			} 
 		}	
@@ -103,10 +103,6 @@ public class TransmissionConfiguration {
 			TT.add(tConfUnit);
 			resetMARK();
 			
-			if(TT.size() == 30)
-			{
-				int i =19;
-			}
 		}	
 		
 		

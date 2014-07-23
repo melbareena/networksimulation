@@ -1,6 +1,6 @@
 package dataStructure;
 
-public class DataRate
+public class DataRate implements Comparable<DataRate>
 {
 	public int getRate()
 	{
@@ -37,5 +37,13 @@ public class DataRate
 	public String toString() 
 	{
 		return "SINR: "+ this.SINR + "\t Data Rate:  " + this.Rate;
+	}
+
+
+
+	@Override
+	public int compareTo(DataRate d)
+	{
+		return Float.compare(this.SINR, d.getSINR());
 	}
 }

@@ -1,11 +1,16 @@
 package setting;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import common.PrintConsole;
+
 import dataStructure.DataRate;
 
 
@@ -35,7 +40,8 @@ class DataRateConfig extends BaseConfiguration
 
 	public List<DataRate> getDataRates()
 	{
-		return dataRates;
+		 Collections.sort(dataRates);
+		 return dataRates;
 	}
 
 	@Override
@@ -72,7 +78,7 @@ class DataRateConfig extends BaseConfiguration
 			}
 			catch(Exception ex)
 			{
-				
+				PrintConsole.printErr("DataRateConfig / FetchConfig" + ex.getMessage() );
 			}
 		}
 		
