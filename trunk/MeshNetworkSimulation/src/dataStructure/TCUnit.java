@@ -42,7 +42,7 @@ public class TCUnit
 	
 	/**
 	 * Calculating the weight of each link in the current configuration
-	 * @param linksTraffic: whole of traffic which is available in the configuation's links.
+	 * @param linksTraffic whole of traffic which is available in the configuation's links.
 	 */
 	public void calcLinkWeight(Map<Link,Double> linksTraffic)
 	{

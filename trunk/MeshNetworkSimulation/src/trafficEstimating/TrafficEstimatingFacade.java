@@ -2,6 +2,7 @@ package trafficEstimating;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -10,6 +11,7 @@ import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 import common.FileGenerator;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
+import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.BufferMap;
 import dataStructure.DownlinkTraffic;
 import dataStructure.LinkType;
@@ -106,6 +108,41 @@ public class TrafficEstimatingFacade
 		return bfMap;
 	
 		
+	}
+
+	/**Update the <code>currentBufferMap</code> by adding some new traffic, using
+	 * the <code>trafficGenerator</code>.
+	 * @param currentBufferMap The <code>BufferMap</code> to be updated.
+	 * @param trafficGenerator The traffic generator used to add new traffic.
+	 * @return The updated <code>BufferMap</code>.
+	 */
+	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, DynamicTrafficGenerator trafficGenerator) {
+		BufferMap bfMap = new BufferMap();
+
+		PathMap uplinks = getOptimalUplinkPath();
+		UplinkTraffic uplinkTraffic = trafficGenerator.generateTimeSlotUplinkTraffic(uplinks);
+		PathMap downlinkPaths = getDownlinkPath();
+		DownlinkTraffic downlinkTraffic = trafficGenerator.generateTimeSlotDownlinkTraffic(downlinkPaths);
+		
+		Map<Integer, Vertex> nodesMap = ApplicationSettingFacade.Nodes.getNodes();
+		for (int vertexIndex : nodesMap.keySet()) {
+			Vertex v = nodesMap.get(vertexIndex);
+			if(uplinkTraffic.hasUplinkTraffic(v)) {
+				int upTraffic = uplinkTraffic.getUplinkTraffic(v);
+				for (Path p : uplinks.get(v)) {		
+					Packet newPacket = new Packet(p, upTraffic);
+					bfMap.put( p.getEdgePath().getFirst(), newPacket);
+				}
+			}
+			if(downlinkTraffic.hasTraffic(v)) {
+				for (Path p : downlinkPaths.get(v)) {
+					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
+					Packet newPacket = new Packet(p, downTraffic);
+					bfMap.put( p.getEdgePath().getFirst(), newPacket);
+				}
+			}
+		}
+		return bfMap;
 	}
 	
 	/*private static void summation(BufferMap bfMap)
