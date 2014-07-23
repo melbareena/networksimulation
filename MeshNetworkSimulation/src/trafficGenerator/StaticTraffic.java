@@ -102,7 +102,7 @@ public class StaticTraffic
 		return uplinkTraffic;
 	}
 	
-	private static DownlinkTraffic getDownlinkTraffic()
+	public static DownlinkTraffic getDownlinkTraffic()
 	{
 		if(downlinkTraffic != null) return downlinkTraffic;
 		
