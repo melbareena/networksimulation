@@ -14,9 +14,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -44,11 +41,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.google.common.base.Splitter;
-
 import launcher.Program;
 import net.miginfocom.swing.MigLayout;
-import setting.ApplicationSettingFacade;
 import setting.XMLParser;
 import setting.XMLWriter;
 import transConf.TCFacade;
@@ -466,7 +460,7 @@ public class StartOptionsDialog extends JDialog {
 				TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 				/* Write config_auto.xml */
-				configFile = "/setting/input/config.xml";
+				configFile = "/setting/input/config_default.xml";
 				JOptionPane.showMessageDialog(null,
 	        			"Loading config file: \n"+XMLParser.class.getResource(configFile).getPath(),
 	    			    "Loading configuration",            			    
