@@ -35,6 +35,7 @@ public abstract class SchedulingStrategy
 		transmitBuffers = new BufferMap();
 		throughput = new Vector<>();
 	}
+	
 	protected SchedulingStrategy()
 	{
 		this.Initiation();
