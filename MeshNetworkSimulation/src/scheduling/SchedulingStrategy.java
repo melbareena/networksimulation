@@ -8,7 +8,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import common.FileGenerator;
-import common.PrintConsole;import trafficEstimating.TrafficEstimatingFacade;
+import common.PrintConsole;
+import trafficEstimating.TrafficEstimatingFacade;
 import trafficGenerator.DynamicTrafficGenerator;
 import transConf.TCFacade;
 import dataStructure.Buffer;
@@ -112,11 +113,14 @@ public abstract class SchedulingStrategy
 		FileGenerator.Throughput(throughput);
 	}
 
-	public void dynamicScheduling(int durationOfTrafficGenerating) {
+	public void dynamicScheduling(long durationOfTrafficGenerating) {
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfiguraions = null;
 		
 		int trafficTimeSlot = 0;
+		
+		sourceBuffers = null;
+		updateTraffic();
 		
 		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 ) {
 			this.calcWeight(true);
@@ -137,6 +141,12 @@ public abstract class SchedulingStrategy
 					}
 				}
 				throughput.add(slotThroughtput);
+				/*----------------------*/
+				/* Generate new traffic */
+				/*----------------------*/
+				if((trafficTimeSlot++) < durationOfTrafficGenerating) {
+					updateTraffic();
+				}
 			}
  			
  			this.calcWeight(false);
@@ -163,7 +173,7 @@ public abstract class SchedulingStrategy
 	}
 	
 	private void updateTraffic() {
-		TrafficEstimatingFacade.getDynamicSourceBuffers(sourceBuffers, dynamicTrafficGenerator);
+		sourceBuffers = TrafficEstimatingFacade.getDynamicSourceBuffers(sourceBuffers, dynamicTrafficGenerator);
 	}
 	
 	private void calcWeight(boolean isSourceBufferTraffic)
