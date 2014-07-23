@@ -117,7 +117,12 @@ public class TrafficEstimatingFacade
 	 * @return The updated <code>BufferMap</code>.
 	 */
 	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, DynamicTrafficGenerator trafficGenerator) {
-		BufferMap bfMap = new BufferMap();
+		BufferMap bfMap = null;
+		if(currentBufferMap == null) {
+			bfMap = new BufferMap();
+		} else {
+			bfMap = currentBufferMap;
+		}
 
 		PathMap uplinks = getOptimalUplinkPath();
 		UplinkTraffic uplinkTraffic = trafficGenerator.generateTimeSlotUplinkTraffic(uplinks);
