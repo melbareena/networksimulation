@@ -23,7 +23,9 @@ public class StaticTraffic
 {	
 	
 	private static UplinkTraffic  uplinkTraffic;
+	
 	private static DownlinkTraffic downlinkTraffic;
+	
 	public static UplinkTraffic getUplinkTraffic()
 	{
 		if(uplinkTraffic != null) return uplinkTraffic;
@@ -32,6 +34,7 @@ public class StaticTraffic
 			return randomUpLink();
 		return fileUplink();
 	}
+	
 	public static UplinkTraffic getUplinkTraffic(PathMap uplinks)
 	{
 		if(uplinkTraffic != null) return uplinkTraffic;
@@ -67,6 +70,7 @@ public class StaticTraffic
 		FileGenerator.UplinkTrafficInFile(uplinkTraffic);
 		return uplinkTraffic;
 	}
+	
 	private static UplinkTraffic randomUpLink(PathMap uplinks)
 	{
 		Random rand = new Random();
@@ -82,6 +86,7 @@ public class StaticTraffic
 		return uplinkTraffic;
 
 	}
+	
 	private static UplinkTraffic randomUpLink()
 	{
 		
@@ -110,6 +115,7 @@ public class StaticTraffic
 			return downlinkRandom();
 		return downlinkFile();
 	}
+	
 	public static DownlinkTraffic getDownlinkTraffic(PathMap downlinkPaths)
 	{
 		if(downlinkTraffic != null) return downlinkTraffic;
@@ -159,6 +165,7 @@ public class StaticTraffic
 		FileGenerator.dowlinkTrafficInFile(downlinkTraffic.getTraffic());
 		return downlinkTraffic;
 	}
+	
 	private static DownlinkTraffic downlinkFile()
 	{
 		Map<Integer,Vertex> routerSet = ApplicationSettingFacade.Router.getRouter();

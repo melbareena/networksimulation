@@ -8,8 +8,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import common.FileGenerator;
-import common.PrintConsole;
-import trafficEstimating.TrafficEstimatingFacade;
+import common.PrintConsole;import trafficEstimating.TrafficEstimatingFacade;
+import trafficGenerator.DynamicTrafficGenerator;
 import transConf.TCFacade;
 import dataStructure.Buffer;
 import dataStructure.BufferMap;
@@ -27,12 +27,15 @@ public abstract class SchedulingStrategy
 	private List<TCUnit> configurations;
 	private Vector<Double> throughput;
 	
+	private DynamicTrafficGenerator dynamicTrafficGenerator;
+	
 	private void Initiation()
 	{
  		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers();
 		configurations = TCFacade.getConfigurations();
 		transmitBuffers = new BufferMap();
 		throughput = new Vector<>();
+		dynamicTrafficGenerator = new DynamicTrafficGenerator(0.5, 4215148182044928764L);
 	}
 	
 	protected SchedulingStrategy()
@@ -108,6 +111,61 @@ public abstract class SchedulingStrategy
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
 	}
+
+	public void dynamicScheduling(int durationOfTrafficGenerating) {
+		Vector<Link> selectedBuffers = null;
+		Vector<TCUnit> transmissionConfiguraions = null;
+		
+		int trafficTimeSlot = 0;
+		
+		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 ) {
+			this.calcWeight(true);
+			selectedBuffers = getBufferStrategy(true);
+			double slotThroughtput = 0;
+ 			transmissionConfiguraions = matching(selectedBuffers);
+ 			for (TCUnit tcunit : transmissionConfiguraions) {
+				slotThroughtput = 0;
+				for (Link link : tcunit.getLinks()) {
+					if(sourceBuffers.containsKey(link)) {
+						int dataRate = tcunit.getRate(link);
+						Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers);
+						if(moved.isReceived()) {
+							double movedTraffic = moved.getTraffic();
+							slotThroughtput += movedTraffic;
+							tcunit.addThroughput(movedTraffic);
+						}
+					}
+				}
+				throughput.add(slotThroughtput);
+			}
+ 			
+ 			this.calcWeight(false);
+ 			selectedBuffers = getBufferStrategy(false);
+ 			transmissionConfiguraions = matching(selectedBuffers);
+ 			for (TCUnit tcunit : transmissionConfiguraions) {
+				slotThroughtput = 0;
+				for (Link link : tcunit.getLinks()) {
+					if(transmitBuffers.containsKey(link)) {
+						int dataRate = tcunit.getRate(link);
+						Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers);
+						if(moved.isReceived()) {
+							double movedTraffic = moved.getTraffic();
+							slotThroughtput += movedTraffic;
+							tcunit.addThroughput(movedTraffic);
+						}
+					}
+				}
+				throughput.add(slotThroughtput);
+			}
+		}
+		FileGenerator.TCThroughput(configurations);
+		FileGenerator.Throughput(throughput);
+	}
+	
+	private void updateTraffic() {
+		TrafficEstimatingFacade.getDynamicSourceBuffers(sourceBuffers, dynamicTrafficGenerator);
+	}
+	
 	private void calcWeight(boolean isSourceBufferTraffic)
 	{
 		BufferMap targetMap;		
@@ -134,6 +192,7 @@ public abstract class SchedulingStrategy
 		}
 		
 	}
+	
 	private Vector<TCUnit> matching(Vector<Link> maxKBuffer)
 	{
 		Vector<TCUnit> result = new Vector<>();
