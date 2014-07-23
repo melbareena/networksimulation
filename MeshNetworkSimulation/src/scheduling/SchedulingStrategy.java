@@ -113,6 +113,7 @@ public abstract class SchedulingStrategy
 		FileGenerator.Throughput(throughput);
 	}
 
+	/*TODO complete...*/
 	public void dynamicScheduling(long durationOfTrafficGenerating) {
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfiguraions = null;
@@ -166,6 +167,12 @@ public abstract class SchedulingStrategy
 					}
 				}
 				throughput.add(slotThroughtput);
+				/*----------------------*/
+				/* Generate new traffic */
+				/*----------------------*/
+				if((trafficTimeSlot++) < durationOfTrafficGenerating) {
+					updateTraffic();
+				}
 			}
 		}
 		FileGenerator.TCThroughput(configurations);
