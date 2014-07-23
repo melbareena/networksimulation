@@ -394,8 +394,9 @@ public class FileGenerator
 			
 			//int filenumber = 0;
 			String path = FILEOUTPUTPATH;
-			if(FILEOUTPUTPATH == null) {
-				path = "/setting/output/";
+			System.out.println(path);
+			if(FILEOUTPUTPATH.equals("null")) {
+				path = FileGenerator.class.getResource("/output/").getPath();
 			}
 			BufferedWriter writer = new BufferedWriter(new FileWriter(path + "throughtput.txt"));
 			//int timeIndex = 0;
@@ -407,7 +408,7 @@ public class FileGenerator
 			}
 			writer.close();
 		
-			PrintConsole.printErr("throughput inserted in file successfully.");
+			PrintConsole.printErr("throughput inserted in "+path+"throughtput.txt successfully.");
 		} 
 		catch (Exception ex)
 		{
