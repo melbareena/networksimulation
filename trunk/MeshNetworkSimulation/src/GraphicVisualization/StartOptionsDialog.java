@@ -135,6 +135,10 @@ public class StartOptionsDialog extends JDialog {
 	private SINREditOptionDialog sinrDialog;
 	
 	private String configFile;
+	private final JPanel panel = new JPanel();
+	private final JRadioButton rdbtnStatic = new JRadioButton("Static");
+	private final JRadioButton rdbtnDynamic = new JRadioButton("Dynamic");
+	private final ButtonGroup groupTraffic = new ButtonGroup();
 
 	/**
 	 * Create the dialog.
@@ -177,7 +181,7 @@ public class StartOptionsDialog extends JDialog {
 		getContentPane().setLayout(borderLayout);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new MigLayout("", "[95px]10[157px,grow]10[95px]10[157px,grow]", "[min!]10[min!,grow]20[grow]10[grow]10[min!,grow]10[min!,grow]"));
+		contentPanel.setLayout(new MigLayout("", "[90px,grow]10[157px,grow]10[95px]10[157px,grow]", "[min!]10[min!,grow]20[grow]10[grow]10[min!,grow]10[min!,grow]"));
 		lblEnvironment.setHorizontalAlignment(SwingConstants.TRAILING);
 		contentPanel.add(lblEnvironment, "cell 0 0,grow");
 		
@@ -241,9 +245,6 @@ public class StartOptionsDialog extends JDialog {
 			}
 		});
 		routersPanel.add(routersButton, "cell 1 1");
-		lblTraffic.setHorizontalAlignment(SwingConstants.TRAILING);
-		
-		contentPanel.add(lblTraffic, "cell 0 2 1 2,grow");
 		
 		contentPanel.add(trafficPanel, "cell 1 2 1 2,grow");
 		trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[][grow][min!][grow][min!]", "[grow][grow][grow][][grow]"));
@@ -316,6 +317,20 @@ public class StartOptionsDialog extends JDialog {
 			}
 		});
 		IFactorPanel.add(IFactorButton, "cell 1 0,growx");
+		
+		contentPanel.add(panel, "cell 0 2 1 2,growx,aligny center");
+		panel.setLayout(new MigLayout("", "[grow]", "[min!]10[min!][min!]"));
+		panel.add(lblTraffic, "cell 0 0,growx");
+		lblTraffic.setHorizontalAlignment(SwingConstants.TRAILING);
+		groupTraffic.add(rdbtnStatic);
+		rdbtnStatic.setFont(new Font("Tahoma", Font.ITALIC, 10));
+		rdbtnStatic.setSelected(true);
+		
+		panel.add(rdbtnStatic, "cell 0 1,alignx right,growy");
+		groupTraffic.add(rdbtnDynamic);
+		rdbtnDynamic.setFont(new Font("Tahoma", Font.ITALIC, 10));
+		
+		panel.add(rdbtnDynamic, "cell 0 2,alignx right,growy");
 		lblDatarates.setHorizontalAlignment(SwingConstants.TRAILING);
 		
 		contentPanel.add(lblDatarates, "cell 2 3,growx,aligny center");
@@ -343,9 +358,9 @@ public class StartOptionsDialog extends JDialog {
 
 		rdbtnPanel.add(rdbtnNewAlgorithm);
 		
-		ButtonGroup group = new ButtonGroup();
-		group.add(rdbtnNewAlgorithm);
-		group.add(rdbtnOriginal);
+		ButtonGroup groupAlgo = new ButtonGroup();
+		groupAlgo.add(rdbtnNewAlgorithm);
+		groupAlgo.add(rdbtnOriginal);
 		rdbtnNewAlgorithm.setSelected(true);
 		lblSinr.setHorizontalAlignment(SwingConstants.TRAILING);
 		
