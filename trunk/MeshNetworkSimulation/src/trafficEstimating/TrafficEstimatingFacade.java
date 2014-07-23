@@ -189,7 +189,7 @@ public class TrafficEstimatingFacade
 		
 		optimalUplinkPath = uplinkEstimating.getOptimalUplinkPaths();
 		
-	
+
 		
 		tarrfic_l = this.filterZeroTraffic(tarrfic_l);
 		

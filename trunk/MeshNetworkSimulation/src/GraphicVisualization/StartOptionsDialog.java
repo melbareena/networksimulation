@@ -704,7 +704,8 @@ public class StartOptionsDialog extends JDialog {
 	public static File saveConfiguration() {
 		try {
 			System.out.println(StartOptionsDialog.class.getResource("/setting/input").getPath());
-			final JFileChooser fileChooser = new JFileChooser(StartOptionsDialog.class.getResource("/setting/input").getPath()){
+			final JFileChooser fileChooser = new JFileChooser(
+					StartOptionsDialog.class.getResource("/setting/input").getPath()){
 				private static final long serialVersionUID = 5313190094648329448L;
 				@Override
 			    public void approveSelection(){
@@ -735,6 +736,8 @@ public class StartOptionsDialog extends JDialog {
 			fileChooser.setDialogTitle("Save the configuration file as...");
 			fileChooser.setMultiSelectionEnabled(false);
 			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooser.setSelectedFile(new File(StartOptionsDialog.class.getResource("/setting/input").getPath()+
+					"/config.xml"));
 			FileNameExtensionFilter filterXML = new FileNameExtensionFilter(
 			        "XML Document", "xml");
 			fileChooser.addChoosableFileFilter(filterXML);
