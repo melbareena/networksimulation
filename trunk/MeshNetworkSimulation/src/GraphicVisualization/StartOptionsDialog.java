@@ -14,6 +14,9 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -41,8 +44,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.google.common.base.Splitter;
+
 import launcher.Program;
 import net.miginfocom.swing.MigLayout;
+import setting.ApplicationSettingFacade;
 import setting.XMLParser;
 import setting.XMLWriter;
 import transConf.TCFacade;
@@ -461,6 +467,10 @@ public class StartOptionsDialog extends JDialog {
 				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 				/* Write config_auto.xml */
 				configFile = "/setting/input/config.xml";
+				JOptionPane.showMessageDialog(null,
+	        			"Loading config file: \n"+XMLParser.class.getResource(configFile).getPath(),
+	    			    "Loading configuration",            			    
+	    			    JOptionPane.INFORMATION_MESSAGE);
 				dispose();
 				XMLParser.CONFIGFILE = configFile;
 				Program.launch();
@@ -684,7 +694,8 @@ public class StartOptionsDialog extends JDialog {
 	
 	public static File saveConfiguration() {
 		try {
-			final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir")){
+			System.out.println(StartOptionsDialog.class.getResource("/setting/input").getPath());
+			final JFileChooser fileChooser = new JFileChooser(StartOptionsDialog.class.getResource("/setting/input").getPath()){
 				private static final long serialVersionUID = 5313190094648329448L;
 				@Override
 			    public void approveSelection(){
