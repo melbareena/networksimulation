@@ -171,7 +171,8 @@ public class GraphViewer extends JFrame {
 	/** Initiate and show the Frame.
 	 * @param throughputData The data for the throughput plot.
 	 */
-	public GraphViewer(Vector<Double> throughputData) {
+	public GraphViewer(Vector<Double> throughputData, Vector<Double> sourceData,
+			Vector<Double> transmitData) {
 		super();
 		
 		String title = "Mesh Network Simulation " + GraphViewer.optionsTitle;
@@ -179,7 +180,7 @@ public class GraphViewer extends JFrame {
 		this.setTitle(title);
 		
 		int step = (throughputData.size() > 300000) ? throughputData.size()/100000 : 1;
-		this.histogramViewerFrame = new HistogramViewer(throughputData, step);
+		this.histogramViewerFrame = new HistogramViewer(throughputData, sourceData, transmitData, step);
 
 		this.graph = new mxGraph() {
 			// Tooltips for edges

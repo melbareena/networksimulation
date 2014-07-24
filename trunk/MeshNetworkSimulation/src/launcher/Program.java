@@ -57,7 +57,7 @@ public class Program {
 			System.err.println("Unable to set the UI look and feel...");
 		}	
 		
-		new GraphViewer(s.getThroughput());
+		new GraphViewer(s.getThroughput(), null, null);
 	}
 
 }
