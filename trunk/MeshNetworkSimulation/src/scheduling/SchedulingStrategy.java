@@ -31,20 +31,15 @@ public abstract class SchedulingStrategy
 	/** The generator used to generate dynamically some new traffic in the network. */
 	private DynamicTrafficGenerator dynamicTrafficGenerator;
 	
-	public static double trafficRate;
-	
 	private void Initiation() {
  		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers();
 		configurations = TCFacade.getConfigurations();
 		transmitBuffers = new BufferMap();
 		throughput = new Vector<>();
-		dynamicTrafficGenerator = new DynamicTrafficGenerator(
-				((SchedulingStrategy.trafficRate == 0) ? 0.5 : SchedulingStrategy.trafficRate),
-				4215148182044928764L);
 	}
 	
-	protected SchedulingStrategy(double trafficRate) {
-		SchedulingStrategy.trafficRate = trafficRate;
+	protected SchedulingStrategy(DynamicTrafficGenerator dynamicTrafficGenerator) {
+		this.dynamicTrafficGenerator = dynamicTrafficGenerator;
 		this.Initiation();
 	}
 	
@@ -134,8 +129,11 @@ public abstract class SchedulingStrategy
 		int timeSlot = 0; // Current number of time slot
 		
 		sourceBuffers = null;
-		updateTraffic(); // Fill the source buffers with random traffic
-		System.out.println("Slot#"+timeSlot+": traffic "+sourceBuffers.trafficSize());
+		do {
+			System.out.println("Try to generate traffic...");
+			updateTraffic(); // Fill the source buffers with random traffic
+		} while(sourceBuffers.trafficSize() == 0);
+		System.out.println("Slot#"+timeSlot+": trafficS "+sourceBuffers.trafficSize()+": trafficT "+transmitBuffers.trafficSize());
 		
 		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0) {
 			// Source Buffers
@@ -163,7 +161,7 @@ public abstract class SchedulingStrategy
 				if((timeSlot++) < durationOfTrafficGenerating) {
 					updateTraffic();
 				}
-				System.out.println("Slot#"+timeSlot+": traffic "+sourceBuffers.trafficSize());
+				System.out.println("Slot#"+timeSlot+": trafficS "+sourceBuffers.trafficSize()+": trafficT "+transmitBuffers.trafficSize());
 			}
  			
  			// Transmit buffers
@@ -190,7 +188,7 @@ public abstract class SchedulingStrategy
 				if((timeSlot++) < durationOfTrafficGenerating) {
 					updateTraffic();
 				}
-				System.out.println("Slot#"+timeSlot+": traffic "+sourceBuffers.trafficSize());
+				System.out.println("Slot#"+timeSlot+": trafficS "+sourceBuffers.trafficSize()+": trafficT "+transmitBuffers.trafficSize());
 			}
 		}
 		FileGenerator.TCThroughput(configurations);

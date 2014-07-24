@@ -2,11 +2,13 @@ package launcher;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.util.Random;
 
 import javax.swing.UIManager;
 
 import scheduling.RoundRobinSchedulingStrategy;
 import scheduling.SchedulingStrategy;
+import trafficGenerator.DynamicTrafficGenerator;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.StartOptionsDialog;
 
@@ -43,8 +45,10 @@ public class Program {
 	}
 	
 	public static void launch() {
-		SchedulingStrategy s = new RoundRobinSchedulingStrategy(0.8);
-		s.dynamicScheduling(100000);
+		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator(0.1, new Random().nextLong(),
+				5, 2);
+		SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
+		s.dynamicScheduling(200000);
 		//s.scheduling();
 		
 		try {
