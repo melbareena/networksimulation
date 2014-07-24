@@ -115,20 +115,23 @@ public class TrafficEstimatingFacade
 	 */
 	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, DynamicTrafficGenerator trafficGenerator) {
 		BufferMap bfMap = null;
+		//Creating a new BufferMap if the current one is null
 		if(currentBufferMap == null) {
 			bfMap = new BufferMap();
 		} else {
 			bfMap = currentBufferMap;
 		}
 
+		//Initializing
 		PathMap uplinks = getOptimalUplinkPath();
 		UplinkTraffic uplinkTraffic = trafficGenerator.generateTimeSlotUplinkTraffic(uplinks);
 		PathMap downlinkPaths = getDownlinkPath();
 		DownlinkTraffic downlinkTraffic = trafficGenerator.generateTimeSlotDownlinkTraffic(downlinkPaths);
-		
 		Map<Integer, Vertex> nodesMap = ApplicationSettingFacade.Nodes.getNodes();
+		
 		for (int vertexIndex : nodesMap.keySet()) {
 			Vertex v = nodesMap.get(vertexIndex);
+			// Add uplink traffic if there is
 			if(uplinkTraffic.hasUplinkTraffic(v)) {
 				int upTraffic = uplinkTraffic.getUplinkTraffic(v);
 				for (Path p : uplinks.get(v)) {		
@@ -136,6 +139,7 @@ public class TrafficEstimatingFacade
 					bfMap.put( p.getEdgePath().getFirst(), newPacket);
 				}
 			}
+			// Add downlink traffic if there is
 			if(downlinkTraffic.hasTraffic(v)) {
 				for (Path p : downlinkPaths.get(v)) {
 					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());

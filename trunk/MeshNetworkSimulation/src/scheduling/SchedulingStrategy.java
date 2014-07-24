@@ -28,19 +28,27 @@ public abstract class SchedulingStrategy
 	private List<TCUnit> configurations;
 	private Vector<Double> throughput;
 	
+	/** The generator used to generate dynamically some new traffic in the network. */
 	private DynamicTrafficGenerator dynamicTrafficGenerator;
 	
-	private void Initiation()
-	{
+	public static double trafficRate;
+	
+	private void Initiation() {
  		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers();
 		configurations = TCFacade.getConfigurations();
 		transmitBuffers = new BufferMap();
 		throughput = new Vector<>();
-		dynamicTrafficGenerator = new DynamicTrafficGenerator(0.5, 4215148182044928764L);
+		dynamicTrafficGenerator = new DynamicTrafficGenerator(
+				((SchedulingStrategy.trafficRate == 0) ? 0.5 : SchedulingStrategy.trafficRate),
+				4215148182044928764L);
 	}
 	
-	protected SchedulingStrategy()
-	{
+	protected SchedulingStrategy(double trafficRate) {
+		SchedulingStrategy.trafficRate = trafficRate;
+		this.Initiation();
+	}
+	
+	protected SchedulingStrategy() {
 		this.Initiation();
 	}
 	
@@ -113,22 +121,29 @@ public abstract class SchedulingStrategy
 		FileGenerator.Throughput(throughput);
 	}
 
-	/*TODO complete...*/
+	/**Schedule the different transmission configurations to dispose of the traffic
+	 * in the network. Some new traffic will be randomly generated during the
+	 * <code>durationOfTrafficGenerating</code> first time solts.
+	 * @param durationOfTrafficGenerating The number of timeslot during which
+	 * some new traffic will be randomly generated.
+	 */
 	public void dynamicScheduling(long durationOfTrafficGenerating) {
 		Vector<Link> selectedBuffers = null;
-		Vector<TCUnit> transmissionConfiguraions = null;
+		Vector<TCUnit> transmissionConfigurations = null;
 		
-		int trafficTimeSlot = 0;
+		int timeSlot = 0; // Current number of time slot
 		
 		sourceBuffers = null;
-		updateTraffic();
+		updateTraffic(); // Fill the source buffers with random traffic
+		System.out.println("Slot#"+timeSlot+": traffic "+sourceBuffers.trafficSize());
 		
-		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 ) {
+		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0) {
+			// Source Buffers
 			this.calcWeight(true);
 			selectedBuffers = getBufferStrategy(true);
 			double slotThroughtput = 0;
- 			transmissionConfiguraions = matching(selectedBuffers);
- 			for (TCUnit tcunit : transmissionConfiguraions) {
+ 			transmissionConfigurations = matching(selectedBuffers);
+ 			for (TCUnit tcunit : transmissionConfigurations) {
 				slotThroughtput = 0;
 				for (Link link : tcunit.getLinks()) {
 					if(sourceBuffers.containsKey(link)) {
@@ -145,15 +160,17 @@ public abstract class SchedulingStrategy
 				/*----------------------*/
 				/* Generate new traffic */
 				/*----------------------*/
-				if((trafficTimeSlot++) < durationOfTrafficGenerating) {
+				if((timeSlot++) < durationOfTrafficGenerating) {
 					updateTraffic();
 				}
+				System.out.println("Slot#"+timeSlot+": traffic "+sourceBuffers.trafficSize());
 			}
  			
+ 			// Transmit buffers
  			this.calcWeight(false);
  			selectedBuffers = getBufferStrategy(false);
- 			transmissionConfiguraions = matching(selectedBuffers);
- 			for (TCUnit tcunit : transmissionConfiguraions) {
+ 			transmissionConfigurations = matching(selectedBuffers);
+ 			for (TCUnit tcunit : transmissionConfigurations) {
 				slotThroughtput = 0;
 				for (Link link : tcunit.getLinks()) {
 					if(transmitBuffers.containsKey(link)) {
@@ -170,15 +187,19 @@ public abstract class SchedulingStrategy
 				/*----------------------*/
 				/* Generate new traffic */
 				/*----------------------*/
-				if((trafficTimeSlot++) < durationOfTrafficGenerating) {
+				if((timeSlot++) < durationOfTrafficGenerating) {
 					updateTraffic();
 				}
+				System.out.println("Slot#"+timeSlot+": traffic "+sourceBuffers.trafficSize());
 			}
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
 	}
 	
+	/**Update the current traffic in the network. Some new packets may be added
+	 * to some source buffers randomly.
+	 */
 	private void updateTraffic() {
 		sourceBuffers = TrafficEstimatingFacade.getDynamicSourceBuffers(sourceBuffers, dynamicTrafficGenerator);
 	}

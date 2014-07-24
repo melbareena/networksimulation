@@ -13,6 +13,17 @@ public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 	
 	private static int sourcePositionIndex = 0;
 	private static int tranmissionPositionIndex = 0;
+	
+	/**Create a RoundRobinSchedulingStrategy with the given trafficRate.
+	 * @param trafficRate The mean traffic rate of the network.
+	 */
+	public RoundRobinSchedulingStrategy(double trafficRate) {
+		super(trafficRate);
+	}
+	
+	public RoundRobinSchedulingStrategy() {
+		super();
+	}
 
 	@Override
 	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer)
