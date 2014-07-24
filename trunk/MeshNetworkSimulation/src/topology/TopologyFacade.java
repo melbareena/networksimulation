@@ -1,12 +1,6 @@
 package topology;
 
 import java.util.Map;
-import java.util.Vector;
-import java.util.Map.Entry;
-
-import setting.ApplicationSettingFacade;
-import topology2graph.TopologyGraphFacade;
-import dataStructure.Link;
 import dataStructure.Vertex;
 
 public class TopologyFacade

@@ -113,6 +113,7 @@ public class Path implements Comparable<Path>
 	}
 	
 	
+	@SuppressWarnings("null")
 	@Override
 	public int compareTo(Path o)
 	{
