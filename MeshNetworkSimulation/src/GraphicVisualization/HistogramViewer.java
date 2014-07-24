@@ -197,7 +197,9 @@ public class HistogramViewer extends JFrame {
 		System.out.println("Collecting data...");
 		
 		XYSeriesCollection c = new XYSeriesCollection();
-		
+		/*TODO convertir en dataset pour afficher avec axes differents
+		 * http://www.java2s.com/Code/Java/Chart/JFreeChartDualAxisDemo.htm
+		 * */
 		XYSeries throughputDataset = new XYSeries("Throughput");
 		int index = 0;
 		for(int i = 0; i < throughputData.size(); i += step) {
