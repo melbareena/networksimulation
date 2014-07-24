@@ -27,6 +27,8 @@ public abstract class SchedulingStrategy
 	protected BufferMap transmitBuffers;
 	private List<TCUnit> configurations;
 	private Vector<Double> throughput;
+	private Vector<Double> trafficSource;
+	private Vector<Double> trafficTransit;
 	
 	/** The generator used to generate dynamically some new traffic in the network. */
 	private DynamicTrafficGenerator dynamicTrafficGenerator;
@@ -35,7 +37,9 @@ public abstract class SchedulingStrategy
  		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers();
 		configurations = TCFacade.getConfigurations();
 		transmitBuffers = new BufferMap();
-		throughput = new Vector<>();
+		throughput = new Vector<Double>();
+		trafficSource = new Vector<Double>();
+		trafficTransit = new Vector<Double>();
 	}
 	
 	protected SchedulingStrategy(DynamicTrafficGenerator dynamicTrafficGenerator) {
@@ -130,7 +134,6 @@ public abstract class SchedulingStrategy
 		
 		sourceBuffers = null;
 		do {
-			System.out.println("Try to generate traffic...");
 			updateTraffic(); // Fill the source buffers with random traffic
 		} while(sourceBuffers.trafficSize() == 0);
 		System.out.println("Slot#"+timeSlot+": trafficS "+sourceBuffers.trafficSize()+": trafficT "+transmitBuffers.trafficSize());
@@ -155,13 +158,14 @@ public abstract class SchedulingStrategy
 					}
 				}
 				throughput.add(slotThroughtput);
+				trafficSource.add(sourceBuffers.trafficSize());
+				trafficTransit.add(transmitBuffers.trafficSize());
 				/*----------------------*/
 				/* Generate new traffic */
 				/*----------------------*/
 				if((timeSlot++) < durationOfTrafficGenerating) {
 					updateTraffic();
 				}
-				System.out.println("Slot#"+timeSlot+": trafficS "+sourceBuffers.trafficSize()+": trafficT "+transmitBuffers.trafficSize());
 			}
  			
  			// Transmit buffers
@@ -188,7 +192,6 @@ public abstract class SchedulingStrategy
 				if((timeSlot++) < durationOfTrafficGenerating) {
 					updateTraffic();
 				}
-				System.out.println("Slot#"+timeSlot+": trafficS "+sourceBuffers.trafficSize()+": trafficT "+transmitBuffers.trafficSize());
 			}
 		}
 		FileGenerator.TCThroughput(configurations);
@@ -292,5 +295,14 @@ public abstract class SchedulingStrategy
 	public Vector<Double> getThroughput()
 	{
 		return throughput;
+	}
+
+	
+	public Vector<Double> getTrafficSource() {
+		return trafficSource;
+	}
+
+	public Vector<Double> getTrafficTransit() {
+		return trafficTransit;
 	}
 }

@@ -25,10 +25,12 @@ import javax.swing.border.EmptyBorder;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  * @author Benjamin
@@ -40,8 +42,6 @@ public class HistogramViewer extends JFrame {
 	
 	private JPanel	contentPane;
 	
-	private DefaultXYDataset dataset = new DefaultXYDataset();
-	
 	private ChartPanel cPanel;
 	
 	private JFreeChart chart;
@@ -52,10 +52,10 @@ public class HistogramViewer extends JFrame {
 
 	/**
 	 * Create the frame.
-	 * @param data 
+	 * @param throughputData 
 	 */
-	public HistogramViewer(Vector<Double> data, int step)
-	{
+	public HistogramViewer(Vector<Double> throughputData, Vector<Double> sourceData,
+			Vector<Double> transmitData, int step) {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 
@@ -64,7 +64,7 @@ public class HistogramViewer extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
-		drawGraph(data, step);
+		drawGraph(throughputData, sourceData, transmitData, step);
 		
 		buildMenu();
 		
@@ -192,29 +192,55 @@ public class HistogramViewer extends JFrame {
 		toolBar.add(lblSamples);
 	}
 	
-	private void drawGraph(Vector<Double> data, int step) {
+	private void drawGraph(Vector<Double> throughputData, Vector<Double> sourceData,
+			Vector<Double> transmitData, int step) {
 		System.out.println("Collecting data...");
-		double[][] serie = new double[2][(data.size()/step)+step];
+		
+		XYSeriesCollection c = new XYSeriesCollection();
+		
+		XYSeries throughputDataset = new XYSeries("Throughput");
 		int index = 0;
-		for(int i = 0; i < data.size(); i += step) {
-			serie[0][index] = i;
-			serie[1][index] = data.get(i);
+		for(int i = 0; i < throughputData.size(); i += step) {
+			throughputDataset.add(i, throughputData.get(i));
 			index++;
 		}
-		dataset.addSeries("Throughput", serie);
+		c.addSeries(throughputDataset);
 		
-		samplesNumber = serie[0].length*step-step;
+		if(sourceData != null) {
+			XYSeries sourceDataset = new XYSeries("Source Buffer Traffic");
+			index = 0;
+			for(int i = 0; i < sourceData.size(); i += step) {
+				sourceDataset.add(i, sourceData.get(i));
+				index++;
+			}
+			c.addSeries(sourceDataset);
+		}
+		
+		if(transmitData != null) {
+			XYSeries transmitDataset = new XYSeries("Transmit Buffer Traffic");
+			index = 0;
+			for(int i = 0; i < transmitData.size(); i += step) {
+				transmitDataset.add(i, transmitData.get(i));
+				index++;
+			}
+			c.addSeries(transmitDataset);
+		}
+
+		samplesNumber = throughputData.size();
 		
 		System.out.println("Finished (max index "+index+"), displaying...");
 		 
 		chart = ChartFactory.createXYLineChart("Throughput "+GraphViewer.optionsTitle, "",
-		"Throughput", dataset, PlotOrientation.VERTICAL, false, true, false);
+		"Throughput", c, PlotOrientation.VERTICAL, false, true, false);
 		
 		XYPlot plot = chart.getXYPlot();
 		plot.setRangeGridlinesVisible(true);
 		plot.setRangeGridlinePaint(Color.DARK_GRAY);
 		plot.setDomainGridlinesVisible(true);
 		plot.setDomainGridlinePaint(Color.DARK_GRAY);
+		plot.setRangeAxis(1, new NumberAxis("Source"));
+
+		plot.mapDatasetToRangeAxis(1, 1);
 		
 		XYItemRenderer renderer = plot.getRenderer();
 		renderer.setSeriesPaint(0, Color.BLUE);
