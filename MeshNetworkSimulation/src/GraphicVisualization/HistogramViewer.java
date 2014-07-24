@@ -54,7 +54,7 @@ public class HistogramViewer extends JFrame {
 	 * Create the frame.
 	 * @param data 
 	 */
-	public HistogramViewer(Vector<Double> data)
+	public HistogramViewer(Vector<Double> data, int step)
 	{
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -64,7 +64,7 @@ public class HistogramViewer extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
-		drawGraph(data, 1);
+		drawGraph(data, step);
 		
 		buildMenu();
 		
@@ -203,7 +203,7 @@ public class HistogramViewer extends JFrame {
 		}
 		dataset.addSeries("Throughput", serie);
 		
-		samplesNumber = serie[0].length;
+		samplesNumber = serie[0].length*step-step;
 		
 		System.out.println("Finished (max index "+index+"), displaying...");
 		 

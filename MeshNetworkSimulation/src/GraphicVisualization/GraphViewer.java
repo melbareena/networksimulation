@@ -168,8 +168,8 @@ public class GraphViewer extends JFrame {
 			+ ((TCFacade.enlargeByGateways) ? " ; enlarge by gw" : "")
 			+ ")";
  
-	/** Initiate and show the Frame
-	 * @param throughputData 
+	/** Initiate and show the Frame.
+	 * @param throughputData The data for the throughput plot.
 	 */
 	public GraphViewer(Vector<Double> throughputData) {
 		super();
@@ -178,8 +178,9 @@ public class GraphViewer extends JFrame {
 		
 		this.setTitle(title);
 		
-		this.histogramViewerFrame = new HistogramViewer(throughputData);
- 
+		int step = (throughputData.size() > 300000) ? throughputData.size()/100000 : 1;
+		this.histogramViewerFrame = new HistogramViewer(throughputData, step);
+
 		this.graph = new mxGraph() {
 			// Tooltips for edges
 			public String getToolTipForCell(Object cell) {

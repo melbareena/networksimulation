@@ -43,8 +43,9 @@ public class Program {
 	}
 	
 	public static void launch() {
-		SchedulingStrategy s = new RoundRobinSchedulingStrategy();
-		s.scheduling();
+		SchedulingStrategy s = new RoundRobinSchedulingStrategy(0.8);
+		s.dynamicScheduling(100000);
+		//s.scheduling();
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
