@@ -4,6 +4,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.Buffer;
 import dataStructure.BufferMap;
 import dataStructure.Link;
@@ -14,11 +15,8 @@ public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 	private static int sourcePositionIndex = 0;
 	private static int tranmissionPositionIndex = 0;
 	
-	/**Create a RoundRobinSchedulingStrategy with the given trafficRate.
-	 * @param trafficRate The mean traffic rate of the network.
-	 */
-	public RoundRobinSchedulingStrategy(double trafficRate) {
-		super(trafficRate);
+	public RoundRobinSchedulingStrategy(DynamicTrafficGenerator dtg) {
+		super(dtg);
 	}
 	
 	public RoundRobinSchedulingStrategy() {

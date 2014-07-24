@@ -18,9 +18,12 @@ public final class DownlinkTraffic
 	{
 		return downLinkTraffic;
 	}
-	public  Float getTraffic(Vertex g, Vertex v)
+	public float getTraffic(Vertex g, Vertex v)
 	{
-		return downLinkTraffic.get(g).get(v);
+		if(downLinkTraffic.get(g) == null) {
+			return 0.0F;
+		}
+		return (downLinkTraffic.get(g).containsKey(v)) ? downLinkTraffic.get(g).get(v) : 0.0F;
 	}
 	public boolean hasTraffic(Vertex v)
 	{

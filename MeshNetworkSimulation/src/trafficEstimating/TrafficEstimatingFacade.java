@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
+
 import common.FileGenerator;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
@@ -18,6 +19,7 @@ import dataStructure.TopologyGraph;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
 import dataStructure.PathMap;
+import dataStructure.Traffic;
 import dataStructure.UplinkTraffic;
 import dataStructure.Vertex;
 
@@ -124,9 +126,10 @@ public class TrafficEstimatingFacade
 
 		//Initializing
 		PathMap uplinks = getOptimalUplinkPath();
-		UplinkTraffic uplinkTraffic = trafficGenerator.generateTimeSlotUplinkTraffic(uplinks);
-		PathMap downlinkPaths = getDownlinkPath();
-		DownlinkTraffic downlinkTraffic = trafficGenerator.generateTimeSlotDownlinkTraffic(downlinkPaths);
+		PathMap downlinks = getDownlinkPath();
+		Traffic globalTraffic = trafficGenerator.generateTraffic(uplinks, downlinks);
+		UplinkTraffic uplinkTraffic = globalTraffic.getUplinkTraffic();
+		DownlinkTraffic downlinkTraffic = globalTraffic.getDownlinkTraffic();
 		Map<Integer, Vertex> nodesMap = ApplicationSettingFacade.Nodes.getNodes();
 		
 		for (int vertexIndex : nodesMap.keySet()) {
@@ -141,7 +144,7 @@ public class TrafficEstimatingFacade
 			}
 			// Add downlink traffic if there is
 			if(downlinkTraffic.hasTraffic(v)) {
-				for (Path p : downlinkPaths.get(v)) {
+				for (Path p : downlinks.get(v)) {
 					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
 					Packet newPacket = new Packet(p, downTraffic);
 					bfMap.put( p.getEdgePath().getFirst(), newPacket);
