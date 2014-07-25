@@ -179,7 +179,7 @@ public class GraphViewer extends JFrame {
 		
 		this.setTitle(title);
 		
-		int step = (throughputData.size() > 300000) ? throughputData.size()/100000 : 1;
+		int step = throughputData.size()/100;
 		this.histogramViewerFrame = new HistogramViewer(throughputData, sourceData, transmitData, step);
 
 		this.graph = new mxGraph() {

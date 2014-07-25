@@ -44,20 +44,24 @@ public class Program {
 		startOptionDialog.setVisible(true);
 	}
 	
-	public static void launch() {
+	public static void launch(boolean dynamic) {
 		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator(0.1, new Random().nextLong(),
 				5, 2);
 		SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
-		s.dynamicScheduling(200000);
-		//s.scheduling();
 		
+		if(dynamic) {
+			s.dynamicScheduling(800000);
+		} else {
+			s.scheduling();
+		}
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 		} catch (Exception e) {
 			System.err.println("Unable to set the UI look and feel...");
 		}	
 		
-		new GraphViewer(s.getThroughput(), null, null);
+		new GraphViewer(s.getThroughput(), s.getTrafficSource(), s.getTrafficTransit());
 	}
 
 }
