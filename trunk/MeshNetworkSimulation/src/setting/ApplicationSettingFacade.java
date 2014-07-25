@@ -76,6 +76,14 @@ public class ApplicationSettingFacade
 		{
 			return _tConf.getAddressDown();
 		}
+		public static long getUpSeed()
+		{
+			return _tConf.getUpSeed();
+		}
+		public static long getDownSeed()
+		{
+			return _tConf.getDownSeed();
+		}
 	}
 	
 	public static class AppOutput

@@ -22,6 +22,9 @@ import setting.BaseConfiguration.TypeOfGenerationEnum;
 public class StaticTraffic
 {	
 	
+	
+	private static long upSeed = ApplicationSettingFacade.Traffic.getUpSeed();
+	private static long downSeed = ApplicationSettingFacade.Traffic.getDownSeed();
 	private static UplinkTraffic  uplinkTraffic;
 	
 	private static DownlinkTraffic downlinkTraffic;
@@ -73,7 +76,9 @@ public class StaticTraffic
 	
 	private static UplinkTraffic randomUpLink(PathMap uplinks)
 	{
-		Random rand = new Random();
+		uplinkTraffic = new UplinkTraffic();
+		Random rand = new Random(upSeed);
+		PrintConsole.print("Seed for uplink traffic is: " + upSeed);
 		for (Entry<Vertex, List<Path>> routerMap : uplinks.entrySet())
 		{
 			int trf = rand.nextInt(20) + 30;
@@ -89,10 +94,10 @@ public class StaticTraffic
 	
 	private static UplinkTraffic randomUpLink()
 	{
-		
+		uplinkTraffic = new UplinkTraffic();
 		Map<Integer,Vertex> routerSet = ApplicationSettingFacade.Router.getRouter();
-		
-		Random rand = new Random();
+		PrintConsole.print("Seed for uplink traffic is: " + upSeed);
+		Random rand = new Random(upSeed);
 		for (Entry<Integer,Vertex> routerMap : routerSet.entrySet())
 		{
 			
@@ -126,7 +131,10 @@ public class StaticTraffic
 
 	private static DownlinkTraffic downlinkRandom(PathMap downlinkPaths)
 	{
-		Random rand = new Random();
+		Random rand = new Random(downSeed);
+		downlinkTraffic = new DownlinkTraffic();
+		PrintConsole.print("Seed for downlink traffic is: " + downSeed);
+		
 		for (Entry<Vertex, List<Path>> ver_path : downlinkPaths.entrySet())
 		{
 			Vertex gateway = ver_path.getKey();
@@ -144,11 +152,13 @@ public class StaticTraffic
 		return downlinkTraffic;
 	}
 
-	private static DownlinkTraffic downlinkRandom()
+	 static DownlinkTraffic downlinkRandom()
 	{
 		Map<Integer,Vertex> routerSet = ApplicationSettingFacade.Router.getRouter();
 		//int gatewayNumbers = ApplicationSettingFacade.Gateway.getSize();
-		Random rand = new Random();
+		Random rand = new Random(downSeed);
+		PrintConsole.print("Seed for downlink traffic is: " + downSeed);
+		downlinkTraffic = new DownlinkTraffic();
 		for (Entry<Integer, Vertex> getway : ApplicationSettingFacade.Gateway.getGateway().entrySet())
 		{
 			TreeMap<Vertex,Float> grMap = new TreeMap<>();

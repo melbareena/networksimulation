@@ -64,8 +64,7 @@ public class RandomTopology extends BaseTopology
 	@Override
 	public Map<Integer, Vertex> CreateTopology()
 	{
-		if(generateRandomPosition() 
-				&& checkingTopology.isAllRoutersAccessibleFromGateway(routerLocationSet, gatewayLocationSet))
+		if(generateRandomPosition())
 		{
 			
 			gatewaySet = ApplicationSettingFacade.Gateway.getGateway();
@@ -104,33 +103,46 @@ public class RandomTopology extends BaseTopology
 		PrintConsole.print("Routers Position are generated randomly.");
 		int x;
 		int y;
-		int numNode = 0;	
-		Random generator = new Random(seed);
+		int numNode = 0;
 		
-		PrintConsole.print("seed for random topology generator is "+seed );
-		int saftyTestCounter = 0;
-		while(numNode < numberOfRouters)
+		int numberOfTest = 0;
+		boolean trueTopology = true;
+		while (numberOfTest < safetyTest)
 		{
+			Random generator = new Random(seed);
 			
-			x = generator.nextInt(_environmentX);
-			y = generator.nextInt(_environmentY);
-			if(addInRouterLocationSet(x,y))
+			PrintConsole.print("seed for random topology generator is "+seed );
+
+			trueTopology = true;
+			while(numNode < numberOfRouters)
 			{
-				numNode++;
-				saftyTestCounter = 0;
-				//PrintConsole.print("Accep: Point------> X1:" + x + " Y1:" + y);
+				
+				x = generator.nextInt(_environmentX);
+				y = generator.nextInt(_environmentY);
+				if(addInRouterLocationSet(x,y))
+					numNode++;
+				else 
+				{
+					trueTopology = false;
+					break;
+				}
 			}
-			else 
-				saftyTestCounter++;
 			
-			if(saftyTestCounter >= safetyTest)
+			if(trueTopology && checkingTopology.isAllRoutersAccessibleFromGateway(routerLocationSet, gatewayLocationSet))
+				return true;
+			else
 			{
-				PrintConsole.printErr("FAIL: Program cannot generate " + numberOfRouters + 
-						" nodes which each of them far away from others at least " + minDistance + " meter" );
-				return false;
+				seed = System.nanoTime();
+				numberOfTest++;
+				if(numberOfTest >= safetyTest)
+				{
+					PrintConsole.printErr("FAIL: Program cannot generate " + numberOfRouters + 
+							" nodes which each of them far away from others at least " + minDistance + " meter" );
+					System.exit(0);
+				}
 			}
 		}
-		return true;
+		return false;
 	}
 	private boolean addInRouterLocationSet(int x, int y)
 	{
