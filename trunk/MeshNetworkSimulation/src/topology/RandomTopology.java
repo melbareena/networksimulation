@@ -106,6 +106,8 @@ public class RandomTopology extends BaseTopology
 		int y;
 		int numNode = 0;	
 		Random generator = new Random(seed);
+		
+		PrintConsole.print("seed for random topology generator is "+seed );
 		int saftyTestCounter = 0;
 		while(numNode < numberOfRouters)
 		{
