@@ -45,12 +45,12 @@ public class Program {
 	}
 	
 	public static void launch(boolean dynamic) {
-		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator(0.1, new Random().nextLong(),
-				5, 2);
+		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator(0.2, new Random().nextLong(),
+				45, 1);
 		SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
 		
 		if(dynamic) {
-			s.dynamicScheduling(800000);
+			s.dynamicScheduling(500000);
 		} else {
 			s.scheduling();
 		}
