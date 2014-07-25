@@ -86,6 +86,8 @@ public abstract class SchedulingStrategy
 					}
 				}
 				throughput.add(slotThroughtput);
+				trafficSource.add(sourceBuffers.trafficSize());
+				trafficTransit.add(transmitBuffers.trafficSize());
 			}
  			this.calcWeight(false);
  			selectedBuffers = getBufferStrategy(false);
@@ -111,6 +113,8 @@ public abstract class SchedulingStrategy
 					}
 				}
 				throughput.add(slotThroughtput);
+				trafficSource.add(sourceBuffers.trafficSize());
+				trafficTransit.add(transmitBuffers.trafficSize());
 			}
  			
  			PrintConsole.print(sourceBuffers.trafficSize() + "");
@@ -138,7 +142,7 @@ public abstract class SchedulingStrategy
 		} while(sourceBuffers.trafficSize() == 0);
 		System.out.println("Slot#"+timeSlot+": trafficS "+sourceBuffers.trafficSize()+": trafficT "+transmitBuffers.trafficSize());
 		
-		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0) {
+		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating) {
 			// Source Buffers
 			this.calcWeight(true);
 			selectedBuffers = getBufferStrategy(true);
@@ -186,6 +190,8 @@ public abstract class SchedulingStrategy
 					}
 				}
 				throughput.add(slotThroughtput);
+				trafficSource.add(sourceBuffers.trafficSize());
+				trafficTransit.add(transmitBuffers.trafficSize());
 				/*----------------------*/
 				/* Generate new traffic */
 				/*----------------------*/

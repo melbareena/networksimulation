@@ -482,7 +482,7 @@ public class StartOptionsDialog extends JDialog {
 	    			    JOptionPane.INFORMATION_MESSAGE);
 				dispose();
 				XMLParser.CONFIGFILE = configFile;
-				Program.launch();
+				Program.launch(rdbtnDynamic.isSelected());
 			}
 		});
 		buttonPane.add(defaultButton);
@@ -503,7 +503,7 @@ public class StartOptionsDialog extends JDialog {
 				configFile = blank.getToolTipText();
 				if(configFile != null) {
 					XMLParser.CONFIGFILE = configFile;
-					Program.launch();
+					Program.launch(rdbtnDynamic.isSelected());
 					dispose();
 				}
 			}
@@ -525,7 +525,7 @@ public class StartOptionsDialog extends JDialog {
 				if(configFile != null) {
 					XMLParser.CONFIGFILE = configFile;
 					dispose();
-					Program.launch();
+					Program.launch(rdbtnDynamic.isSelected());
 				}
 			}
 		});
