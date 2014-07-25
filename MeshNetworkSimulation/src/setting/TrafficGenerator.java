@@ -23,6 +23,8 @@ class TrafficGenerator extends BaseConfiguration
 	private static final String ATTGEN = "Generator";
 	private static final String ATTADDRESSUP = "AddressUp";
 	private static final String ATTADDRESSDOWN = "AddressDown";
+	private static final String ATTUPSEED = "UpSeed";
+	private static final String ATTDOWNSEED = "DownSeed";
 	
 	private TypeOfGenerationEnum typeOfgeneration;
 	public TypeOfGenerationEnum getTypeOfgeneration()
@@ -46,6 +48,16 @@ class TrafficGenerator extends BaseConfiguration
 		this.FetchConfig();
 	}
 
+	private long upSeed;
+	public long getUpSeed()
+	{
+		return upSeed;
+	}
+	private long downSeed;
+	public long getDownSeed()
+	{
+		return downSeed;
+	}
 	@Override
 	protected void FetchConfig()
 	{
@@ -63,6 +75,11 @@ class TrafficGenerator extends BaseConfiguration
 					typeOfgeneration = TypeOfGenerationEnum.valueOf(eElement.getAttribute(ATTGEN).toUpperCase());
 					if(typeOfgeneration == TypeOfGenerationEnum.FILE  && ValidateXMLDocument(eElement, typeOfgeneration))
 						FetchFromFile(eElement);
+					if(typeOfgeneration == TypeOfGenerationEnum.RANDOM)
+					{
+						upSeed =  fetchUpSeed(eElement);
+						downSeed = fetchDownSeed(eElement);
+					}
 				}
 			} 
 			catch (Exception e)
@@ -73,7 +90,18 @@ class TrafficGenerator extends BaseConfiguration
 		}
 		
 	}
-
+	private long fetchUpSeed(Element eElement)
+	{
+		if(eElement.hasAttribute(ATTUPSEED))
+			return Long.valueOf(eElement.getAttribute(ATTUPSEED));
+		return System.nanoTime();
+	}
+	private long fetchDownSeed(Element eElement)
+	{
+		if(eElement.hasAttribute(ATTDOWNSEED))
+			return Long.valueOf(eElement.getAttribute(ATTDOWNSEED));
+		return System.nanoTime();
+	}
 	private void FetchFromFile(Element eElement)
 	{
 		addressDown = eElement.getAttribute(ATTADDRESSDOWN);
@@ -103,5 +131,10 @@ class TrafficGenerator extends BaseConfiguration
 						"<Traffic Generator=\"File\"AddressUp=\"src/setting/input/trafficUp.txt\" AddressDown=\"src/setting/input/traffic.txt\"  /> \n " );
 		}
 		return true;
+	}
+	public void getSeed()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }
