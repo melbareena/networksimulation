@@ -3,6 +3,7 @@ package GraphicVisualization;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
@@ -23,6 +24,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
 import org.jfree.chart.ChartFactory;
@@ -30,6 +33,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.ChartProgressEvent;
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -77,7 +81,7 @@ public class HistogramViewer extends JFrame {
 	public final static String[] colors = new String[] {"Blue","Red","Green", "Orange", "Pink", "Black"};
 	
 	public final static String[] shapes = new String[] {"Regular Cross", "Diagonal Cross", "Diamond", "Down Triangle", "Up Triangle"};
-
+	
 	/**
 	 * Create the frame.
 	 * @param throughputData 
@@ -100,8 +104,10 @@ public class HistogramViewer extends JFrame {
 		this.stepThroughput = step;
 		this.stepSource = step;
 		this.stepTransmit = step;
-		
-		drawGraph(throughputData, step, sourceData, step, transmitData, step);
+	}
+	
+	public void showGraph() {
+		drawGraph(dataThroughput, stepThroughput, dataSource, stepSource, dataTransmit, stepTransmit);
 		
 		buildMenu();
 		
@@ -230,11 +236,12 @@ public class HistogramViewer extends JFrame {
 					Field dataField = HistogramViewer.class.getField("data"+target.split(" ")[0]);
 					Field datasetField = HistogramViewer.class.getField("dataset"+target.split(" ")[0]);
 					if(stepField.getInt(self) != result) {
+						/* Show Loading Dialog */
 						stepField.setInt(self, result);
 						updateDataset((DefaultXYDataset)datasetField.get(self),
 								target,
 								(Vector<Double>) dataField.get(self),
-								stepField.getInt(self));
+								stepField.getInt(self), 0);
 					}
 				} catch (NumberFormatException ex) {
 					GraphViewer.showErrorDialog("Error "+ex.getClass(), ex.getClass()+": "+s+
@@ -337,24 +344,24 @@ public class HistogramViewer extends JFrame {
 	private void drawGraph(Vector<Double> throughputData, int stepThroughput,
 			Vector<Double> sourceData, int stepSource,
 			Vector<Double> transmitData, int stepTransmit) {
-		System.out.println("Collecting data...");
+		System.out.println("Collecting throughput data...");
 		
 		samplesNumber = throughputData.size();
 
 		/* Throughput data */
 		datasetThroughput = new DefaultXYDataset();
-		updateDataset(datasetThroughput, "Throughput", throughputData, stepThroughput);
+		updateDataset(datasetThroughput, "Throughput", throughputData, stepThroughput, 20);
 		
 		/* Source buffers data */
 		datasetSource = new DefaultXYDataset();
 		if(sourceData != null) {
-			updateDataset(datasetSource, "Source Traffic", sourceData, stepSource);
+			updateDataset(datasetSource, "Source Traffic", sourceData, stepSource, 20);
 		}
 		
 		/* Transmit buffers data */
 		datasetTransmit = new DefaultXYDataset();
 		if(transmitData != null) {
-			updateDataset(datasetTransmit, "Transmit Traffic", transmitData, stepTransmit);
+			updateDataset(datasetTransmit, "Transmit Traffic", transmitData, stepTransmit, 20);
 		}
 		
 		System.out.println("Finished, displaying...");
@@ -412,7 +419,7 @@ public class HistogramViewer extends JFrame {
 		this.repaint();
 	}
 	
-	private double[][] collectData(Vector<Double> data, int step) {
+	private double[][] collectData(Vector<Double> data, int step, int progress) {
 		int size = (int) Math.floor((double)data.size() / (double)step);
 		double[][] dataArray = new double[2][size];
 		int index = 0;
@@ -430,9 +437,9 @@ public class HistogramViewer extends JFrame {
 	}
 	
 	private void updateDataset(DefaultXYDataset ds, String serieKey,
-			Vector<Double> data, int step) {
+			Vector<Double> data, int step, int progress) {
 		ds.removeSeries(serieKey);
-		ds.addSeries(serieKey, collectData(data, step));
+		ds.addSeries(serieKey, collectData(data, step, progress));
 	}
 	
 	private void changeColor(int index, Color color) {

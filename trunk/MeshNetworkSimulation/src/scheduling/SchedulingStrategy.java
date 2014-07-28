@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import launcher.Program;
 import common.FileGenerator;
 import common.PrintConsole;
 import setting.ApplicationSettingFacade;
@@ -55,8 +56,10 @@ public abstract class SchedulingStrategy
 	
 	public void scheduling()
 	{
+		Program.loadingDialog.setIndeterminate(true);
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfiguraions = null;
+		int timeSlot = 0;
 		//System.err.println( sourceBuffers.trafficSize()) ;
 		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 )
 		{
@@ -86,6 +89,8 @@ public abstract class SchedulingStrategy
 						}
 					}
 				}
+				timeSlot++;
+				Program.loadingDialog.setLabel("Simulating... (timeslot "+timeSlot+")");
 				throughput.add(slotThroughtput);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
@@ -113,6 +118,8 @@ public abstract class SchedulingStrategy
 						}
 					}
 				}
+				timeSlot++;
+				Program.loadingDialog.setLabel("Simulating... (timeslot "+timeSlot+")");
 				throughput.add(slotThroughtput);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
@@ -178,8 +185,14 @@ public abstract class SchedulingStrategy
 				/*----------------------*/
 				/* Generate new traffic */
 				/*----------------------*/
-				if((timeSlot++) < durationOfTrafficGenerating) {
+				timeSlot++;
+				if(timeSlot < durationOfTrafficGenerating) {
 					updateTraffic();
+					Program.loadingDialog.addProgress((int) (99*timeSlot/durationOfTrafficGenerating) - Program.loadingDialog.getProgress(),
+							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
+				} else {
+					Program.loadingDialog.setIndeterminate(true);
+					Program.loadingDialog.setLabel("Disposing of network traffic... (timeslot "+timeSlot+")");
 				}
 			}
  			
@@ -206,11 +219,18 @@ public abstract class SchedulingStrategy
 				/*----------------------*/
 				/* Generate new traffic */
 				/*----------------------*/
-				if((timeSlot++) < durationOfTrafficGenerating) {
+				timeSlot++;
+				if(timeSlot < durationOfTrafficGenerating) {
 					updateTraffic();
+					Program.loadingDialog.addProgress((int) (99*timeSlot/durationOfTrafficGenerating) - Program.loadingDialog.getProgress(),
+							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
+				} else {
+					Program.loadingDialog.setIndeterminate(true);
+					Program.loadingDialog.setLabel("Disposing of network traffic... (timeslot "+timeSlot+")");
 				}
 			}
 		}
+		System.out.println("Traffic simulation done");
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
 	}
