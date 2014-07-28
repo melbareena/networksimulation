@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import common.FileGenerator;
 import common.PrintConsole;
 import dataStructure.Vertex;
-
 import setting.ApplicationSettingFacade;
 
 
@@ -104,14 +103,14 @@ public class RandomTopology extends BaseTopology
 		int x;
 		int y;
 		int numNode = 0;
-		
+		Random generator = new Random(seed);
 		int numberOfTest = 0;
 		boolean trueTopology = true;
 		while (numberOfTest < safetyTest)
 		{
-			Random generator = new Random(seed);
 			
-			PrintConsole.print("seed for random topology generator is "+seed );
+			generator.setSeed(seed);
+			PrintConsole.print(numberOfTest + " ");
 
 			trueTopology = true;
 			while(numNode < numberOfRouters)
@@ -129,17 +128,24 @@ public class RandomTopology extends BaseTopology
 			}
 			
 			if(trueTopology && checkingTopology.isAllRoutersAccessibleFromGateway(routerLocationSet, gatewayLocationSet))
-				return true;
-			else
 			{
-				seed = System.nanoTime();
-				numberOfTest++;
-				if(numberOfTest >= safetyTest)
+				PrintConsole.print("seed for random topology generator is "+  seed );
+				try
 				{
-					PrintConsole.printErr("FAIL: Program cannot generate " + numberOfRouters + 
-							" nodes which each of them far away from others at least " + minDistance + " meter" );
-					System.exit(0);
+					Thread.sleep(3000);
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
 				}
+				return true;
+			}
+			seed = System.nanoTime();
+			numberOfTest++;
+			if(numberOfTest >= safetyTest)
+			{
+				PrintConsole.printErr("FAIL: Program cannot generate " + numberOfRouters + 
+						" nodes which each of them far away from others at least " + minDistance + " meter" );
+				System.exit(0);
 			}
 		}
 		return false;
