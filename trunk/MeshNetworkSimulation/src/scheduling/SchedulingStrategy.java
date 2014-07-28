@@ -9,6 +9,7 @@ import java.util.Vector;
 
 import common.FileGenerator;
 import common.PrintConsole;
+import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
 import trafficGenerator.DynamicTrafficGenerator;
 import transConf.TCFacade;
@@ -124,6 +125,16 @@ public abstract class SchedulingStrategy
 		FileGenerator.Throughput(throughput);
 	}
 
+	/**Schedule the different transmission configurations to dispose of the traffic
+	 * in the network. Some new traffic will be randomly generated during the
+	 * first time solts.
+	 * The number of timeslot during which some new traffic will be randomly generated
+	 * is parsed from the XML configuration file.
+	 */
+	public void dynamicScheduling() {
+		this.dynamicScheduling(ApplicationSettingFacade.Traffic.getDuration());
+	}
+	
 	/**Schedule the different transmission configurations to dispose of the traffic
 	 * in the network. Some new traffic will be randomly generated during the
 	 * <code>durationOfTrafficGenerating</code> first time solts.

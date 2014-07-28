@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ButtonGroup;
@@ -85,8 +86,18 @@ public class StartOptionsDialog extends JDialog {
 	private final JPanel outputPanel = new JPanel();
 	private final JTextField outputFolderPathTextField = new JTextField();
 	private final JCheckBox chckbxGenerateFiles = new JCheckBox("Generate files");
+	private JPanel trafficPanel = new JPanel();
+	private final JLabel lblDuration = new JLabel("Duration:");
+	private final JSpinner durationSpinner = new JSpinner();
+	private final JLabel lblRate = new JLabel("Traffic rate:");
+	private final JSpinner rateSpinner = new JSpinner();
+	private final JLabel lblSeed = new JLabel("Seed:");
+	private final JSpinner seedSpinner = new JSpinner();
+	private final JLabel lblNbNewNodes = new JLabel("Nb new nodes:");
+	private final JSpinner nodesSpinner = new JSpinner();
+	private final JLabel lblRatio = new JLabel("Ratio:");
+	private final JSpinner ratioSpinner = new JSpinner();
 	private final JLabel lblTraffic = new JLabel("Traffic:");
-	private final JPanel trafficPanel = new JPanel();
 	private final JLabel lblGenerator = new JLabel("Generator:");
 	private final JComboBox trafficComboBox = new JComboBox();
 	private final JTextField upTrafficTextField = new JTextField();
@@ -96,6 +107,12 @@ public class StartOptionsDialog extends JDialog {
 	private final JTextField downTrafficTextField = new JTextField();
 	private final JLabel lblD = new JLabel("D:");
 	private final JLabel lblSetDefaults = new JLabel("Set defaults...");
+	private final JLabel lblUpSeed = new JLabel("Up seed:");
+	private final JSpinner upseedSpinner = new JSpinner();
+	private final JButton btnUpseed = new JButton("R");
+	private final JLabel lblDownSeed = new JLabel("Down seed:");
+	private final JSpinner downseedSpinner = new JSpinner();
+	private final JButton btnDownseed = new JButton("R");
 	private final JLabel lblGateways = new JLabel("Gateways:");
 	private final JButton gatewaysButton = new JButton("Edit");
 	private final JPanel gatewaysPanel = new JPanel();
@@ -135,7 +152,7 @@ public class StartOptionsDialog extends JDialog {
 	private SINREditOptionDialog sinrDialog;
 	
 	private String configFile;
-	private final JPanel panel = new JPanel();
+	private final JPanel trafficLabelPanel = new JPanel();
 	private final JRadioButton rdbtnStatic = new JRadioButton("Static");
 	private final JRadioButton rdbtnDynamic = new JRadioButton("Dynamic");
 	private final ButtonGroup groupTraffic = new ButtonGroup();
@@ -144,418 +161,567 @@ public class StartOptionsDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public StartOptionsDialog() {
-		gatewaysDialog = new GatewaysEditOptionDialog(this);
-		routersDialog = new RoutersEditOptionDialog(this);
-		ifactorDialog = new IFactorEditOptionDialog(this);
-		datarateDialog = new DatarateEditOptionDialog(this);
-		sinrDialog = new SINREditOptionDialog(this);
+		/*--------------*/
+		/* Init Dialogs */
+		/*--------------*/
+		{
+			gatewaysDialog = new GatewaysEditOptionDialog(this);
+			routersDialog = new RoutersEditOptionDialog(this);
+			ifactorDialog = new IFactorEditOptionDialog(this);
+			datarateDialog = new DatarateEditOptionDialog(this);
+			sinrDialog = new SINREditOptionDialog(this);
+		}
 		
-		SINRTextField.setEditable(false);
-		SINRTextField.setColumns(10);
-		dataratesTextField.setEditable(false);
-		dataratesTextField.setColumns(10);
-		String filePath = "/setting/input/routers.txt";
-		routersTextField.setText("File: ..."+filePath.substring(filePath.length()-20, filePath.length()));
-		routersTextField.setEditable(false);
-		routersTextField.setColumns(10);
-		gatewaysTextField.setText("Static: 4 gateways...");
-		gatewaysTextField.setEditable(false);
-		gatewaysTextField.setColumns(10);
-		downTrafficTextField.setText(".../trafficDown.txt");
-		downTrafficTextField.setToolTipText("/setting/input/trafficDown.txt");
-		downTrafficTextField.setEditable(false);
-		downTrafficTextField.setColumns(10);
-		upTrafficTextField.setText("...ut/trafficUp.txt");
-		upTrafficTextField.setToolTipText("/setting/input/trafficUp.txt");
-		upTrafficTextField.setEditable(false);
-		upTrafficTextField.setColumns(10);
-		outputFolderPathTextField.setFont(new Font("Tahoma", Font.ITALIC, 11));
-		outputFolderPathTextField.setText("Output folder...");
-		outputFolderPathTextField.setEditable(false);
-		outputFolderPathTextField.setColumns(10);	
-		setIconImage(Toolkit.getDefaultToolkit().getImage(StartOptionsDialog.class.getResource("/com/sun/java/swing/plaf/windows/icons/Computer.gif")));
-		setTitle("Parameters");
-		setResizable(false);
-		setBounds(100, 100, 450, 300);
-		BorderLayout borderLayout = new BorderLayout();
-		getContentPane().setLayout(borderLayout);
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new MigLayout("", "[90px,grow]10[157px,grow]10[95px]10[157px,grow]", "[min!]10[min!,grow]20[grow]10[grow]10[min!,grow]10[min!,grow]"));
-		lblEnvironment.setHorizontalAlignment(SwingConstants.TRAILING);
-		contentPanel.add(lblEnvironment, "cell 0 0,grow");
+		/*-----------------*/
+		/* Init Components */
+		/*-----------------*/
+		{
+			SINRTextField.setEditable(false);
+			SINRTextField.setColumns(10);
+			dataratesTextField.setEditable(false);
+			dataratesTextField.setColumns(10);
+			String filePath = "/setting/input/routers.txt";
+			routersTextField.setText("File: ..."+filePath.substring(filePath.length()-20, filePath.length()));
+			routersTextField.setEditable(false);
+			routersTextField.setColumns(10);
+			gatewaysTextField.setText("Static: 4 gateways...");
+			gatewaysTextField.setEditable(false);
+			gatewaysTextField.setColumns(10);
+			downTrafficTextField.setText(".../trafficDown.txt");
+			downTrafficTextField.setToolTipText("/setting/input/trafficDown.txt");
+			downTrafficTextField.setEditable(false);
+			downTrafficTextField.setColumns(10);
+			upTrafficTextField.setText("...ut/trafficUp.txt");
+			upTrafficTextField.setToolTipText("/setting/input/trafficUp.txt");
+			upTrafficTextField.setEditable(false);
+			upTrafficTextField.setColumns(10);
+			outputFolderPathTextField.setFont(new Font("Tahoma", Font.ITALIC, 11));
+			outputFolderPathTextField.setText("Output folder...");
+			outputFolderPathTextField.setEditable(false);
+			outputFolderPathTextField.setColumns(10);	
+		}
 		
-		contentPanel.add(environmentPanel, "cell 1 0,growx,aligny center");
-		environmentPanel.setLayout(new MigLayout("insets 0 0 0 0", "[min!][150px]", "[25px][25px]"));
-		environmentPanel.add(lblX);
+		/*------------------*/
+		/* Frame Parameters */
+		/*------------------*/
+		{
+			setIconImage(Toolkit.getDefaultToolkit().getImage(StartOptionsDialog.class.getResource("/com/sun/java/swing/plaf/windows/icons/Computer.gif")));
+			setTitle("Parameters");
+			setResizable(false);
+			getContentPane().setLayout(new BorderLayout());
+			contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+			getContentPane().add(contentPanel, BorderLayout.CENTER);
+			contentPanel.setLayout(new MigLayout("", "[90px,grow]10[157px,grow]10[95px]10[157px,grow]", "[min!]10[min!,grow]20[grow]10[grow]10[min!,grow]10[min!,grow]"));
+		}
 		
-		envXSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
-		environmentPanel.add(envXSpinner, "wrap,grow");
-		environmentPanel.add(lblY);
-		envYSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
-		environmentPanel.add(envYSpinner, "grow");
-		lblGateways.setHorizontalAlignment(SwingConstants.TRAILING);
+		/*-------------*/
+		/* Environment */
+		/*-------------*/
+		{
+			lblEnvironment.setHorizontalAlignment(SwingConstants.TRAILING);
+			contentPanel.add(lblEnvironment, "cell 0 0,grow");
+			
+			contentPanel.add(environmentPanel, "cell 1 0,growx,aligny center");
+			environmentPanel.setLayout(new MigLayout("insets 0 0 0 0", "[min!][150px]", "[25px][25px]"));
+			environmentPanel.add(lblX);
+			
+			envXSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
+			environmentPanel.add(envXSpinner, "wrap,grow");
+			environmentPanel.add(lblY);
+			envYSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
+			environmentPanel.add(envYSpinner, "grow");
+			lblGateways.setHorizontalAlignment(SwingConstants.TRAILING);
+		}
 		
-		contentPanel.add(lblGateways, "cell 2 0,grow");
-		
-		contentPanel.add(gatewaysPanel, "cell 3 0,growx,aligny center");
-		gatewaysPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
-		
-		gatewaysPanel.add(gatewaysTextField, "cell 0 0,grow");
-		gatewaysButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				gatewaysDialog.showDialog(true);
-			}
-		});
-		gatewaysPanel.add(gatewaysButton, "cell 1 0,alignx center,aligny center");
-		
-		contentPanel.add(lblOutput, "cell 0 1,alignx trailing,aligny center");
-		
-		contentPanel.add(outputPanel, "cell 1 1,grow");
-		outputPanel.setLayout(new MigLayout("insets 0 0 0 0", "[5][150px][min!]", "[][23px]"));
-		chckbxGenerateFiles.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				btnOutput.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-				outputFolderPathTextField.setText("Output folder...");
-				outputFolderPathTextField.setToolTipText("");
-			}
-		});
-		
-		outputPanel.add(chckbxGenerateFiles, "cell 0 0 3 1,grow");
-		
-		outputPanel.add(outputFolderPathTextField, "cell 1 1,grow");
-		btnOutput.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showFileChooser(outputFolderPathTextField, "output", true, 15);
-			}
-		});
-		btnOutput.setEnabled(false);
-		outputPanel.add(btnOutput, "cell 2 1,growx,aligny top");
-		lblRouters.setHorizontalAlignment(SwingConstants.TRAILING);
-		
-		contentPanel.add(lblRouters, "cell 2 1,grow");
-		
-		contentPanel.add(routersPanel, "cell 3 1,growx,aligny center");
-		routersPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
-		
-		routersPanel.add(routersTextField, "cell 0 1,grow");
-		routersButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				routersDialog.showDialog(true);
-			}
-		});
-		routersPanel.add(routersButton, "cell 1 1");
-		
-		contentPanel.add(trafficPanel, "cell 1 2 1 2,grow");
-		trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[][grow][min!][grow][min!]", "[grow][grow][grow][][grow]"));
-		
-		trafficPanel.add(lblGenerator, "cell 0 0 2 1,grow");
-		trafficComboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				boolean select = ((String)trafficComboBox.getSelectedItem()).equals("File");
-				btnDownTraffic.setEnabled(select);
-				btnUpTraffic.setEnabled(select);
-				lblSetDefaults.setEnabled(select);
-			}
-		});
-		trafficComboBox.setModel(new DefaultComboBoxModel(new String[] {"File", "Random"}));
-		trafficComboBox.setSelectedIndex(0);
-		
-		trafficPanel.add(trafficComboBox, "cell 3 0 3 1,grow");
-		
-		trafficPanel.add(lblU, "cell 0 1,alignx trailing");
-		
-		trafficPanel.add(upTrafficTextField, "cell 1 1 3 1,growx");
-		btnUpTraffic.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				showFileChooser(upTrafficTextField, "uplink traffic", false, 15);
-			}
-		});
-		
-		trafficPanel.add(btnUpTraffic, "cell 4 1,growx");
-		
-		trafficPanel.add(lblD, "cell 0 2,alignx trailing");
-		
-		trafficPanel.add(downTrafficTextField, "cell 1 2 3 1,growx");
-		
-		trafficPanel.add(btnDownTraffic, "cell 4 2");
-		btnDownTraffic.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				showFileChooser(downTrafficTextField, "downlink traffic", false, 15);
-			}
-		});
-		
-		lblSetDefaults.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				if(lblSetDefaults.isEnabled()) {
-					upTrafficTextField.setText("...ut/trafficUp.txt");
-					upTrafficTextField.setToolTipText("/setting/input/trafficUp.txt");
-					downTrafficTextField.setText(".../trafficDown.txt");
-					downTrafficTextField.setToolTipText("/setting/input/trafficDown.txt");
+		/*----------*/
+		/* Gateways */
+		/*----------*/
+		{
+			contentPanel.add(lblGateways, "cell 2 0,grow");
+			
+			contentPanel.add(gatewaysPanel, "cell 3 0,growx,aligny center");
+			gatewaysPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
+			
+			gatewaysPanel.add(gatewaysTextField, "cell 0 0,grow");
+			gatewaysButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					gatewaysDialog.showDialog(true);
 				}
-			}
-		});
-		lblSetDefaults.setCursor(new Cursor(java.awt.Cursor.HAND_CURSOR));
-		lblSetDefaults.setForeground(new Color(0, 0, 255));
-		lblSetDefaults.setFont(new Font("Tahoma", Font.ITALIC, 11));
+			});
+			gatewaysPanel.add(gatewaysButton, "cell 1 0,alignx center,aligny center");
+		}
 		
-		trafficPanel.add(lblSetDefaults, "cell 3 3 2 1,alignx right");
-		lblIfactor.setHorizontalAlignment(SwingConstants.TRAILING);
+		/*--------*/
+		/* Output */
+		/*--------*/
+		{
+			contentPanel.add(lblOutput, "cell 0 1,alignx trailing,aligny center");
+			
+			contentPanel.add(outputPanel, "cell 1 1,grow");
+			outputPanel.setLayout(new MigLayout("insets 0 0 0 0", "[5][150px][min!]", "[][23px]"));
+			chckbxGenerateFiles.addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+					btnOutput.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+					outputFolderPathTextField.setText("Output folder...");
+					outputFolderPathTextField.setToolTipText("");
+				}
+			});
+			
+			outputPanel.add(chckbxGenerateFiles, "cell 0 0 3 1,grow");
+			
+			outputPanel.add(outputFolderPathTextField, "cell 1 1,grow");
+			btnOutput.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showFileChooser(outputFolderPathTextField, "output", true, 15);
+				}
+			});
+			btnOutput.setEnabled(false);
+			outputPanel.add(btnOutput, "cell 2 1,growx,aligny top");
+		}
 		
-		contentPanel.add(lblIfactor, "cell 2 2,growx,aligny center");
-		IFactorTextField.setEditable(false);
-		IFactorTextField.setColumns(10);
+		/*---------*/
+		/* Routers */
+		/*---------*/
+		{
+			lblRouters.setHorizontalAlignment(SwingConstants.TRAILING);
+			
+			contentPanel.add(lblRouters, "cell 2 1,grow");
+			
+			contentPanel.add(routersPanel, "cell 3 1,growx,aligny center");
+			routersPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
+			
+			routersPanel.add(routersTextField, "cell 0 1,grow");
+			routersButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					routersDialog.showDialog(true);
+				}
+			});
+			routersPanel.add(routersButton, "cell 1 1");
+		}
 		
-		contentPanel.add(IFactorPanel, "cell 3 2,growx,aligny center");
-		IFactorPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
+		/*---------*/
+		/* Traffic */
+		/*---------*/
+		{
+			contentPanel.add(trafficLabelPanel, "cell 0 2 1 2,growx,aligny center");
+			
+			trafficLabelPanel.setLayout(new MigLayout("", "[grow]", "[min!]10[min!][min!]"));
+			trafficLabelPanel.add(lblTraffic, "cell 0 0,growx");
+			
+			lblTraffic.setHorizontalAlignment(SwingConstants.TRAILING);
+			
+			groupTraffic.add(rdbtnStatic);
+			
+			rdbtnStatic.setFont(new Font("Tahoma", Font.ITALIC, 10));
+			rdbtnStatic.setSelected(true);
+			rdbtnStatic.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					updateTrafficPanel(!rdbtnStatic.isSelected(), trafficComboBox.getSelectedIndex() == 1);
+				}
+			});
+			
+			trafficLabelPanel.add(rdbtnStatic, "cell 0 1,alignx right,growy");
+			
+			groupTraffic.add(rdbtnDynamic);
+			
+			rdbtnDynamic.setFont(new Font("Tahoma", Font.ITALIC, 10));
+			rdbtnDynamic.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					updateTrafficPanel(rdbtnDynamic.isSelected(), false);
+				}
+			});
+			
+			
+			trafficLabelPanel.add(rdbtnDynamic, "cell 0 2,alignx right,growy");
+			
+			trafficComboBox.addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+					boolean select = ((String)trafficComboBox.getSelectedItem()).equals("File");
+					btnDownTraffic.setEnabled(select);
+					btnUpTraffic.setEnabled(select);
+					lblSetDefaults.setEnabled(select);
+				}
+			});
+			trafficComboBox.setModel(new DefaultComboBoxModel(new String[] {"File", "Random"}));
+			trafficComboBox.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if(e.getStateChange() == ItemEvent.SELECTED) {
+						updateTrafficPanel(false, trafficComboBox.getSelectedIndex() == 1);
+					}
+				}
+			});
+			trafficComboBox.setSelectedIndex(0);
+			
+			btnUpTraffic.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					showFileChooser(upTrafficTextField, "uplink traffic", false, 15);
+				}
+			});
+			
+			btnDownTraffic.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					showFileChooser(downTrafficTextField, "downlink traffic", false, 15);
+				}
+			});
 		
-		IFactorPanel.add(IFactorTextField, "cell 0 0,grow");
-		IFactorButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ifactorDialog.showDialog(true);
-			}
-		});
-		IFactorPanel.add(IFactorButton, "cell 1 0,growx");
+			lblSetDefaults.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent arg0) {
+					if(lblSetDefaults.isEnabled()) {
+						upTrafficTextField.setText("...ut/trafficUp.txt");
+						upTrafficTextField.setToolTipText("/setting/input/trafficUp.txt");
+						downTrafficTextField.setText(".../trafficDown.txt");
+						downTrafficTextField.setToolTipText("/setting/input/trafficDown.txt");
+					}
+				}
+			});
+			lblSetDefaults.setCursor(new Cursor(java.awt.Cursor.HAND_CURSOR));
+			lblSetDefaults.setForeground(new Color(0, 0, 255));
+			lblSetDefaults.setFont(new Font("Tahoma", Font.ITALIC, 11));
+			
+			durationSpinner.setModel(new SpinnerNumberModel(new Long(100000), new Long(1), null, new Long(100)));
+			rateSpinner.setModel(new SpinnerNumberModel(new Double(0.5), new Double(0.001), new Double(1.0), new Double(0.01)));
+			seedSpinner.setModel(new SpinnerNumberModel(Math.abs(new Random().nextLong()), new Long(1), null, new Long(1)));
+			nodesSpinner.setModel(new SpinnerNumberModel(new Integer(5), new Integer(1), null, new Integer(1)));
+			ratioSpinner.setModel(new SpinnerNumberModel(new Integer(2), new Integer(1), null, new Integer(1)));
+			
+			upseedSpinner.setModel(new SpinnerNumberModel(Math.abs(new Random().nextLong()), new Long(1), null, new Long(1)));
+			btnUpseed.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					upseedSpinner.setValue(Math.abs(new Random().nextLong()));
+				}
+			});
+			downseedSpinner.setModel(new SpinnerNumberModel(Math.abs(new Random().nextLong()), new Long(1), null, new Long(1)));
+			btnDownseed.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					downseedSpinner.setValue(Math.abs(new Random().nextLong()));
+				}
+			});
+			
+			updateTrafficPanel(false, false);
+		}
+			
+		/*---------*/
+		/* IFactor */
+		/*---------*/
+		{
+			lblIfactor.setHorizontalAlignment(SwingConstants.TRAILING);
+			
+			contentPanel.add(lblIfactor, "cell 2 2,growx,aligny center");
+			IFactorTextField.setEditable(false);
+			IFactorTextField.setColumns(10);
+			
+			contentPanel.add(IFactorPanel, "cell 3 2,growx,aligny center");
+			IFactorPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
+			
+			IFactorPanel.add(IFactorTextField, "cell 0 0,grow");
+			IFactorButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					ifactorDialog.showDialog(true);
+				}
+			});
+			IFactorPanel.add(IFactorButton, "cell 1 0,growx");
+		}
 		
-		contentPanel.add(panel, "cell 0 2 1 2,growx,aligny center");
-		panel.setLayout(new MigLayout("", "[grow]", "[min!]10[min!][min!]"));
-		panel.add(lblTraffic, "cell 0 0,growx");
-		lblTraffic.setHorizontalAlignment(SwingConstants.TRAILING);
-		groupTraffic.add(rdbtnStatic);
-		rdbtnStatic.setFont(new Font("Tahoma", Font.ITALIC, 10));
-		rdbtnStatic.setSelected(true);
+		/*-----------*/
+		/* Datarates */
+		/*-----------*/
+		{
+			lblDatarates.setHorizontalAlignment(SwingConstants.TRAILING);
+			contentPanel.add(lblDatarates, "cell 2 3,growx,aligny center");
+			
+			contentPanel.add(dataratesPanel, "cell 3 3,growx,aligny center");
+			dataratesPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
+			
+			dataratesPanel.add(dataratesTextField, "cell 0 0,grow");
+			dataratesButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					datarateDialog.showDialog(true);
+				}
+			});
+			dataratesPanel.add(dataratesButton, "cell 1 0,growx");
+		}
 		
-		panel.add(rdbtnStatic, "cell 0 1,alignx right,growy");
-		groupTraffic.add(rdbtnDynamic);
-		rdbtnDynamic.setFont(new Font("Tahoma", Font.ITALIC, 10));
+		/*------------*/
+		/* Algorithms */
+		/*------------*/
+		{
+			lblAlgorithm.setHorizontalAlignment(SwingConstants.TRAILING);
+			contentPanel.add(lblAlgorithm, "cell 0 4,grow");
+	
+			JPanel rdbtnPanel = new JPanel();
+			contentPanel.add(rdbtnPanel, "cell 1 4,alignx left,growy");
+			rdbtnPanel.setLayout(new GridLayout(2, 0, 0, 0));
+			
+			JRadioButton rdbtnOriginal = new JRadioButton("Original algorithm");
+			rdbtnPanel.add(rdbtnOriginal);
+	
+			rdbtnNewAlgorithm.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					chckbxPanel.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+					spinnerRatio.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+					chckbxAlternateOrder.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+					chckbxRepeatLinksTo.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+					chckbxEnlargeByGateways.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+				}
+			});
+			rdbtnPanel.add(rdbtnNewAlgorithm);
+			
+			ButtonGroup groupAlgo = new ButtonGroup();
+			groupAlgo.add(rdbtnNewAlgorithm);
+			groupAlgo.add(rdbtnOriginal);
+			rdbtnNewAlgorithm.setSelected(true);
+			lblSinr.setHorizontalAlignment(SwingConstants.TRAILING);
+			
+			newAlgoPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "New algorithm parameters", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+			
+			contentPanel.add(newAlgoPanel, "cell 0 5 2 1,alignx center,aligny center");
+			newAlgoPanel.setLayout(new MigLayout("insets 5 0 0 0", "[min!]10[157px]", "[83px][83px]"));
+			newAlgoPanel.add(ratioLabelsPanel, "cell 0 0,alignx trailing,aligny center");
+			ratioLabelsPanel.setLayout(new MigLayout("insets 0 0 0 0", "[157px]", "[min!][min!]"));
+			
+			JLabel spinnerLabel = new JLabel("Ratio Downlinks");
+			ratioLabelsPanel.add(spinnerLabel, "cell 0 0,alignx right,growy");
+			spinnerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			spinnerLabel.setAlignmentX(CENTER_ALIGNMENT);
+			lblOverUplinks.setHorizontalAlignment(SwingConstants.CENTER);
+			
+			ratioLabelsPanel.add(lblOverUplinks, "cell 0 1,alignx right,growy");
+			
+			spinnerRatio.setModel(new SpinnerNumberModel(1, 1, 4, 1));
+			JPanel spinnerPanel = new JPanel();
+			newAlgoPanel.add(spinnerPanel, "cell 1 0,growx,aligny center");
+			spinnerPanel.setAlignmentX(CENTER_ALIGNMENT);
+			spinnerPanel.setLayout(new MigLayout("insets 0 5 0 0", "[157px]", "[27px]"));
+			spinnerPanel.add(spinnerRatio, "cell 0 0,growx,aligny center");
+			newAlgoPanel.add(lblNewLabel, "cell 0 1,alignx right,aligny center");
+			lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			newAlgoPanel.add(chckbxPanel, "cell 1 1,grow");
+			chckbxPanel.setLayout(new GridLayout(3, 0, 0, 0));
+	
+			chckbxPanel.add(chckbxAlternateOrder);
+	
+			chckbxPanel.add(chckbxRepeatLinksTo);
+	
+			chckbxPanel.add(chckbxEnlargeByGateways);
+			lblChannels.setHorizontalAlignment(SwingConstants.TRAILING);
+		}
 		
-		panel.add(rdbtnDynamic, "cell 0 2,alignx right,growy");
-		lblDatarates.setHorizontalAlignment(SwingConstants.TRAILING);
+		/*------*/
+		/* SINR */
+		/*------*/
+		{
+			contentPanel.add(lblSinr, "cell 2 4,growx,aligny center");
+			
+			contentPanel.add(SINRPanel, "cell 3 4,growx,aligny center");
+			SINRPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
+			
+			SINRPanel.add(SINRTextField, "cell 0 0,grow");
+			SINRButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					sinrDialog.showDialog(true);
+				}
+			});
+			SINRPanel.add(SINRButton, "cell 1 0,growx");
+		}
 		
-		contentPanel.add(lblDatarates, "cell 2 3,growx,aligny center");
-		
-		contentPanel.add(dataratesPanel, "cell 3 3,growx,aligny center");
-		dataratesPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
-		
-		dataratesPanel.add(dataratesTextField, "cell 0 0,grow");
-		dataratesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				datarateDialog.showDialog(true);
-			}
-		});
-		dataratesPanel.add(dataratesButton, "cell 1 0,growx");
-		
-		lblAlgorithm.setHorizontalAlignment(SwingConstants.TRAILING);
-		contentPanel.add(lblAlgorithm, "cell 0 4,grow");
+		/*----------*/
+		/* Channels */
+		/*----------*/
+		{
+			contentPanel.add(lblChannels, "cell 2 5,growx,aligny center");
+			
+			contentPanel.add(channelsPanel, "cell 3 5,grow");
+			channelsPanel.setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
+			
+			channelsPanel.add(lblMode, "cell 0 0,alignx trailing");
+			channelModeComboBox.addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+					channelList.setEnabled(channelModeComboBox.getSelectedIndex() != 0);
+					lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() != 0);
+				}
+			});
+			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Partially"}));
+			channelModeComboBox.setSelectedIndex(0);
+			
+			channelsPanel.add(channelModeComboBox, "cell 1 0,grow");
+			lblSelected.setHorizontalAlignment(SwingConstants.TRAILING);
+			
+			channelsPanel.add(lblSelected, "flowy,cell 0 1,growx");
+			lblChannels_1.setHorizontalAlignment(SwingConstants.TRAILING);
+			
+			channelsPanel.add(lblChannels_1, "cell 0 1,growx");
+			
+			channelsPanel.add(channelScrollPane, "cell 1 1,grow");
+			channelList.setEnabled(false);
+			channelList.setModel(new AbstractListModel() {
+				public int getSize() {
+					return StartOptionsDialog.MaxChannelNumber;
+				}
+				public Object getElementAt(int index) {
+					return ((index < StartOptionsDialog.MaxChannelNumber) ? index+1 : null);
+				}
+			});
+			channelList.setVisibleRowCount(3);
+			channelScrollPane.setViewportView(channelList);
+			
+			lbluseCtrlTo.setVisible(false);
+			lbluseCtrlTo.setFont(new Font("Tahoma", Font.PLAIN, 9));
+			lbluseCtrlTo.setHorizontalAlignment(SwingConstants.CENTER);
+			
+			channelScrollPane.setColumnHeaderView(lbluseCtrlTo);
+			lblStrategy.setHorizontalAlignment(SwingConstants.TRAILING);
+			
+			channelsPanel.add(lblStrategy, "cell 0 2,growx");
+			channelStrategyComboBox.setModel(new DefaultComboBoxModel(
+					new String[] {"All Balancing", "Orthogonal Balancing", "Non Orthogonal Blancing", "Original",
+							"Select Min Randomly", "SINR"}));
+			channelStrategyComboBox.setSelectedIndex(3);
+			
+			channelsPanel.add(channelStrategyComboBox, "cell 1 2,grow");
+		}
 
-		JPanel rdbtnPanel = new JPanel();
-		contentPanel.add(rdbtnPanel, "cell 1 4,alignx left,growy");
-		rdbtnPanel.setLayout(new GridLayout(2, 0, 0, 0));
-		
-		JRadioButton rdbtnOriginal = new JRadioButton("Original algorithm");
-		rdbtnPanel.add(rdbtnOriginal);
-
-		rdbtnPanel.add(rdbtnNewAlgorithm);
-		
-		ButtonGroup groupAlgo = new ButtonGroup();
-		groupAlgo.add(rdbtnNewAlgorithm);
-		groupAlgo.add(rdbtnOriginal);
-		rdbtnNewAlgorithm.setSelected(true);
-		lblSinr.setHorizontalAlignment(SwingConstants.TRAILING);
-		
-		contentPanel.add(lblSinr, "cell 2 4,growx,aligny center");
-		
-		contentPanel.add(SINRPanel, "cell 3 4,growx,aligny center");
-		SINRPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
-		
-		SINRPanel.add(SINRTextField, "cell 0 0,grow");
-		SINRButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				sinrDialog.showDialog(true);
-			}
-		});
-		SINRPanel.add(SINRButton, "cell 1 0,growx");
-		newAlgoPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "New algorithm parameters", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		
-		contentPanel.add(newAlgoPanel, "cell 0 5 2 1,alignx center,aligny center");
-		newAlgoPanel.setLayout(new MigLayout("insets 5 0 0 0", "[min!]10[157px]", "[83px][83px]"));
-		newAlgoPanel.add(ratioLabelsPanel, "cell 0 0,alignx trailing,aligny center");
-		ratioLabelsPanel.setLayout(new MigLayout("insets 0 0 0 0", "[157px]", "[min!][min!]"));
-		
-		JLabel spinnerLabel = new JLabel("Ratio Downlinks");
-		ratioLabelsPanel.add(spinnerLabel, "cell 0 0,alignx right,growy");
-		spinnerLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		spinnerLabel.setAlignmentX(CENTER_ALIGNMENT);
-		lblOverUplinks.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		ratioLabelsPanel.add(lblOverUplinks, "cell 0 1,alignx right,growy");
-		
-		spinnerRatio.setModel(new SpinnerNumberModel(1, 1, 4, 1));
-		JPanel spinnerPanel = new JPanel();
-		newAlgoPanel.add(spinnerPanel, "cell 1 0,growx,aligny center");
-		spinnerPanel.setAlignmentX(CENTER_ALIGNMENT);
-		spinnerPanel.setLayout(new MigLayout("insets 0 5 0 0", "[157px]", "[27px]"));
-		spinnerPanel.add(spinnerRatio, "cell 0 0,growx,aligny center");
-		newAlgoPanel.add(lblNewLabel, "cell 0 1,alignx right,aligny center");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		newAlgoPanel.add(chckbxPanel, "cell 1 1,grow");
-		chckbxPanel.setLayout(new GridLayout(3, 0, 0, 0));
-
-		chckbxPanel.add(chckbxAlternateOrder);
-
-		chckbxPanel.add(chckbxRepeatLinksTo);
-
-		chckbxPanel.add(chckbxEnlargeByGateways);
-		lblChannels.setHorizontalAlignment(SwingConstants.TRAILING);
-		
-		contentPanel.add(lblChannels, "cell 2 5,growx,aligny center");
-		
-		contentPanel.add(channelsPanel, "cell 3 5,grow");
-		channelsPanel.setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
-		
-		channelsPanel.add(lblMode, "cell 0 0,alignx trailing");
-		channelModeComboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				channelList.setEnabled(channelModeComboBox.getSelectedIndex() != 0);
-				lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() != 0);
-			}
-		});
-		channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Partially"}));
-		channelModeComboBox.setSelectedIndex(0);
-		
-		channelsPanel.add(channelModeComboBox, "cell 1 0,grow");
-		lblSelected.setHorizontalAlignment(SwingConstants.TRAILING);
-		
-		channelsPanel.add(lblSelected, "flowy,cell 0 1,growx");
-		lblChannels_1.setHorizontalAlignment(SwingConstants.TRAILING);
-		
-		channelsPanel.add(lblChannels_1, "cell 0 1,growx");
-		
-		channelsPanel.add(channelScrollPane, "cell 1 1,grow");
-		channelList.setEnabled(false);
-		channelList.setModel(new AbstractListModel() {
-			public int getSize() {
-				return StartOptionsDialog.MaxChannelNumber;
-			}
-			public Object getElementAt(int index) {
-				return ((index < StartOptionsDialog.MaxChannelNumber) ? index+1 : null);
-			}
-		});
-		channelList.setVisibleRowCount(3);
-		channelScrollPane.setViewportView(channelList);
-		
-		lbluseCtrlTo.setVisible(false);
-		lbluseCtrlTo.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		lbluseCtrlTo.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		channelScrollPane.setColumnHeaderView(lbluseCtrlTo);
-		lblStrategy.setHorizontalAlignment(SwingConstants.TRAILING);
-		
-		channelsPanel.add(lblStrategy, "cell 0 2,growx");
-		channelStrategyComboBox.setModel(new DefaultComboBoxModel(
-				new String[] {"All Balancing", "Orthogonal Balancing", "Non Orthogonal Blancing", "Original",
-						"Select Min Randomly", "SINR"}));
-		channelStrategyComboBox.setSelectedIndex(3);
-		
-		channelsPanel.add(channelStrategyComboBox, "cell 1 2,grow");
-
-		JPanel buttonPane = new JPanel();
-		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		getContentPane().add(buttonPane, BorderLayout.SOUTH);
-		
-		JButton defaultButton = new JButton("Use Default and Run");
-		defaultButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Properties24.gif")));
-		defaultButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
-				TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-				TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
-				TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
-				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
-				/* Write config_auto.xml */
-				configFile = "/setting/input/config_default.xml";
-				JOptionPane.showMessageDialog(null,
-	        			"Loading config file: \n"+XMLParser.class.getResource(configFile).getPath(),
-	    			    "Loading configuration",            			    
-	    			    JOptionPane.INFORMATION_MESSAGE);
-				dispose();
-				XMLParser.CONFIGFILE = configFile;
-				Program.launch(rdbtnDynamic.isSelected());
-			}
-		});
-		buttonPane.add(defaultButton);
-		
-		JButton loadConfigButton = new JButton("Load and Run");
-		loadConfigButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
-		loadConfigButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
-				TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-				TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
-				TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
-				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
-				/* Write config_auto.xml */
-				JTextField blank = new JTextField();
-				showFileChooser(blank, "configuration to load", false, 10);
-				configFile = blank.getToolTipText();
-				if(configFile != null) {
+		/*---------*/
+		/* Buttons */
+		/*---------*/
+		{
+			JPanel buttonPane = new JPanel();
+			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			
+			JButton defaultButton = new JButton("Use Default and Run");
+			defaultButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Properties24.gif")));
+			defaultButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
+					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
+					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
+					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
+					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+					/* Write config_auto.xml */
+					configFile = "/setting/input/config_default.xml";
+					JOptionPane.showMessageDialog(null,
+		        			"Loading config file: \n"+XMLParser.class.getResource(configFile).getPath(),
+		    			    "Loading configuration",            			    
+		    			    JOptionPane.INFORMATION_MESSAGE);
+					dispose();
 					XMLParser.CONFIGFILE = configFile;
 					Program.launch(rdbtnDynamic.isSelected());
-					dispose();
 				}
-			}
-		});
-		buttonPane.add(loadConfigButton);
-
-		JButton saveAndRunButton = new JButton("Save and Run");
-		saveAndRunButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play24.gif")));
-		saveAndRunButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
-				TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-				TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
-				TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
-				TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
-				/* Write config_auto.xml */
-				writeConfiguration();
-				if(configFile != null) {
-					XMLParser.CONFIGFILE = configFile;
-					dispose();
-					Program.launch(rdbtnDynamic.isSelected());
+			});
+			buttonPane.add(defaultButton);
+			
+			JButton loadConfigButton = new JButton("Load and Run");
+			loadConfigButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
+			loadConfigButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
+					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
+					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
+					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
+					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+					/* Write config_auto.xml */
+					JTextField blank = new JTextField();
+					showFileChooser(blank, "configuration to load", false, 10);
+					configFile = blank.getToolTipText();
+					if(configFile != null) {
+						XMLParser.CONFIGFILE = configFile;
+						Program.launch(rdbtnDynamic.isSelected());
+						dispose();
+					}
 				}
-			}
-		});
-		buttonPane.add(saveAndRunButton);
-		getRootPane().setDefaultButton(saveAndRunButton);
-
-		JButton cancelButton = new JButton("Exit");
-		cancelButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop24.gif")));
-		cancelButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
-		buttonPane.add(cancelButton);
-		
-		rdbtnNewAlgorithm.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				chckbxPanel.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-				spinnerRatio.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-				chckbxAlternateOrder.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-				chckbxRepeatLinksTo.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-				chckbxEnlargeByGateways.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-			}
-		});
+			});
+			buttonPane.add(loadConfigButton);
+	
+			JButton saveAndRunButton = new JButton("Save and Run");
+			saveAndRunButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play24.gif")));
+			saveAndRunButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
+					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
+					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
+					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
+					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+					/* Write config_auto.xml */
+					writeConfiguration();
+					if(configFile != null) {
+						XMLParser.CONFIGFILE = configFile;
+						dispose();
+						Program.launch(rdbtnDynamic.isSelected());
+					}
+				}
+			});
+			buttonPane.add(saveAndRunButton);
+			getRootPane().setDefaultButton(saveAndRunButton);
+	
+			JButton cancelButton = new JButton("Exit");
+			cancelButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop24.gif")));
+			cancelButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					System.exit(0);
+				}
+			});
+			buttonPane.add(cancelButton);
+		}
 		
 		pack();
+		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+	}
+	
+	private void updateTrafficPanel(boolean dynamic, boolean random) {
+		contentPanel.remove(trafficPanel);
+		trafficPanel = new JPanel();
+		if(dynamic) {
+			trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[min!][grow]", "[grow][grow][grow][grow][grow]"));
+			trafficPanel.add(lblDuration, "cell 0 0,alignx trailing");
+			trafficPanel.add(durationSpinner, "cell 1 0, grow");
+			trafficPanel.add(lblRate, "cell 0 1,alignx trailing");
+			trafficPanel.add(rateSpinner, "cell 1 1, grow");
+			trafficPanel.add(lblSeed, "cell 0 2,alignx trailing");
+			seedSpinner.setValue(Math.abs(new Random().nextLong()));
+			trafficPanel.add(seedSpinner, "cell 1 2, grow");
+			trafficPanel.add(lblNbNewNodes, "cell 0 3,alignx trailing");
+			trafficPanel.add(nodesSpinner, "cell 1 3, grow");
+			trafficPanel.add(lblRatio, "cell 0 4,alignx trailing");
+			trafficPanel.add(ratioSpinner, "cell 1 4, grow");
+		} else {
+			trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[][grow][min!][grow][min!]", "[grow][grow][grow][][grow]"));
+			trafficPanel.add(lblGenerator, "cell 0 0 2 1,alignx trailing");
+			trafficPanel.add(trafficComboBox, "cell 3 0 3 1,grow");
+			if(random) {				
+				trafficPanel.add(lblUpSeed, "cell 0 1,alignx trailing");
+				trafficPanel.add(upseedSpinner, "cell 1 1 3 1,grow");
+				trafficPanel.add(btnUpseed, "cell 4 1,growx");
+				trafficPanel.add(lblDownSeed, "cell 0 2,alignx trailing");
+				trafficPanel.add(downseedSpinner, "cell 1 2 3 1,growx");
+				trafficPanel.add(btnDownseed, "cell 4 2");
+			} else {
+				trafficPanel.add(lblU, "cell 0 1,alignx trailing");
+				trafficPanel.add(upTrafficTextField, "cell 1 1 3 1,growx");
+				trafficPanel.add(btnUpTraffic, "cell 4 1,growx");
+				trafficPanel.add(lblD, "cell 0 2,alignx trailing");
+				trafficPanel.add(downTrafficTextField, "cell 1 2 3 1,growx");
+				trafficPanel.add(btnDownTraffic, "cell 4 2");
+				trafficPanel.add(lblSetDefaults, "cell 3 3 2 1,alignx right");
+			}
+		}
+		
+		contentPanel.add(trafficPanel, "cell 1 2 1 2,grow");
+		
+		this.revalidate();
+		this.repaint();
 	}
 	
 	public static void showFileChooser(JTextField source, String title, boolean folder, int textSize) {
@@ -690,9 +856,17 @@ public class StartOptionsDialog extends JDialog {
 				(int) sinrResult.get("power"), (double) sinrResult.get("beta"),
 				(double) sinrResult.get("mu"));
 		
-		XMLWriter.writeTraffic(trafficComboBox.getSelectedItem().toString(),
+		XMLWriter.writeTraffic(rdbtnDynamic.isSelected(),
+				trafficComboBox.getSelectedItem().toString(),
 				upTrafficTextField.getToolTipText()+"",
-				downTrafficTextField.getToolTipText()+"");
+				downTrafficTextField.getToolTipText()+"",
+				(long) upseedSpinner.getValue(),
+				(long) downseedSpinner.getValue(),
+				(double) rateSpinner.getValue(),
+				(long) seedSpinner.getValue(),
+				(int) nodesSpinner.getValue(),
+				(int) ratioSpinner.getValue(),
+				(long) durationSpinner.getValue());
 
 		File f = saveConfiguration();
 		if(f != null) {

@@ -70,6 +70,16 @@ public class DynamicTrafficGenerator {
 		this.downOverUpRatio = downOverUpRatio;
 	}
 	
+	/**Create a DynamicTrafficGenerator with the parameter specified in the XML
+	 * config file.
+	 */
+	public DynamicTrafficGenerator() {
+		this(ApplicationSettingFacade.Traffic.getTrafficRate(),
+				ApplicationSettingFacade.Traffic.getSeed(),
+				ApplicationSettingFacade.Traffic.getNumberOfNewEmittingNodes(),
+				ApplicationSettingFacade.Traffic.getRatio());
+	}
+	
 	/**Generate some traffic in the network for {@link DynamicTrafficGenerator#nodesToConsider n}
 	 * randomly selected nodes, and respecting the
 	 * {@link DynamicTrafficGenerator#downOverUpRatio given ratio}.
