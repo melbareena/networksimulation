@@ -3,16 +3,19 @@ package launcher;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 import scheduling.RoundRobinSchedulingStrategy;
 import scheduling.SchedulingStrategy;
 import trafficGenerator.DynamicTrafficGenerator;
 import GraphicVisualization.GraphViewer;
+import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.StartOptionsDialog;
 
 public class Program {
 	
+	public static LoadingDialog loadingDialog = new LoadingDialog(null, "simulation", false);
 	
 	public static void restartApplication() {
 		try {
@@ -47,10 +50,29 @@ public class Program {
 		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
 		SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
 		
+		loadingDialog.setVisible(true);
 		if(dynamic) {
-			s.dynamicScheduling();
+			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
+				@Override
+				protected Object doInBackground() throws Exception {
+					s.dynamicScheduling();
+					Program.loadingDialog.setLabel("Building user interface...");
+					new GraphViewer(s.getThroughput(), s.getTrafficSource(), s.getTrafficTransit());
+					return null;
+				}
+			};
+			worker.execute();
 		} else {
-			s.scheduling();
+			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
+				@Override
+				protected Object doInBackground() throws Exception {
+					s.scheduling();
+					Program.loadingDialog.setLabel("Building user interface...");
+					new GraphViewer(s.getThroughput(), s.getTrafficSource(), s.getTrafficTransit());
+					return null;
+				}
+			};
+			worker.execute();
 		}
 
 		try {
@@ -58,8 +80,7 @@ public class Program {
 		} catch (Exception e) {
 			System.err.println("Unable to set the UI look and feel...");
 		}	
-		
-		new GraphViewer(s.getThroughput(), s.getTrafficSource(), s.getTrafficTransit());
+
 	}
 
 }

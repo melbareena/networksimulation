@@ -180,7 +180,15 @@ public class GraphViewer extends JFrame {
 		this.setTitle(title);
 		
 		int step = throughputData.size()/100;
-		this.histogramViewerFrame = new HistogramViewer(throughputData, sourceData, transmitData, step);
+		histogramViewerFrame = new HistogramViewer(throughputData, sourceData, transmitData, step);
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				histogramViewerFrame.showGraph();
+			}
+		});
+		t.run();
+		
 
 		this.graph = new mxGraph() {
 			// Tooltips for edges
@@ -289,6 +297,8 @@ public class GraphViewer extends JFrame {
 		});
 		
 		setVisible(true);
+		Program.loadingDialog.addProgress(100 - Program.loadingDialog.getProgress(),
+				"Done!");
     }
 	
 	/** Build the bottom panel of the frame 
