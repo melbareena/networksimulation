@@ -62,27 +62,48 @@ public class ApplicationSettingFacade
 	
 	
 	
-	public static class Traffic
-	{
-		public static TypeOfGenerationEnum getTypeOfGenerator()
-		{
+	public static class Traffic {
+		public static TypeOfGenerationEnum getTypeOfGenerator() {
 			return _tConf.getTypeOfgeneration();
 		}
-		public static String getAddressUp()
-		{
+		
+		public static String getAddressUp() {
 			return _tConf.getAddressUp();
 		}
-		public static String getAddressDown()
-		{
+		
+		public static String getAddressDown() {
 			return _tConf.getAddressDown();
 		}
-		public static long getUpSeed()
-		{
+		
+		public static long getUpSeed() {
 			return _tConf.getUpSeed();
 		}
-		public static long getDownSeed()
-		{
+		
+		public static long getDownSeed() {
 			return _tConf.getDownSeed();
+		}
+		public boolean isDynamicType() {
+			return _tConf.isDynamicType();
+		}
+
+		public static double getTrafficRate() {
+			return _tConf.getTrafficRate();
+		}
+		
+		public static long getDuration() {
+			return _tConf.getDuration();
+		}
+
+		public static long getSeed() {
+			return _tConf.getSeed();
+		}
+
+		public static int getNumberOfNewEmittingNodes() {
+			return _tConf.getNumberOfNewEmittingNodes();
+		}
+
+		public static int getRatio() {
+			return _tConf.getRatio();
 		}
 	}
 	

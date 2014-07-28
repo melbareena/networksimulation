@@ -70,13 +70,25 @@ public class XMLWriter {
 		e.setAttribute("IntermidiateConsoleOutput", "false");
 	}
 	
-	public static void writeTraffic(String generator, String addrUp, String addrDown) {
+	public static void writeTraffic(boolean dynamic, String generator, String addrUp, String addrDown,
+			long upseed, long downseed, double rate, long seed, int nodes, int ratio, long duration) {
 		Element e = doc.createElement("Traffic");
 		rootElement.appendChild(e);
+		e.setAttribute("Type", (dynamic ? "Dynamic" : "Static"));
 		e.setAttribute("Generator", generator);
 		if(generator == "File") {
 			e.setAttribute("AddressUp", addrUp);
 			e.setAttribute("AddressDown", addrDown);
+		} else {
+			e.setAttribute("UpSeed", upseed+"");
+			e.setAttribute("DownSeed", downseed+"");
+		}
+		if(dynamic) {
+			e.setAttribute("Rate", rate+"");
+			e.setAttribute("Seed", seed+"");
+			e.setAttribute("NbOfNewEmittingNodes", nodes+"");
+			e.setAttribute("Ratio", ratio+"");
+			e.setAttribute("Duration", duration+"");
 		}
 	}
 	
