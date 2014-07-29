@@ -8,6 +8,7 @@ import javax.swing.UIManager;
 
 import scheduling.RoundRobinSchedulingStrategy;
 import scheduling.SchedulingStrategy;
+import setting.ApplicationSettingFacade;
 import trafficGenerator.DynamicTrafficGenerator;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.LoadingDialog;
@@ -46,13 +47,13 @@ public class Program {
 		startOptionDialog.setVisible(true);
 	}
 	
-	public static void launch(boolean dynamic) {
+	public static void launch() {
 		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
 		final SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
 	
 		loadingDialog.setVisible(true);
 		try {
-			if(dynamic) {
+			if(ApplicationSettingFacade.Traffic.isDynamicType()) {
 				SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
 					@Override
 					protected Object doInBackground() throws Exception {

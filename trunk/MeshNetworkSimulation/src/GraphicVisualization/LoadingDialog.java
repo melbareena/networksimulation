@@ -81,6 +81,11 @@ public class LoadingDialog extends JDialog {
 		this.progressBar.setValue(n);
 	}
 	
+	public void setProgress(int n, String s) {
+		this.progressBar.setValue(n);
+		setLabel(s);
+	}
+	
 	public void setLabel(String s) {
 		this.lblText.setText(s);
 	}

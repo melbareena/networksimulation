@@ -174,7 +174,8 @@ public class GraphViewer extends JFrame {
 	public GraphViewer(Results results) {
 		super();
 		
-		String title = "Mesh Network Simulation " + GraphViewer.optionsTitle;
+		String title = "Mesh Network Simulation " + GraphViewer.optionsTitle
+				+ " - " + results.getSchedulingStrategy() + " - " + results.getTrafficGenerator() + " traffic";
 		
 		this.setTitle(title);
 		

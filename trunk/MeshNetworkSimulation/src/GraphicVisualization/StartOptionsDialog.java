@@ -6,11 +6,14 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -145,6 +148,8 @@ public class StartOptionsDialog extends JDialog {
 	private final JComboBox channelStrategyComboBox = new JComboBox();
 	private final JLabel lbluseCtrlTo = new JLabel("(use Ctrl to select mutiples)");
 	
+	private final JButton defaultButton = new JButton("Use Default and Run");
+	
 	private GatewaysEditOptionDialog gatewaysDialog;
 	private RoutersEditOptionDialog routersDialog;
 	private IFactorEditOptionDialog ifactorDialog;
@@ -212,6 +217,7 @@ public class StartOptionsDialog extends JDialog {
 			contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 			getContentPane().add(contentPanel, BorderLayout.CENTER);
 			contentPanel.setLayout(new MigLayout("", "[90px,grow]10[157px,grow]10[95px]10[157px,grow]", "[min!]10[min!,grow]20[grow]10[grow]10[min!,grow]10[min!,grow]"));
+			setKeyListener();
 		}
 		
 		/*-------------*/
@@ -595,7 +601,7 @@ public class StartOptionsDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			
-			JButton defaultButton = new JButton("Use Default and Run");
+			defaultButton.setMnemonic(KeyEvent.VK_D);
 			defaultButton.setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Properties24.gif")));
 			defaultButton.addActionListener(new ActionListener() {
 				@Override
@@ -613,7 +619,7 @@ public class StartOptionsDialog extends JDialog {
 		    			    JOptionPane.INFORMATION_MESSAGE);
 					dispose();
 					XMLParser.CONFIGFILE = configFile;
-					Program.launch(rdbtnDynamic.isSelected());
+					Program.launch();
 				}
 			});
 			buttonPane.add(defaultButton);
@@ -634,7 +640,7 @@ public class StartOptionsDialog extends JDialog {
 					configFile = blank.getToolTipText();
 					if(configFile != null) {
 						XMLParser.CONFIGFILE = configFile;
-						Program.launch(rdbtnDynamic.isSelected());
+						Program.launch();
 						dispose();
 					}
 				}
@@ -656,7 +662,7 @@ public class StartOptionsDialog extends JDialog {
 					if(configFile != null) {
 						XMLParser.CONFIGFILE = configFile;
 						dispose();
-						Program.launch(rdbtnDynamic.isSelected());
+						Program.launch();
 					}
 				}
 			});
@@ -932,6 +938,28 @@ public class StartOptionsDialog extends JDialog {
 			GraphViewer.showErrorDialog(e.getMessage());
 		}
 		return null;
+	}
+	
+	public void setKeyListener() {
+		//Intercepte le keyboard manager
+		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		manager.addKeyEventDispatcher(new KeyEventDispatcher() {
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				if(e.getID() == KeyEvent.KEY_RELEASED) {//&& ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+					switch(e.getKeyCode()) {
+					case KeyEvent.VK_D: //Bouton avancer
+						if((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+							rdbtnDynamic.doClick();
+						} else {
+							defaultButton.doClick();
+						}
+						break;
+					}
+				}
+				//Empêche de propager les évènements du clavier
+				return false;
+			}
+		});
 	}
 
 }

@@ -82,7 +82,7 @@ public class ApplicationSettingFacade
 		public static long getDownSeed() {
 			return _tConf.getDownSeed();
 		}
-		public boolean isDynamicType() {
+		public static boolean isDynamicType() {
 			return _tConf.isDynamicType();
 		}
 
