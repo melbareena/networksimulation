@@ -48,8 +48,8 @@ public class Program {
 	
 	public static void launch(boolean dynamic) {
 		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
-		SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
-		
+		final SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
+	
 		loadingDialog.setVisible(true);
 		if(dynamic) {
 			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {

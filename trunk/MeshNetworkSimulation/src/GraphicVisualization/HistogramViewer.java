@@ -3,7 +3,6 @@ package GraphicVisualization;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
@@ -24,8 +23,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
 import org.jfree.chart.ChartFactory;
@@ -33,7 +30,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.event.ChartProgressEvent;
+
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -197,7 +194,7 @@ public class HistogramViewer extends JFrame {
 		cPanel.setPopupMenu(null);
 	}
 	
-	private JMenu buildMenuDisplay(String target, int index) {
+	private JMenu buildMenuDisplay(final String target, final int index) {
 		JMenu menu = new JMenu(target);
 		
 		JMenuItem mnVisible= new JMenuItem("Set invisible");
@@ -253,8 +250,8 @@ public class HistogramViewer extends JFrame {
 		});
 		
 		JMenu mnShape = new JMenu("Shape");
-		XYPlot plot = chart.getXYPlot();		
-		XYSplineRenderer renderer = (XYSplineRenderer) plot.getRenderer(index);
+		final XYPlot plot = chart.getXYPlot();		
+		final XYSplineRenderer renderer = (XYSplineRenderer) plot.getRenderer(index);
 		JMenuItem nullShape = new JMenuItem("No Shape");
 		nullShape.addActionListener(new ActionListener() {
 			@Override
@@ -304,7 +301,7 @@ public class HistogramViewer extends JFrame {
 			color.setActionCommand(colors[i]);
 			try {
 				Field field = Color.class.getField(colors[i].toUpperCase());
-				Color c = (Color)field.get(null);
+				final Color c = (Color)field.get(null);
 				color.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {

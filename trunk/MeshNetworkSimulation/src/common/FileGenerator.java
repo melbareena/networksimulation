@@ -375,7 +375,7 @@ public class FileGenerator
 			}
 
 			writer.close();
-			PrintConsole.printErr("Transmission Configuration inserted in file successfully.");
+			PrintConsole.print("Transmission Configuration inserted in file successfully.");
 		} 
 		catch (Exception ex)
 		{
@@ -408,7 +408,7 @@ public class FileGenerator
 			}
 			writer.close();
 		
-			PrintConsole.printErr("throughput inserted in "+path+"throughtput.txt successfully.");
+			PrintConsole.print("throughput inserted in file successfully.");
 		} 
 		catch (Exception ex)
 		{
@@ -446,7 +446,7 @@ public class FileGenerator
 
 			writer.close();
 			writer2.close();
-			PrintConsole.printErr("Data rate  inserted in file successfully.");
+			PrintConsole.print("Data rate  inserted in file successfully.");
 		} 
 		catch (Exception ex)
 		{
@@ -531,7 +531,7 @@ public class FileGenerator
 			}
 
 			writer.close();
-			PrintConsole.printErr("Throughput for each Transmission Configuration inserted in file successfully.");
+			PrintConsole.print("Throughput for each Transmission Configuration inserted in file successfully.");
 		} 
 		catch (Exception ex)
 		{

@@ -111,7 +111,7 @@ public class TransmissionConfiguration {
 		return TT;
 	}
 
-	private TCUnit exchangeOutgoing(TCUnit tConfUnit, Vertex g)
+/*	private TCUnit exchangeOutgoing(TCUnit tConfUnit, Vertex g)
 	{
 		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
 		Triple<Link,Link, Double> triple; // add,remove, sinr
@@ -151,7 +151,7 @@ public class TransmissionConfiguration {
 		}
 		
 		return tConfUnit;
-	}
+	}*/
 
 	
 
