@@ -78,5 +78,11 @@ public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 		}
 		return selectedLinks;
 	}
+
+	
+	@Override
+	protected String getName() {
+		return "Round Robin Scheduling Strategy";
+	}
 	
 }

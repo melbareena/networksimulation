@@ -28,12 +28,16 @@ public abstract class SchedulingStrategy
 	protected BufferMap sourceBuffers;
 	protected BufferMap transmitBuffers;
 	private List<TCUnit> configurations;
-	private Vector<Double> throughput;
-	private Vector<Double> trafficSource;
-	private Vector<Double> trafficTransit;
 	
 	/** The generator used to generate dynamically some new traffic in the network. */
 	private DynamicTrafficGenerator dynamicTrafficGenerator;
+	
+	/* For collecting results */
+	private Vector<Double> throughput;
+	private Vector<Double> trafficSource;
+	private Vector<Double> trafficTransit;
+	private double totalTrafficGenerated;
+	private String trafficGenerator;
 	
 	private void Initiation() {
  		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers();
@@ -56,12 +60,13 @@ public abstract class SchedulingStrategy
 	
 	public void scheduling()
 	{
+		trafficGenerator = "Static";
 		Program.loadingDialog.setIndeterminate(true);
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfiguraions = null;
 		int timeSlot = 0;
-		//System.err.println( sourceBuffers.trafficSize()) ;
-		double maxTrafficSource = sourceBuffers.trafficSize();
+		
+		totalTrafficGenerated = sourceBuffers.trafficSize();
 		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 )
 		{
 			this.calcWeight(true);
@@ -95,7 +100,7 @@ public abstract class SchedulingStrategy
 					Program.loadingDialog.setIndeterminate(true);
 					Program.loadingDialog.setLabel("Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
 				} else {
-					Program.loadingDialog.addProgress((int) (99*timeSlot/maxTrafficSource) - Program.loadingDialog.getProgress(),
+					Program.loadingDialog.addProgress((int) (99*timeSlot/totalTrafficGenerated) - Program.loadingDialog.getProgress(),
 							"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
 				}
 				throughput.add(slotThroughtput);
@@ -130,7 +135,7 @@ public abstract class SchedulingStrategy
 					Program.loadingDialog.setIndeterminate(true);
 					Program.loadingDialog.setLabel("Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
 				} else {
-					Program.loadingDialog.addProgress((int) (99*timeSlot/maxTrafficSource) - Program.loadingDialog.getProgress(),
+					Program.loadingDialog.addProgress((int) (99*timeSlot/totalTrafficGenerated) - Program.loadingDialog.getProgress(),
 							"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
 				}
 				throughput.add(slotThroughtput);
@@ -152,6 +157,7 @@ public abstract class SchedulingStrategy
 	 * first time solts.
 	 * The number of timeslot during which some new traffic will be randomly generated
 	 * is parsed from the XML configuration file.
+	 * @return The results of the scheduling.
 	 */
 	public void dynamicScheduling() {
 		this.dynamicScheduling(ApplicationSettingFacade.Traffic.getDuration());
@@ -164,6 +170,8 @@ public abstract class SchedulingStrategy
 	 * some new traffic will be randomly generated.
 	 */
 	public void dynamicScheduling(long durationOfTrafficGenerating) {
+		trafficGenerator = "Dynamic";
+		
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfigurations = null;
 		
@@ -173,9 +181,11 @@ public abstract class SchedulingStrategy
 		do {
 			updateTraffic(); // Fill the source buffers with random traffic
 		} while(sourceBuffers.trafficSize() == 0);
-		System.out.println("Slot#"+timeSlot+": trafficS "+sourceBuffers.trafficSize()+": trafficT "+transmitBuffers.trafficSize());
 		
+		
+		totalTrafficGenerated = 0.0;
 		double maxTrafficSource = -1.0;
+		
 		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating) {
 			// Source Buffers
 			this.calcWeight(true);
@@ -203,7 +213,7 @@ public abstract class SchedulingStrategy
 				/*----------------------*/
 				timeSlot++;
 				if(timeSlot < durationOfTrafficGenerating) {
-					updateTraffic();
+					totalTrafficGenerated += updateTraffic();
 					Program.loadingDialog.addProgress((int) (99*timeSlot/durationOfTrafficGenerating) - Program.loadingDialog.getProgress(),
 							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 				} else {
@@ -246,7 +256,7 @@ public abstract class SchedulingStrategy
 				/*----------------------*/
 				timeSlot++;
 				if(timeSlot < durationOfTrafficGenerating) {
-					updateTraffic();
+					totalTrafficGenerated += updateTraffic();
 					Program.loadingDialog.addProgress((int) (99*timeSlot/durationOfTrafficGenerating) - Program.loadingDialog.getProgress(),
 							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 				} else {
@@ -264,7 +274,6 @@ public abstract class SchedulingStrategy
 				}
 			}
 		}
-		System.out.println("Traffic simulation done");
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
 	}
@@ -272,8 +281,13 @@ public abstract class SchedulingStrategy
 	/**Update the current traffic in the network. Some new packets may be added
 	 * to some source buffers randomly.
 	 */
-	private void updateTraffic() {
+	private double updateTraffic() {
+		double currentTrafficAmount = 0.0;
+		if(sourceBuffers != null) {
+			currentTrafficAmount = sourceBuffers.trafficSize();
+		}
 		sourceBuffers = TrafficEstimatingFacade.getDynamicSourceBuffers(sourceBuffers, dynamicTrafficGenerator);
+		return sourceBuffers.trafficSize() - currentTrafficAmount;
 	}
 	
 	private void calcWeight(boolean isSourceBufferTraffic)
@@ -363,17 +377,16 @@ public abstract class SchedulingStrategy
 	
 	protected abstract Vector<Link> getBufferStrategy(boolean isSourceBuffer);
 	
-	public Vector<Double> getThroughput()
-	{
-		return throughput;
+	public Results getResults() {
+		Results results = new Results();
+		results.setSchedulingStrategy(getName());
+		results.setTrafficGenerator(trafficGenerator);
+		results.setThroughputData(throughput);
+		results.setSourceData(trafficSource);
+		results.setTransmitData(trafficTransit);
+		results.setTotalTrafficGenerated(totalTrafficGenerated);
+		return results;
 	}
-
 	
-	public Vector<Double> getTrafficSource() {
-		return trafficSource;
-	}
-
-	public Vector<Double> getTrafficTransit() {
-		return trafficTransit;
-	}
+	abstract protected String getName();
 }

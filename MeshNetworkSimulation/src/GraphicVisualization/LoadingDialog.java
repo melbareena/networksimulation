@@ -31,7 +31,7 @@ public class LoadingDialog extends JDialog {
 		setTitle("Loading "+title+"...");
 		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		setSize(350, 80);
+		setSize(500, 80);
 		setUndecorated(true);
 		
 		getContentPane().setLayout(new BorderLayout());
