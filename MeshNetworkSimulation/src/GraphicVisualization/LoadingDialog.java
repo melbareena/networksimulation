@@ -1,6 +1,7 @@
 package GraphicVisualization;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Frame;
 
 import javax.swing.JDialog;
@@ -62,6 +63,7 @@ public class LoadingDialog extends JDialog {
 		
 		setAlwaysOnTop(true);
 		setLocationRelativeTo(parent);
+		setCursor(new Cursor(Cursor.WAIT_CURSOR));
 	}
 	
 	public void addProgress(int n) {

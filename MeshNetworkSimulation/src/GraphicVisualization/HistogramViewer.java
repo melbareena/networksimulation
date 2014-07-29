@@ -377,9 +377,15 @@ public class HistogramViewer extends JFrame {
 		for(Double d : dataThroughput) {
 			sum += d;
 		}
-		//StringBuilder sb = new String
-		JLabel lblSamples = new JLabel(results.getTotalTrafficGenerated()+samplesNumber+" samples.");
-		toolBar.add(lblSamples);
+		JLabel lblInfos = new JLabel("<html><u>Total traffic generated:</u> <em>"
+				+ String.format("%,d", (int) results.getTotalTrafficGenerated())
+				+"</em>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;"
+				+"<u>Overall throughput:</u> <em>"
+				+ String.format("%,d", (int) sum)
+				+"</em>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;"
+				+"<em>"+String.format("%,d", samplesNumber)+"</em> samples.</html>");
+		lblInfos.setHorizontalAlignment(JLabel.TRAILING);
+		toolBar.add(lblInfos);
 	}
 	
 	private void drawGraph(Vector<Double> throughputData, int stepThroughput,

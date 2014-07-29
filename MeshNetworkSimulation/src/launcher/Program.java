@@ -51,30 +51,36 @@ public class Program {
 		final SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
 	
 		loadingDialog.setVisible(true);
-		if(dynamic) {
-			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
-				@Override
-				protected Object doInBackground() throws Exception {
-					s.dynamicScheduling();
-					Program.loadingDialog.setIndeterminate(true);
-					Program.loadingDialog.setLabel("Building user interface...");
-					new GraphViewer(s.getResults());
-					return null;
-				}
-			};
-			worker.execute();
-		} else {
-			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
-				@Override
-				protected Object doInBackground() throws Exception {
-					s.scheduling();
-					Program.loadingDialog.setIndeterminate(true);
-					Program.loadingDialog.setLabel("Building user interface...");
-					new GraphViewer(s.getResults());
-					return null;
-				}
-			};
-			worker.execute();
+		try {
+			if(dynamic) {
+				SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
+					@Override
+					protected Object doInBackground() throws Exception {
+						s.dynamicScheduling();
+						Program.loadingDialog.setIndeterminate(true);
+						Program.loadingDialog.setLabel("Building user interface...");
+						new GraphViewer(s.getResults());
+						return null;
+					}
+				};
+				worker.execute();
+			} else {
+				SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
+					@Override
+					protected Object doInBackground() throws Exception {
+						s.scheduling();
+						Program.loadingDialog.setIndeterminate(true);
+						Program.loadingDialog.setLabel("Building user interface...");
+						new GraphViewer(s.getResults());
+						return null;
+					}
+				};
+				worker.execute();
+			}
+		} catch(Exception e) {
+			GraphViewer.showErrorDialog(e.getClass().toString(),
+					e.getClass().toGenericString()+": "+e.getMessage().toString());
+			e.printStackTrace(System.err);
 		}
 
 		try {
