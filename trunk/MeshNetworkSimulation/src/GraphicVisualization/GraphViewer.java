@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -55,6 +54,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import launcher.Program;
+import scheduling.Results;
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
 import transConf.TCFacade;
@@ -171,16 +171,15 @@ public class GraphViewer extends JFrame {
 	/** Initiate and show the Frame.
 	 * @param throughputData The data for the throughput plot.
 	 */
-	public GraphViewer(Vector<Double> throughputData, Vector<Double> sourceData,
-			Vector<Double> transmitData) {
+	public GraphViewer(Results results) {
 		super();
 		
 		String title = "Mesh Network Simulation " + GraphViewer.optionsTitle;
 		
 		this.setTitle(title);
 		
-		int step = throughputData.size()/100;
-		histogramViewerFrame = new HistogramViewer(throughputData, sourceData, transmitData, step);
+		int step = results.getThroughputData().size()/100;
+		histogramViewerFrame = new HistogramViewer(results, step);
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {

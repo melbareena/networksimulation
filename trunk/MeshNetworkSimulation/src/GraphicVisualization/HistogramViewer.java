@@ -30,14 +30,16 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
-
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.util.ShapeUtilities;
+
+import scheduling.Results;
 
 /**
  * @author Benjamin
@@ -67,13 +69,15 @@ public class HistogramViewer extends JFrame {
 	
 	public DefaultXYDataset datasetTransmit;
 	
-	private int samplesNumber;
+	public int samplesNumber;
 	
 	public int stepThroughput;
 	
 	public int stepSource;
 	
 	public int stepTransmit;
+	
+	public Results results;
 	
 	public final static String[] colors = new String[] {"Blue","Red","Green", "Orange", "Pink", "Black"};
 	
@@ -83,8 +87,7 @@ public class HistogramViewer extends JFrame {
 	 * Create the frame.
 	 * @param throughputData 
 	 */
-	public HistogramViewer(Vector<Double> throughputData, Vector<Double> sourceData,
-			Vector<Double> transmitData, int step) {
+	public HistogramViewer(Results results, int step) {
 		this.self = this;		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
@@ -94,9 +97,11 @@ public class HistogramViewer extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
-		this.dataThroughput = throughputData;
-		this.dataSource = sourceData;
-		this.dataTransmit = transmitData;
+		this.results = results;
+		
+		this.dataThroughput = results.getThroughputData();
+		this.dataSource = results.getSourceData();
+		this.dataTransmit = results.getTransmitData();
 		
 		this.stepThroughput = step;
 		this.stepSource = step;
@@ -194,7 +199,7 @@ public class HistogramViewer extends JFrame {
 		cPanel.setPopupMenu(null);
 	}
 	
-	private JMenu buildMenuDisplay(final String target, final int index) {
+	private JMenu buildMenuDisplay(String target, int index) {
 		JMenu menu = new JMenu(target);
 		
 		JMenuItem mnVisible= new JMenuItem("Set invisible");
@@ -249,14 +254,45 @@ public class HistogramViewer extends JFrame {
 			}
 		});
 		
+		JMenu mnInterpolation = new JMenu("Interpolation");
+		JMenuItem linearInterpolation = new JMenuItem("Linear");
+		linearInterpolation.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				XYPlot plot = chart.getXYPlot();		
+				XYLineAndShapeRenderer oldRenderer = (XYLineAndShapeRenderer) plot.getRenderer(index);
+				XYLineAndShapeRenderer newRenderer = new XYLineAndShapeRenderer(true, 
+						oldRenderer.getBaseShapesVisible());
+				newRenderer.setSeriesPaint(0, oldRenderer.getSeriesPaint(0));
+				newRenderer.setSeriesShape(0, oldRenderer.getSeriesShape(0));
+				plot.setRenderer(index, newRenderer);
+			}
+		});
+		mnInterpolation.add(linearInterpolation);
+		JMenuItem splineInterpolation = new JMenuItem("Spline");
+		splineInterpolation.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				XYPlot plot = chart.getXYPlot();		
+				XYLineAndShapeRenderer oldRenderer = (XYLineAndShapeRenderer) plot.getRenderer(index);
+				XYSplineRenderer newRenderer = new XYSplineRenderer();
+				newRenderer.setSeriesLinesVisible(0, oldRenderer.getSeriesLinesVisible(0));
+				newRenderer.setSeriesPaint(0, oldRenderer.getSeriesPaint(0));
+				newRenderer.setSeriesShape(0, oldRenderer.getSeriesShape(0));
+				newRenderer.setSeriesShapesVisible(0, oldRenderer.getSeriesShapesVisible(0));
+				plot.setRenderer(index, newRenderer);
+			}
+		});
+		mnInterpolation.add(splineInterpolation);
+		menu.add(mnInterpolation);
+		
 		JMenu mnShape = new JMenu("Shape");
-		final XYPlot plot = chart.getXYPlot();		
-		final XYSplineRenderer renderer = (XYSplineRenderer) plot.getRenderer(index);
 		JMenuItem nullShape = new JMenuItem("No Shape");
 		nullShape.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				renderer.setSeriesShape(0, null);
+				XYPlot plot = chart.getXYPlot();		
+				XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(index);
 				renderer.setSeriesShapesVisible(0, false);
 				plot.setRenderer(index, renderer);
 			}
@@ -268,6 +304,8 @@ public class HistogramViewer extends JFrame {
 			shape.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					XYPlot plot = chart.getXYPlot();		
+					XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(index);
 					Shape s = null;
 					switch (e.getActionCommand()) {
 					case "Regular Cross":
@@ -301,7 +339,7 @@ public class HistogramViewer extends JFrame {
 			color.setActionCommand(colors[i]);
 			try {
 				Field field = Color.class.getField(colors[i].toUpperCase());
-				final Color c = (Color)field.get(null);
+				Color c = (Color)field.get(null);
 				color.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -334,7 +372,13 @@ public class HistogramViewer extends JFrame {
 		
 		toolBar.add(Box.createHorizontalGlue());
 		
-		JLabel lblSamples = new JLabel(samplesNumber+" samples.");
+		/*TODO*/
+		double sum = 0.0;
+		for(Double d : dataThroughput) {
+			sum += d;
+		}
+		//StringBuilder sb = new String
+		JLabel lblSamples = new JLabel(results.getTotalTrafficGenerated()+samplesNumber+" samples.");
 		toolBar.add(lblSamples);
 	}
 	
@@ -441,7 +485,7 @@ public class HistogramViewer extends JFrame {
 	
 	private void changeColor(int index, Color color) {
 		XYPlot plot = chart.getXYPlot();
-		XYSplineRenderer renderer = (XYSplineRenderer) plot.getRenderer(index);
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(index);
 		renderer.setSeriesPaint(0, color);
 		plot.setRenderer(index,renderer);
 		ValueAxis axis0 = plot.getRangeAxis(index);

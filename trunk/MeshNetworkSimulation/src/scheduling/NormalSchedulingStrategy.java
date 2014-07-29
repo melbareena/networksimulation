@@ -43,4 +43,9 @@ public class NormalSchedulingStrategy extends SchedulingStrategy
 		return selectedLinks;
 	}
 
+	@Override
+	protected String getName() {
+		return "Normal Scheduling Strategy";
+	}
+
 }

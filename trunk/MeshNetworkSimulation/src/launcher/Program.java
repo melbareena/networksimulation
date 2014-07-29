@@ -58,7 +58,7 @@ public class Program {
 					s.dynamicScheduling();
 					Program.loadingDialog.setIndeterminate(true);
 					Program.loadingDialog.setLabel("Building user interface...");
-					new GraphViewer(s.getThroughput(), s.getTrafficSource(), s.getTrafficTransit());
+					new GraphViewer(s.getResults());
 					return null;
 				}
 			};
@@ -70,7 +70,7 @@ public class Program {
 					s.scheduling();
 					Program.loadingDialog.setIndeterminate(true);
 					Program.loadingDialog.setLabel("Building user interface...");
-					new GraphViewer(s.getThroughput(), s.getTrafficSource(), s.getTrafficTransit());
+					new GraphViewer(s.getResults());
 					return null;
 				}
 			};
