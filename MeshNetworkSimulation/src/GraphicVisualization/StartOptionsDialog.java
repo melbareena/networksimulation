@@ -217,7 +217,6 @@ public class StartOptionsDialog extends JDialog {
 			contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 			getContentPane().add(contentPanel, BorderLayout.CENTER);
 			contentPanel.setLayout(new MigLayout("", "[90px,grow]10[157px,grow]10[95px]10[157px,grow]", "[min!]10[min!,grow]20[grow]10[grow]10[min!,grow]10[min!,grow]"));
-			setKeyListener();
 		}
 		
 		/*-------------*/
@@ -938,28 +937,6 @@ public class StartOptionsDialog extends JDialog {
 			GraphViewer.showErrorDialog(e.getMessage());
 		}
 		return null;
-	}
-	
-	public void setKeyListener() {
-		//Intercepte le keyboard manager
-		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		manager.addKeyEventDispatcher(new KeyEventDispatcher() {
-			public boolean dispatchKeyEvent(KeyEvent e) {
-				if(e.getID() == KeyEvent.KEY_RELEASED) {//&& ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					switch(e.getKeyCode()) {
-					case KeyEvent.VK_D: //Bouton avancer
-						if((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
-							rdbtnDynamic.doClick();
-						} else {
-							defaultButton.doClick();
-						}
-						break;
-					}
-				}
-				//Empêche de propager les évènements du clavier
-				return false;
-			}
-		});
 	}
 
 }
