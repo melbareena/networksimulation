@@ -56,6 +56,7 @@ public class Program {
 				@Override
 				protected Object doInBackground() throws Exception {
 					s.dynamicScheduling();
+					Program.loadingDialog.setIndeterminate(true);
 					Program.loadingDialog.setLabel("Building user interface...");
 					new GraphViewer(s.getThroughput(), s.getTrafficSource(), s.getTrafficTransit());
 					return null;
@@ -67,6 +68,7 @@ public class Program {
 				@Override
 				protected Object doInBackground() throws Exception {
 					s.scheduling();
+					Program.loadingDialog.setIndeterminate(true);
 					Program.loadingDialog.setLabel("Building user interface...");
 					new GraphViewer(s.getThroughput(), s.getTrafficSource(), s.getTrafficTransit());
 					return null;
