@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
+import java.text.NumberFormat;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -30,6 +31,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -82,6 +84,9 @@ public class HistogramViewer extends JFrame {
 	public final static String[] colors = new String[] {"Blue","Red","Green", "Orange", "Pink", "Black"};
 	
 	public final static String[] shapes = new String[] {"Regular Cross", "Diagonal Cross", "Diamond", "Down Triangle", "Up Triangle"};
+	
+	public final StandardXYToolTipGenerator sttg = new StandardXYToolTipGenerator("{0}: Sample {1} -> Value {2}",
+			NumberFormat.getNumberInstance(), NumberFormat.getNumberInstance());
 	
 	/**
 	 * Create the frame.
@@ -267,6 +272,7 @@ public class HistogramViewer extends JFrame {
 						oldRenderer.getBaseShapesVisible());
 				newRenderer.setSeriesPaint(0, oldRenderer.getSeriesPaint(0));
 				newRenderer.setSeriesShape(0, oldRenderer.getSeriesShape(0));
+				newRenderer.setSeriesToolTipGenerator(0, sttg);
 				plot.setRenderer(index, newRenderer);
 			}
 		});
@@ -282,6 +288,7 @@ public class HistogramViewer extends JFrame {
 				newRenderer.setSeriesPaint(0, oldRenderer.getSeriesPaint(0));
 				newRenderer.setSeriesShape(0, oldRenderer.getSeriesShape(0));
 				newRenderer.setSeriesShapesVisible(0, oldRenderer.getSeriesShapesVisible(0));
+				newRenderer.setSeriesToolTipGenerator(0, sttg);
 				plot.setRenderer(index, newRenderer);
 			}
 		});
@@ -429,6 +436,7 @@ public class HistogramViewer extends JFrame {
 		
 		/* Throughput renderer */
 		XYSplineRenderer renderer0 = new XYSplineRenderer();
+		renderer0.setSeriesToolTipGenerator(0, sttg);
 		renderer0.setSeriesShape(0, ShapeUtilities.createDiagonalCross(3.0F, 0.5F));
 		plot.setRenderer(0, renderer0);
 		changeColor(0, Color.BLUE);
@@ -440,6 +448,7 @@ public class HistogramViewer extends JFrame {
 			plot.setRangeAxis(1, new NumberAxis("Source Traffic"));
 			
 			XYSplineRenderer renderer1 = new XYSplineRenderer();
+			renderer1.setSeriesToolTipGenerator(0, sttg);
 			renderer1.setSeriesShape(0, ShapeUtilities.createUpTriangle(3.0F));
 			plot.setRenderer(1, renderer1);
 			changeColor(1, Color.GREEN);
@@ -452,6 +461,7 @@ public class HistogramViewer extends JFrame {
 			plot.setRangeAxis(2, new NumberAxis("Transmit Traffic"));
 			
 			XYSplineRenderer renderer2 = new XYSplineRenderer();
+			renderer2.setSeriesToolTipGenerator(0, sttg);
 			renderer2.setSeriesShape(0, ShapeUtilities.createDownTriangle(3.0F));
 			plot.setRenderer(2, renderer2);
 			changeColor(2, Color.RED);
