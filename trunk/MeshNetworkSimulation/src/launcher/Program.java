@@ -79,7 +79,7 @@ public class Program {
 			}
 		} catch(Exception e) {
 			GraphViewer.showErrorDialog(e.getClass().toString(),
-					e.getClass().toGenericString()+": "+e.getMessage().toString());
+					e.getClass().toString()+": "+e.getMessage().toString());
 			e.printStackTrace(System.err);
 		}
 
