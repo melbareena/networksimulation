@@ -90,6 +90,8 @@ public class HistogramViewer extends JFrame {
 	public HistogramViewer(Results results, int step) {
 		this.self = this;		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle("Results plot " + GraphViewer.optionsTitle
+				+ " - " + results.getSchedulingStrategy() + " - " + results.getTrafficGenerator() + " traffic");
 		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
 
 		contentPane = new JPanel();
@@ -414,8 +416,9 @@ public class HistogramViewer extends JFrame {
 		System.out.println("Finished, displaying...");
 		
 		/* Creating chart */
-		chart = ChartFactory.createXYLineChart("Throughput "+GraphViewer.optionsTitle, "",
-		"Throughput", datasetThroughput, PlotOrientation.VERTICAL, true, true, false);
+		chart = ChartFactory.createXYLineChart("Results " + GraphViewer.optionsTitle + " - " +
+				results.getSchedulingStrategy()	+ " - " + results.getTrafficGenerator() + " traffic",
+				"",	"Throughput", datasetThroughput, PlotOrientation.VERTICAL, true, true, false);
 		
 		/* Plot properties */
 		XYPlot plot = chart.getXYPlot();
