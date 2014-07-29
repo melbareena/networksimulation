@@ -199,7 +199,7 @@ public class HistogramViewer extends JFrame {
 		cPanel.setPopupMenu(null);
 	}
 	
-	private JMenu buildMenuDisplay(String target, int index) {
+	private JMenu buildMenuDisplay(final String target, final int index) {
 		JMenu menu = new JMenu(target);
 		
 		JMenuItem mnVisible= new JMenuItem("Set invisible");
@@ -339,7 +339,7 @@ public class HistogramViewer extends JFrame {
 			color.setActionCommand(colors[i]);
 			try {
 				Field field = Color.class.getField(colors[i].toUpperCase());
-				Color c = (Color)field.get(null);
+				final Color c = (Color)field.get(null);
 				color.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
