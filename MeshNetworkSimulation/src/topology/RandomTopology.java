@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Map.Entry;
-
 import common.FileGenerator;
 import common.PrintConsole;
 import dataStructure.Vertex;
@@ -100,52 +99,51 @@ public class RandomTopology extends BaseTopology
 	private boolean generateRandomPosition()
 	{
 		PrintConsole.print("Routers Position are generated randomly.");
+		
+		long lSeed = this.seed;
+
+		Random rand = new Random();
 		int x;
 		int y;
 		int numNode = 0;
-		Random generator = new Random(seed);
 		int numberOfTest = 0;
-		boolean trueTopology = true;
-		while (numberOfTest < safetyTest)
+		while(numberOfTest < this.safetyTest)
 		{
-			
-			generator.setSeed(seed);
-			PrintConsole.print(numberOfTest + " ");
-
-			trueTopology = true;
-			while(numNode < numberOfRouters)
+			rand.setSeed(lSeed);
+			while(numNode < this.numberOfRouters )
 			{
+				x = Math.abs(rand.nextInt(_environmentX));
+				y = Math.abs(rand.nextInt(_environmentY));
+				if(addInRouterLocationSet(x, y))
+					numNode++;	
 				
-				x = generator.nextInt(_environmentX);
-				y = generator.nextInt(_environmentY);
-				if(addInRouterLocationSet(x,y))
-					numNode++;
-				else 
-				{
-					trueTopology = false;
-					break;
-				}
 			}
-			
-			if(trueTopology && checkingTopology.isAllRoutersAccessibleFromGateway(routerLocationSet, gatewayLocationSet))
+			if(checkingTopology.isAllRoutersAccessibleFromGateway(routerLocationSet, gatewayLocationSet))
 			{
-				PrintConsole.print("seed for random topology generator is "+  seed );
+				System.out.println("The topology generate based on random method (the seed is = " + lSeed);
 				try
 				{
-					Thread.sleep(3000);
+					Thread.sleep(2000);
 				} catch (InterruptedException e)
 				{
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				return true;
 			}
-			seed = System.nanoTime();
-			numberOfTest++;
-			if(numberOfTest >= safetyTest)
+			else
 			{
-				PrintConsole.printErr("FAIL: Program cannot generate " + numberOfRouters + 
-						" nodes which each of them far away from others at least " + minDistance + " meter" );
-				System.exit(0);
+				numberOfTest++;
+				lSeed = System.nanoTime();
+				if(numberOfTest >= this.safetyTest)
+				{
+					PrintConsole.printErr("FAIL: Program cannot generate " + numberOfRouters + 
+							" nodes which each of them far away from others at least " + minDistance + " meter" );
+					System.exit(0);
+
+				}
+				routerLocationSet.clear();
+				numNode = 0;
 			}
 		}
 		return false;
@@ -161,7 +159,7 @@ public class RandomTopology extends BaseTopology
 		{
 			routerLocationSet.put(mapKey, newPoint);
 			return true;
-		}	
+		}
 		return false;
 	}
 	private void initializeGatewayLocationSet()

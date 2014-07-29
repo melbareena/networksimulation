@@ -137,8 +137,11 @@ public abstract class SchedulingStrategy
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
 			}
- 			PrintConsole.print(sourceBuffers.trafficSize() + "");
- 			PrintConsole.printErr(sourceBuffers.trafficSize() + "");
+ 			if(ApplicationSettingFacade.AppOutput.showIntermediateOutput())
+ 			{
+ 				PrintConsole.print(sourceBuffers.trafficSize() + "");
+ 				PrintConsole.printErr(sourceBuffers.trafficSize() + "");
+ 			}
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
