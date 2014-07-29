@@ -131,7 +131,7 @@ public class TopologyChecker
 			
 			if(getwayNeighborsStack.size() > 0)
 				findMarkedRouterNeighbors(getwayNeighborsStack, routersLocations);
-			
+			if(ApplicationSettingFacade.AppOutput.showIntermediateOutput())
 				PrintConsole.print("The number of accessible router from the getway " +
 						"<"+getway.getValue().x+", "+getway.getValue().y +
 						"> is: " + ACCESSIBLE);
