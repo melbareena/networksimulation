@@ -121,14 +121,6 @@ public class RandomTopology extends BaseTopology
 			if(checkingTopology.isAllRoutersAccessibleFromGateway(routerLocationSet, gatewayLocationSet))
 			{
 				System.out.println("The topology generate based on random method (the seed is = " + lSeed);
-				try
-				{
-					Thread.sleep(2000);
-				} catch (InterruptedException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				return true;
 			}
 			else
