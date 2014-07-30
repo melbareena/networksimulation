@@ -7,6 +7,7 @@ import java.util.HashSet;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -39,6 +40,8 @@ public class XMLWriter {
 		try {		
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(file);
 			transformer.transform(source, result);
@@ -47,10 +50,11 @@ public class XMLWriter {
     			    "Configuration successfully saved",            			    
     			    JOptionPane.INFORMATION_MESSAGE);
 			return true;
-		} catch (Exception e) { }
-		GraphViewer.showErrorDialog("Error while writing configuration",
-				"Failed to write configuration file:"+
-				"\n"+file.getAbsolutePath()+"\nExiting.");
+		} catch (Exception e) {
+			GraphViewer.showErrorDialog("Error while writing configuration",
+					"Failed to write configuration file:"+
+					"\n"+file.getAbsolutePath()+"\nExiting.");
+		}
 		System.exit(0);
 		return false;
 	}

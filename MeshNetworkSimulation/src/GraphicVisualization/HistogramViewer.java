@@ -30,6 +30,9 @@ import javax.swing.border.EmptyBorder;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYAnnotation;
+import org.jfree.chart.annotations.XYDrawableAnnotation;
+import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
@@ -97,6 +100,8 @@ public class HistogramViewer extends JFrame {
 	
 	public final Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration());
 	
+	public final ValueMarker meanThroughput;
+	
 	/**
 	 * Create the frame.
 	 * @param throughputData 
@@ -122,6 +127,12 @@ public class HistogramViewer extends JFrame {
 		this.stepThroughput = step;
 		this.stepSource = step;
 		this.stepTransmit = step;
+		
+		double sum = 0.0;
+        for(int i = 0; i < ApplicationSettingFacade.Traffic.getDuration(); i++) {
+        	sum += dataThroughput.get(i);
+        }
+        meanThroughput = new ValueMarker(sum / ApplicationSettingFacade.Traffic.getDuration());
 	}
 	
 	public void showGraph() {
@@ -196,8 +207,10 @@ public class HistogramViewer extends JFrame {
 				XYPlot plot = ((XYPlot) chart.getPlot());
 				if(toggle) {
 					plot.addDomainMarker(endTraffic);
+					plot.addRangeMarker(meanThroughput);
 				} else {
 					plot.clearDomainMarkers();
+					plot.clearRangeMarkers();
 				}
 			}
 		});
@@ -470,8 +483,9 @@ public class HistogramViewer extends JFrame {
 		plot.setDomainGridlinesVisible(true);
 		plot.setDomainGridlinePaint(Color.DARK_GRAY);
 		
-		/* End of traffic generation marker */
+		/* Markers for dynamic traffic */
 		if(ApplicationSettingFacade.Traffic.isDynamicType()) {
+			/* End of traffic generation marker */
 	        endTraffic.setPaint(Color.BLACK);
 	        endTraffic.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 	        		10.0F, new float[] {10, 10}, 0.0F));
@@ -482,6 +496,18 @@ public class HistogramViewer extends JFrame {
 	        endTraffic.setLabelBackgroundColor(Color.WHITE);
 	        endTraffic.setLabelFont(endTraffic.getLabelFont().deriveFont(Font.BOLD, 12));
 	        plot.addDomainMarker(endTraffic);
+	        
+	        /* Mean throughput marker */
+	        meanThroughput.setPaint(Color.BLUE);
+	        meanThroughput.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+	        		10.0F, new float[] {10, 10}, 0.0F));
+	        meanThroughput.setLabel("Average throughput (steady state): "+ String.format("%,f", meanThroughput.getValue()));
+	        meanThroughput.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
+	        meanThroughput.setLabelTextAnchor(TextAnchor.BOTTOM_RIGHT);
+	        meanThroughput.setOutlinePaint(Color.BLACK);
+	        meanThroughput.setLabelBackgroundColor(Color.WHITE);
+	        meanThroughput.setLabelFont(meanThroughput.getLabelFont().deriveFont(Font.BOLD, 12));
+	        plot.addRangeMarker(meanThroughput);
 		}
 		
 		/* Throughput renderer */
@@ -563,6 +589,10 @@ public class HistogramViewer extends JFrame {
 		axis0.setTickLabelPaint(color);
 		axis0.setTickMarkPaint(color);
 		plot.setRangeAxis(index, axis0);
+		/* Change throughput marker if necessary */
+		if(index == 0) {
+			 meanThroughput.setPaint(color);
+		}
 	}
 
 }
