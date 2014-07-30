@@ -3,10 +3,13 @@ package setting;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import common.PrintConsole;
 
 import dataStructure.Channel;
 
@@ -108,8 +111,11 @@ class ChannelConfig extends BaseConfiguration
 	protected boolean ValidateXMLDocument(Element eElement) throws Exception
 	{
 		if(!eElement.hasAttribute(ATTMODE))
-			throw new Exception(TAG + " must have child node. the following template may help you " +
+		{
+			PrintConsole.printErr(TAG + " must have child node. the following template may help you " +
 					"\n <Channels Mode=\"Partially|All\"> \n \t <Add Value=\"1\" />\n\t<Add Value=\"2\" /> \n </Channels>" );
+			System.exit(0);
+		}
 		return true;
 	}
 
@@ -119,8 +125,11 @@ class ChannelConfig extends BaseConfiguration
 		if(mode == ChannelMode.Partially)
 		{
 			if(eElement.hasChildNodes())
-				throw new Exception(TAG + " must have child node. the following template may help you " +
+			{
+				PrintConsole.printErr(TAG + " must have child node. the following template may help you " +
 						"\n <Channels Mode=\"Partially\"> \n \t <Add Value=\"1\" />\n\t<Add Value=\"2\" /> \n </Channels>" );
+				System.exit(0);
+			}
 		}
 		return true;
 	}

@@ -172,26 +172,43 @@ class GatewayConfig extends BaseConfiguration
 	protected boolean ValidateXMLDocument(Element eElement) throws Exception
 	{
 		if(!eElement.hasAttribute(ATTNUM))
-			throw new Exception(ATTNUM + " attribute in " + TAG + " tag is missing. the following template may help you." +
+		{
+			PrintConsole.printErr(ATTNUM + " attribute in " + TAG + " tag is missing. the following template may help you." +
 							"\n <Gateways Number=\"2\" TypeOfGeneration=\"Static\"> \n	" +
 							"<Add x=\"114\" y=\"457\" />\n<Add x=\"12\" y=\"333\" /></Gateways>" );
+			System.exit(0);
+		}
 		else if(!Pattern.matches("-?[0-9]+", eElement.getAttribute(ATTNUM)))
-			throw new Exception("The value of " + ATTNUM + " attribute  in "+ TAG +" must be an interger value. \n\n" );
-		
+		{
+			PrintConsole.printErr("The value of " + ATTNUM + " attribute  in "+ TAG +" must be an interger value. \n\n" );
+			System.exit(0);
+		}
 		if(!eElement.hasAttribute(ATTTOG))
-			throw new Exception(ATTTOG + " attribute in " + TAG + " tag is missing. this template may help you." +
+		{
+			PrintConsole.printErr(ATTTOG + " attribute in " + TAG + " tag is missing. this template may help you." +
 						"\n <Gateways Number=\"2\" TypeOfGeneration=\"Static\"> \n	" +
 						"<Add x=\"114\" y=\"457\" />\n<Add x=\"12\" y=\"333\" /></Gateways>" );
+			System.exit(0);
+		}
 		else if(!Pattern.matches("random|static|file", eElement.getAttribute(ATTTOG).toLowerCase()))
-			throw new Exception("the value of " + ATTTOG + " in "+ TAG +" node must be on of the following item:" +
+		{
+			PrintConsole.printErr("the value of " + ATTTOG + " in "+ TAG +" node must be on of the following item:" +
 					" \n 1- File \n 2- Static \n 3- Random.\n\n");
+			System.exit(0);
+		}
 		if(!eElement.hasAttribute(ATTRADIO))
-			throw new Exception(ATTRADIO + " attribute in " + TAG + " tag is missing. the following template may help you." +
+		{
+			PrintConsole.printErr(ATTRADIO + " attribute in " + TAG + " tag is missing. the following template may help you." +
 						"\n <Routers Number=\"20\" TypeOfGeneration=\"RANDOM\" MinDistance=\"50\" Seed=\" 12252554 \" " +
 						"SaftyTest=\"50\" />\n\n" );
+			System.exit(0);
+		}
 		// check the value of tag
 		else if(!Pattern.matches("-?[0-9]+", eElement.getAttribute(ATTRADIO)))
-			throw new Exception("The value of " + ATTRADIO + " attribute must be an interger value. \n\n" );
+		{
+			PrintConsole.printErr("The value of " + ATTRADIO + " attribute must be an interger value. \n\n" );
+			System.exit(0);
+		}
 		return true;
 	}
 
@@ -203,17 +220,26 @@ class GatewayConfig extends BaseConfiguration
 		{
 			if(eElement.hasAttribute(ATTSEED))
 				if(!Pattern.matches("-?[0-9]+", eElement.getAttribute(ATTSEED)))
-					throw new Exception("The value of "+ ATTSEED + " attribute in "+ TAG +" must be an interger value. \n\n");
+				{
+					PrintConsole.printErr("The value of "+ ATTSEED + " attribute in "+ TAG +" must be an interger value. \n\n");
+					System.exit(0);
+				}
 		}
 		if(type == TypeOfGenerationEnum.FILE)
 			if(!eElement.hasAttribute(ATTFILE))
-				throw new Exception(ATTFILE + " attribute in " + TAG + " tag is missing. the following template may help you \n" +
+			{
+				PrintConsole.printErr(ATTFILE + " attribute in " + TAG + " tag is missing. the following template may help you \n" +
 						"<Gateways Number=\"2\" TypeOfGeneration=\"file\" Address=\"src/setting/gatway.txt\" />" );
+				System.exit(0);
+			}
 		if(type == TypeOfGenerationEnum.STATIC)
 			if(!eElement.hasChildNodes())
-				throw new Exception(TAG + " must have child node. the following template may help you " +
+			{
+				PrintConsole.printErr(TAG + " must have child node. the following template may help you " +
 						"\n <Gateways Number=\"2\" TypeOfGeneration=\"Static\">" +
 						" \n <Add x=\"150\" y=\"975\" /> \n <Add x=\"274\" y=\"785\" />\n</Gateways> " );
+				System.exit(0);
+			}
 		
 		return true;
 	}

@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import common.PrintConsole;
+
 
 public class ChannelAssignmentConfig extends BaseConfiguration
 {
@@ -62,8 +64,11 @@ public class ChannelAssignmentConfig extends BaseConfiguration
 	protected boolean ValidateXMLDocument(Element eElement) throws Exception
 	{
 		if(!eElement.hasAttribute(ATTSTERATEGY))
-			throw new Exception(TAG + " must have an attribute. the following template may help you " +
+		{
+			PrintConsole.printErr(TAG + " must have an attribute. the following template may help you " +
 					"\n	<ChannelAssignment Strategy=\"Standard\" />" );
+			System.exit(0);
+		}
 		return true;
 	}
 

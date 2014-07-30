@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import common.PrintConsole;
+
 /**
  * Class's responsibility is fetching data from configuration file (xml file). This class follows <i>singleton</i> design pattern. You <strong>cannot</strong> use this class directly. 
  * for using this class in rest of program please watch {@link ApplicationSettingFacade}
@@ -77,11 +79,17 @@ class EnvironmentConfig extends BaseConfiguration
 	protected boolean ValidateXMLDocument(Element eElement) throws Exception
 	{
 		if(!eElement.hasAttribute(ATTWIDTH))
-			throw new Exception(ATTWIDTH + " attribute in " + TAG + " tag is missing. the following template may help you." +
-						"\n <Environment Width=\"1000\" Height=\"1000\" />" );	
+		{
+			PrintConsole.printErr(ATTWIDTH + " attribute in " + TAG + " tag is missing. the following template may help you." +
+						"\n <Environment Width=\"1000\" Height=\"1000\" />" );
+			System.exit(0);
+		}
 		if(!eElement.hasAttribute(ATTHEIGHT))
-			throw new Exception(ATTHEIGHT + " attribute in " + TAG + " tag is missing. the following template may help you." +
-						"\n <Environment Width=\"1000\" Height=\"1000\" />" );	
+		{
+			PrintConsole.printErr(ATTHEIGHT + " attribute in " + TAG + " tag is missing. the following template may help you." +
+						"\n <Environment Width=\"1000\" Height=\"1000\" />" );
+			System.exit(0);
+		}
 		return true;
 	}
 	

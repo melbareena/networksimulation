@@ -90,11 +90,14 @@ class DataRateConfig extends BaseConfiguration
 		
 		
 		if(!eElement.hasChildNodes())
-			throw new Exception(TAG + " must have child node. the following template may help you " +
+		{
+			PrintConsole.printErr(TAG + " must have child node. the following template may help you " +
 					"\n <DataRate> \n "+
 					"\t <Add SINR=\"8.15\" Rate=\"6\" /> \n" +
 					"</DataRate>" );
-		
+			
+			System.exit(0);
+		}
 		
 		
 		return true;
