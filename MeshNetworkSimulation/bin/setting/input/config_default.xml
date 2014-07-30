@@ -35,5 +35,5 @@
     <OutputFolder GenerateFileAsOutput="false" IntermidiateConsoleOutput="false" Path="null"/>
     <Routers MinDistance="50" Number="80" Radio="2" SaftyTest="500" Seed="3503654693501859557" TransmissionRate="200" TypeOfGeneration="Random"/>
     <SINR Alpha="4" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
-    <Traffic DownSeed="6225413419355531295" Duration="10000" Generator="Random" NbOfNewEmittingNodes="5" Rate="0.5" Ratio="3" Seed="3284806326027181415" Type="Dynamic" UpSeed="1218278686150786157"/>
+    <Traffic DownSeed="6225413419355531295" Duration="10000" Generator="Random" NbOfNewEmittingNodes="5" Rate="0.5" Ratio="1" Seed="3284806326027181415" Type="Dynamic" UpSeed="1218278686150786157"/>
 </AppConfiguration>

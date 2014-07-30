@@ -9,10 +9,14 @@ public class Packet implements Comparable<Packet>
 	private LinkedList<Link> packetPath;
 	private Vertex currentNode;
 	private double traffic;
-	private int delay;
+	
+	private int dateOfBirth;
+	private int dateOfDeath;
+	
 	private boolean isReceived;
 	private Path orginalPath;
-	public Packet(Path path, double traffic)
+	
+	public Packet(Path path, double traffic, int currentTimeSlot)
 	{
 		this.destination = path.getDestination();
 		this.source = path.getSource();
@@ -20,11 +24,13 @@ public class Packet implements Comparable<Packet>
 		this.currentNode = source;
 		this.isReceived = false;
 		this.traffic = traffic;
-		this.delay = 0;
 		this.orginalPath = path;
+		
+		this.dateOfBirth = currentTimeSlot;
+		this.dateOfDeath = 0;
 	}
 	
-	public Packet(Path path,Vertex currentNode, LinkedList<Link> packetPathLinks, double traffic)
+	public Packet(Path path,Vertex currentNode, LinkedList<Link> packetPathLinks, double traffic, int currentTimeSlot)
 	{
 		this.destination = path.getDestination();
 		this.source = path.getSource();
@@ -36,8 +42,12 @@ public class Packet implements Comparable<Packet>
 		
 		this.currentNode = currentNode;
 		
-		if(currentNode == this.destination)
+		this.dateOfBirth = currentTimeSlot;
+		
+		if(currentNode == this.destination) {
 			this.isReceived = true;
+			this.dateOfDeath = currentTimeSlot;
+		}
 	}
 	
 	
@@ -45,10 +55,11 @@ public class Packet implements Comparable<Packet>
 	{
 		return this.orginalPath;
 	}
-	public int getDelay()
-	{
-		return delay;
+	
+	public int getDelay() {
+		return isReceived ? (dateOfDeath - dateOfBirth) : 0;
 	}
+	
 	public double getTraffic()
 	{
 		return traffic;
@@ -89,7 +100,7 @@ public class Packet implements Comparable<Packet>
 		this.traffic -= value;
 	}
 	
-	public Packet send(double dataRate)
+	public Packet send(double dataRate, int currentTimeSlot)
 	{
 		if(!this.isReceived)
 		{
@@ -97,8 +108,10 @@ public class Packet implements Comparable<Packet>
 			{
 				Link l = packetPath.remove();
 				this.currentNode = l.getDestination();
-				if(this.currentNode == this.destination)
+				if(this.currentNode == this.destination) {
 					this.isReceived = true;
+					this.dateOfDeath = currentTimeSlot;
+				}
 				return this;
 			}
 			this.traffic -= dataRate;
@@ -107,7 +120,7 @@ public class Packet implements Comparable<Packet>
 			LinkedList<Link> sentPacketPath = (LinkedList<Link>) this.packetPath.clone();
 			Link l = sentPacketPath.remove();
 			
-			Packet sentPacket = new Packet(this.orginalPath ,l.getDestination(), sentPacketPath, dataRate);
+			Packet sentPacket = new Packet(this.orginalPath ,l.getDestination(), sentPacketPath, dataRate, this.dateOfBirth);
 			return sentPacket;
 				
 		}

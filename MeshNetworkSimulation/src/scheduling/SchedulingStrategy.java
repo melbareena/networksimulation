@@ -36,16 +36,18 @@ public abstract class SchedulingStrategy
 	private Vector<Double> throughput;
 	private Vector<Double> trafficSource;
 	private Vector<Double> trafficTransit;
+	private Vector<Integer> packetsDelay;
 	private double totalTrafficGenerated;
 	private String trafficGenerator;
 	
 	private void Initiation() {
- 		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers();
+ 		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
 		configurations = TCFacade.getConfigurations();
 		transmitBuffers = new BufferMap();
 		throughput = new Vector<Double>();
 		trafficSource = new Vector<Double>();
 		trafficTransit = new Vector<Double>();
+		packetsDelay = new Vector<Integer>();
 	}
 	
 	protected SchedulingStrategy(DynamicTrafficGenerator dynamicTrafficGenerator) {
@@ -88,10 +90,11 @@ public abstract class SchedulingStrategy
 					if(sourceBuffers.containsKey(link))
 					{
 						int dataRate = tcunit.getRate(link);
-						Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers);
+						Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
 						if(moved.isReceived())
 						{
 							double movedTraffic = moved.getTraffic();
+							packetsDelay.add(moved.getDelay());
 							slotThroughtput += movedTraffic;
 							tcunit.addThroughput(movedTraffic);
 						}
@@ -127,10 +130,11 @@ public abstract class SchedulingStrategy
 					if(transmitBuffers.containsKey(link))
 					{
 						int dataRate = tcunit.getRate(link);
-						Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers);
+						Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
 						if(moved.isReceived())
 						{
 							double movedTraffic = moved.getTraffic();
+							packetsDelay.add(moved.getDelay());
 							slotThroughtput += movedTraffic;
 							tcunit.addThroughput(movedTraffic);
 						}
@@ -189,7 +193,7 @@ public abstract class SchedulingStrategy
 		
 		sourceBuffers = null;
 		do {
-			updateTraffic(); // Fill the source buffers with random traffic
+			updateTraffic(0); // Fill the source buffers with random traffic
 		} while(sourceBuffers.trafficSize() == 0);
 		
 		
@@ -208,9 +212,10 @@ public abstract class SchedulingStrategy
 				for (Link link : tcunit.getLinks()) {
 					if(sourceBuffers.containsKey(link)) {
 						int dataRate = tcunit.getRate(link);
-						Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers);
+						Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
 						if(moved.isReceived()) {
 							double movedTraffic = moved.getTraffic();
+							packetsDelay.add(moved.getDelay());
 							slotThroughtput += movedTraffic;
 							tcunit.addThroughput(movedTraffic);
 						}
@@ -224,7 +229,7 @@ public abstract class SchedulingStrategy
 				/*----------------------*/
 				timeSlot++;
 				if(timeSlot < durationOfTrafficGenerating) {
-					totalTrafficGenerated += updateTraffic();
+					totalTrafficGenerated += updateTraffic(timeSlot);
 					Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
 							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 				} else {
@@ -255,9 +260,10 @@ public abstract class SchedulingStrategy
 				for (Link link : tcunit.getLinks()) {
 					if(transmitBuffers.containsKey(link)) {
 						int dataRate = tcunit.getRate(link);
-						Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers);
+						Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
 						if(moved.isReceived()) {
 							double movedTraffic = moved.getTraffic();
+							packetsDelay.add(moved.getDelay());
 							slotThroughtput += movedTraffic;
 							tcunit.addThroughput(movedTraffic);
 						}
@@ -271,7 +277,7 @@ public abstract class SchedulingStrategy
 				/*----------------------*/
 				timeSlot++;
 				if(timeSlot < durationOfTrafficGenerating) {
-					totalTrafficGenerated += updateTraffic();
+					totalTrafficGenerated += updateTraffic(timeSlot);
 					Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
 							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 				} else {
@@ -295,17 +301,23 @@ public abstract class SchedulingStrategy
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
+		
+		int sum = 0;
+		for(int i = 0; i < packetsDelay.size(); i++) {
+			sum += packetsDelay.get(i);
+		}
+		System.out.println("Average delay: "+(sum / packetsDelay.size())+" timeslots");
 	}
 	
 	/**Update the current traffic in the network. Some new packets may be added
 	 * to some source buffers randomly.
 	 */
-	private double updateTraffic() {
+	private double updateTraffic(int currentTimeSlot) {
 		double currentTrafficAmount = 0.0;
 		if(sourceBuffers != null) {
 			currentTrafficAmount = sourceBuffers.trafficSize();
 		}
-		sourceBuffers = TrafficEstimatingFacade.getDynamicSourceBuffers(sourceBuffers, dynamicTrafficGenerator);
+		sourceBuffers = TrafficEstimatingFacade.getDynamicSourceBuffers(sourceBuffers, dynamicTrafficGenerator, currentTimeSlot);
 		return sourceBuffers.trafficSize() - currentTrafficAmount;
 	}
 	
