@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import common.PrintConsole;
+
 import dataStructure.IFactorMap;
 
 
@@ -79,10 +81,12 @@ public class IFactorConfig extends BaseConfiguration
 	@Override
 	protected boolean ValidateXMLDocument(Element eElement) throws Exception
 	{
-		// TODO Auto-generated method stub
 		if(!eElement.hasChildNodes())
-			throw new Exception(TAG + " must have child node. the following template may help you " +
+		{
+			PrintConsole.printErr(TAG + " must have child node. the following template may help you " +
 					"<IFactor> \n \t <Add Key=\"0\" Value=\"1\" /> \n </IFactor>" );
+			System.exit(0);
+		}
 		return true;
 	}
 
