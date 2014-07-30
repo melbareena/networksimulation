@@ -1,5 +1,6 @@
 package GraphicVisualization;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -33,15 +34,20 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.DatasetRenderingOrder;
+import org.jfree.chart.plot.Marker;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.ui.RectangleAnchor;
+import org.jfree.ui.TextAnchor;
 import org.jfree.util.ShapeUtilities;
 
 import scheduling.Results;
+import setting.ApplicationSettingFacade;
 
 /**
  * @author Benjamin
@@ -81,12 +87,15 @@ public class HistogramViewer extends JFrame {
 	
 	public Results results;
 	
-	public final static String[] colors = new String[] {"Blue","Red","Green", "Orange", "Pink", "Black"};
+	public final static String[] colors = new String[] {"Blue", "Cyan", "Red", "Magenta", "Green", "Orange",
+		"Yellow", "Pink", "Gray", "Black"};
 	
 	public final static String[] shapes = new String[] {"Regular Cross", "Diagonal Cross", "Diamond", "Down Triangle", "Up Triangle"};
 	
-	public final StandardXYToolTipGenerator sttg = new StandardXYToolTipGenerator("{0}: Sample {1} -> Value {2}",
+	public final StandardXYToolTipGenerator sttg = new StandardXYToolTipGenerator("{0}: (Sample {1} -> Value {2})",
 			NumberFormat.getNumberInstance(), NumberFormat.getNumberInstance());
+	
+	public final Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration());
 	
 	/**
 	 * Create the frame.
@@ -175,6 +184,25 @@ public class HistogramViewer extends JFrame {
 
 		mnDisplay.add(buildMenuDisplay("Transmit Traffic", 2));
 		
+		if(ApplicationSettingFacade.Traffic.isDynamicType()) {
+			JMenuItem mnMarkerVisible= new JMenuItem("Hide markers");
+			mnDisplay.add(mnMarkerVisible);
+			mnMarkerVisible.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String t = ((JMenuItem) e.getSource()).getText();
+				boolean toggle = (t.equals("Show markers") ? true : false);
+				((JMenuItem) e.getSource()).setText((toggle ? "Hide markers" : "Show markers"));
+				XYPlot plot = ((XYPlot) chart.getPlot());
+				if(toggle) {
+					plot.addDomainMarker(endTraffic);
+				} else {
+					plot.clearDomainMarkers();
+				}
+			}
+		});
+		}
+		
 		JMenu mnView = new JMenu("View");
 		menuBar.add(mnView);
 		
@@ -191,7 +219,6 @@ public class HistogramViewer extends JFrame {
 		        KeyEvent.VK_SUBTRACT, 0));
 		
 		JLabel use = new JLabel(" (or use mouse wheel)");
-		//use.setHorizontalAlignment(JLabel.RIGHT);
 		use.setFont(use.getFont().deriveFont(Font.ITALIC, 10.0F));
 		mnView.add(use);
 		
@@ -209,14 +236,14 @@ public class HistogramViewer extends JFrame {
 	private JMenu buildMenuDisplay(final String target, final int index) {
 		JMenu menu = new JMenu(target);
 		
-		JMenuItem mnVisible= new JMenuItem("Set invisible");
+		JMenuItem mnVisible= new JMenuItem("Hide");
 		menu.add(mnVisible);
 		mnVisible.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String t = ((JMenuItem) e.getSource()).getText();
-				boolean toggle = (t.equals("Set visible") ? true : false);
-				((JMenuItem) e.getSource()).setText((toggle ? "Set invisible" : "Set visible"));
+				boolean toggle = (t.equals("Show") ? true : false);
+				((JMenuItem) e.getSource()).setText((toggle ? "Hide" : "Show"));
 				XYPlot plot = ((XYPlot) chart.getPlot());
 				XYItemRenderer r = plot.getRenderer(index);
 				r.setSeriesVisible(0, toggle);
@@ -309,31 +336,32 @@ public class HistogramViewer extends JFrame {
 		mnShape.add(nullShape);
 		for(int i = 0; i < shapes.length; i++) {
 			JMenuItem shape = new JMenuItem(shapes[i]);
-			shape.setActionCommand(shapes[i]);
+			Shape s = null;
+			switch (shapes[i]) {
+			case "Regular Cross":
+				s = ShapeUtilities.createRegularCross(3.0F, 0.5F);
+				break;
+			case "Diagonal Cross" :
+				s = ShapeUtilities.createDiagonalCross(3.0F, 0.5F);
+				break;
+			case "Diamond" :
+				s = ShapeUtilities.createDiamond(3.0F);
+				break;
+			case "Down Triangle" :
+				s = ShapeUtilities.createDownTriangle(3.0F);
+				break;
+			case "Up Triangle":
+				s = ShapeUtilities.createUpTriangle(3.0F);
+				break;
+			}
+			shape.setIcon(new ShapeIcon(s, Color.BLACK));
+			final Shape sFinal = s;
 			shape.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					XYPlot plot = chart.getXYPlot();		
 					XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(index);
-					Shape s = null;
-					switch (e.getActionCommand()) {
-					case "Regular Cross":
-						s = ShapeUtilities.createRegularCross(3.0F, 0.5F);
-						break;
-					case "Diagonal Cross" :
-						s = ShapeUtilities.createDiagonalCross(3.0F, 0.5F);
-						break;
-					case "Diamond" :
-						s = ShapeUtilities.createDiamond(3.0F);
-						break;
-					case "Down Triangle" :
-						s = ShapeUtilities.createDownTriangle(3.0F);
-						break;
-					case "Up Triangle":
-						s = ShapeUtilities.createUpTriangle(3.0F);
-						break;
-					}
-					renderer.setSeriesShape(0, s);
+					renderer.setSeriesShape(0, sFinal);
 					renderer.setSeriesShapesVisible(0, true);
 					plot.setRenderer(index, renderer);
 				}
@@ -422,10 +450,18 @@ public class HistogramViewer extends JFrame {
 		
 		System.out.println("Finished, displaying...");
 		
+		String titleString = "Results " + GraphViewer.optionsTitle + "\n"
+				+ results.getSchedulingStrategy() + "\n"
+				+ results.getTrafficGenerator() + " traffic"
+				+ ((ApplicationSettingFacade.Traffic.isDynamicType()) ? " (lambda "
+				+ ApplicationSettingFacade.Traffic.getTrafficRate()
+				+ " ; " + ApplicationSettingFacade.Traffic.getNumberOfNewEmittingNodes()
+				+ " em. nodes ; ratio "
+				+ ApplicationSettingFacade.Traffic.getRatio() + ")" : "");
+		
 		/* Creating chart */
-		chart = ChartFactory.createXYLineChart("Results " + GraphViewer.optionsTitle + " - " +
-				results.getSchedulingStrategy()	+ " - " + results.getTrafficGenerator() + " traffic",
-				"",	"Throughput", datasetThroughput, PlotOrientation.VERTICAL, true, true, false);
+		chart = ChartFactory.createXYLineChart(titleString,	"Samples",	"Throughput",
+				datasetThroughput, PlotOrientation.VERTICAL, true, true, false);
 		
 		/* Plot properties */
 		XYPlot plot = chart.getXYPlot();
@@ -433,6 +469,20 @@ public class HistogramViewer extends JFrame {
 		plot.setRangeGridlinePaint(Color.DARK_GRAY);
 		plot.setDomainGridlinesVisible(true);
 		plot.setDomainGridlinePaint(Color.DARK_GRAY);
+		
+		/* End of traffic generation marker */
+		if(ApplicationSettingFacade.Traffic.isDynamicType()) {
+	        endTraffic.setPaint(Color.BLACK);
+	        endTraffic.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+	        		10.0F, new float[] {10, 10}, 0.0F));
+	        endTraffic.setLabel("End of traffic generation");
+	        endTraffic.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
+	        endTraffic.setLabelTextAnchor(TextAnchor.TOP_LEFT);
+	        endTraffic.setOutlinePaint(Color.BLACK);
+	        endTraffic.setLabelBackgroundColor(Color.WHITE);
+	        endTraffic.setLabelFont(endTraffic.getLabelFont().deriveFont(Font.BOLD, 12));
+	        plot.addDomainMarker(endTraffic);
+		}
 		
 		/* Throughput renderer */
 		XYSplineRenderer renderer0 = new XYSplineRenderer();
