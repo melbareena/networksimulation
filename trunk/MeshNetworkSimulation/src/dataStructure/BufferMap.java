@@ -136,10 +136,10 @@ public class BufferMap implements Map<Link, Buffer>
 		 return sorted;
 	}
 
-	public Packet sendPacket(Link link, int dataRate, BufferMap transmissionBuffer)
+	public Packet sendPacket(Link link, int dataRate, BufferMap transmissionBuffer, int currentTimeSlot)
 	{
 		Buffer b = this.get(link);	
- 		Packet movedPacket = b.send(dataRate);
+ 		Packet movedPacket = b.send(dataRate, currentTimeSlot);
 		
 		if(!movedPacket.isReceived())
 			transmissionBuffer.put(movedPacket.getCurrentLink(), movedPacket);

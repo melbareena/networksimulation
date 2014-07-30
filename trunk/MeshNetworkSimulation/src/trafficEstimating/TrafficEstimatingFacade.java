@@ -66,7 +66,7 @@ public class TrafficEstimatingFacade
 	}*/
 	
 	
-	public static BufferMap getSourceBuffers()
+	public static BufferMap getSourceBuffers(int currentTimeslot)
 	{
 		
 		BufferMap bfMap = new BufferMap();
@@ -87,7 +87,7 @@ public class TrafficEstimatingFacade
 				
 				for (Path p : uplinks.get(v))
 				{		
-					Packet newPacket = new Packet(p, upTraffic);
+					Packet newPacket = new Packet(p, upTraffic, currentTimeslot);
 					bfMap.put( p.getEdgePath().getFirst(), newPacket);
 				}
 			}
@@ -97,7 +97,7 @@ public class TrafficEstimatingFacade
 				for (Path p : downlinkPaths.get(v))
 				{
 					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
-					Packet newPacket = new Packet(p, downTraffic);
+					Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
 					bfMap.put( p.getEdgePath().getFirst(), newPacket);
 				}
 
@@ -115,7 +115,8 @@ public class TrafficEstimatingFacade
 	 * @param trafficGenerator The traffic generator used to add new traffic.
 	 * @return The updated <code>BufferMap</code>.
 	 */
-	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, DynamicTrafficGenerator trafficGenerator) {
+	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, DynamicTrafficGenerator trafficGenerator,
+			int currentTimeslot) {
 		BufferMap bfMap = null;
 		//Creating a new BufferMap if the current one is null
 		if(currentBufferMap == null) {
@@ -138,7 +139,7 @@ public class TrafficEstimatingFacade
 			if(uplinkTraffic.hasUplinkTraffic(v)) {
 				int upTraffic = uplinkTraffic.getUplinkTraffic(v);
 				for (Path p : uplinks.get(v)) {		
-					Packet newPacket = new Packet(p, upTraffic);
+					Packet newPacket = new Packet(p, upTraffic, currentTimeslot);
 					bfMap.put( p.getEdgePath().getFirst(), newPacket);
 				}
 			}
@@ -146,7 +147,7 @@ public class TrafficEstimatingFacade
 			if(downlinkTraffic.hasTraffic(v)) {
 				for (Path p : downlinks.get(v)) {
 					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
-					Packet newPacket = new Packet(p, downTraffic);
+					Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
 					bfMap.put( p.getEdgePath().getFirst(), newPacket);
 				}
 			}

@@ -141,7 +141,7 @@ public class DynamicTrafficGenerator {
 			for(Vertex gateway : gateways) {
 				TreeMap<Vertex,Float> gatewayTrafficMap = new TreeMap<>();
 				// Shuffling the list of path from the gateway
-				Collections.shuffle(downlinks.get(gateway));
+				Collections.shuffle(downlinks.get(gateway), this.randomGenerator);
 				// Adding traffic for n links
 				for(int i = 0; i < n; i++) {
 					Path p = downlinks.get(gateway).get(i);
@@ -161,7 +161,7 @@ public class DynamicTrafficGenerator {
 	 */
 	public Set<Vertex> pickUpRandomNodes(int n) {
 		List<Vertex> shuffledList = Lists.newArrayList(ApplicationSettingFacade.Nodes.getNodes().values());
-		Collections.shuffle(shuffledList);
+		Collections.shuffle(shuffledList, this.randomGenerator);
 		return Sets.newHashSet(shuffledList.subList(0, n));
 	}
 	

@@ -30,9 +30,6 @@ import javax.swing.border.EmptyBorder;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.annotations.XYAnnotation;
-import org.jfree.chart.annotations.XYDrawableAnnotation;
-import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
@@ -51,6 +48,7 @@ import org.jfree.util.ShapeUtilities;
 
 import scheduling.Results;
 import setting.ApplicationSettingFacade;
+import setting.BaseConfiguration.TypeOfGenerationEnum;
 
 /**
  * @author Benjamin
@@ -422,7 +420,6 @@ public class HistogramViewer extends JFrame {
 		
 		toolBar.add(Box.createHorizontalGlue());
 		
-		/*TODO*/
 		double sum = 0.0;
 		for(Double d : dataThroughput) {
 			sum += d;
@@ -464,7 +461,9 @@ public class HistogramViewer extends JFrame {
 		System.out.println("Finished, displaying...");
 		
 		String titleString = "Results " + GraphViewer.optionsTitle + "\n"
-				+ results.getSchedulingStrategy() + "\n"
+				+ results.getSchedulingStrategy() + " - "
+				+ ((ApplicationSettingFacade.Router.getTypeOfGeneration() == TypeOfGenerationEnum.RANDOM) ?
+						"Random Topolgy" : "Static Topology") + "\n"
 				+ results.getTrafficGenerator() + " traffic"
 				+ ((ApplicationSettingFacade.Traffic.isDynamicType()) ? " (lambda "
 				+ ApplicationSettingFacade.Traffic.getTrafficRate()
@@ -486,14 +485,13 @@ public class HistogramViewer extends JFrame {
 		/* Markers for dynamic traffic */
 		if(ApplicationSettingFacade.Traffic.isDynamicType()) {
 			/* End of traffic generation marker */
-	        endTraffic.setPaint(Color.BLACK);
+	        endTraffic.setPaint(Color.GREEN);
 	        endTraffic.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 	        		10.0F, new float[] {10, 10}, 0.0F));
 	        endTraffic.setLabel("End of traffic generation");
 	        endTraffic.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
 	        endTraffic.setLabelTextAnchor(TextAnchor.TOP_LEFT);
 	        endTraffic.setOutlinePaint(Color.BLACK);
-	        endTraffic.setLabelBackgroundColor(Color.WHITE);
 	        endTraffic.setLabelFont(endTraffic.getLabelFont().deriveFont(Font.BOLD, 12));
 	        plot.addDomainMarker(endTraffic);
 	        
@@ -505,7 +503,6 @@ public class HistogramViewer extends JFrame {
 	        meanThroughput.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
 	        meanThroughput.setLabelTextAnchor(TextAnchor.BOTTOM_RIGHT);
 	        meanThroughput.setOutlinePaint(Color.BLACK);
-	        meanThroughput.setLabelBackgroundColor(Color.WHITE);
 	        meanThroughput.setLabelFont(meanThroughput.getLabelFont().deriveFont(Font.BOLD, 12));
 	        plot.addRangeMarker(meanThroughput);
 		}
@@ -589,9 +586,11 @@ public class HistogramViewer extends JFrame {
 		axis0.setTickLabelPaint(color);
 		axis0.setTickMarkPaint(color);
 		plot.setRangeAxis(index, axis0);
-		/* Change throughput marker if necessary */
+		/* Change markers if necessary */
 		if(index == 0) {
 			 meanThroughput.setPaint(color);
+		} else if(index == 1) {
+			 endTraffic.setPaint(color);
 		}
 	}
 

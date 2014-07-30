@@ -62,7 +62,7 @@ public class Buffer
 	}
 
 
-	public Packet send(int dataRate)
+	public Packet send(int dataRate, int currentTimeSlot)
 	{
 		
 		Packet max = this.getMax();
@@ -70,7 +70,7 @@ public class Buffer
 		{
 			if(max.getTraffic() < dataRate)
 				packets.remove(max);
-			return max.send(dataRate);
+			return max.send(dataRate, currentTimeSlot);
 		}
 		return null;
 	}
