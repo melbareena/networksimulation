@@ -12,69 +12,62 @@ import dataStructure.Link;
 public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 {
 	
-	private static int sourcePositionIndex = 0;
-	private static int tranmissionPositionIndex = 0;
+	private int sourcePositionIndex;
+	private int tranmissionPositionIndex;
 	
 	public RoundRobinSchedulingStrategy(DynamicTrafficGenerator dtg) {
 		super(dtg);
+		sourcePositionIndex = 0;
+		tranmissionPositionIndex = 0;
 	}
 	
 	public RoundRobinSchedulingStrategy() {
 		super();
+		sourcePositionIndex = 0;
+		tranmissionPositionIndex = 0;
 	}
 
 	@Override
-	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer)
-	{
-		
-		if(sourcePositionIndex > super.sourceBuffers.size())
+	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) {
+		if (sourcePositionIndex > super.sourceBuffers.size()) {
 			sourcePositionIndex = 0;
-		if(tranmissionPositionIndex > super.transmitBuffers.size())
+		}
+		if (tranmissionPositionIndex > super.transmitBuffers.size()) {
 			tranmissionPositionIndex = 0;
-		
+		}
+
 		BufferMap targetBuffer;
-		
+
 		int roundRobinIndex = 0;
-		
-		if(isSourceBuffer)
-		{
+
+		if (isSourceBuffer) {
 			targetBuffer = super.sourceBuffers;
 			roundRobinIndex = sourcePositionIndex;
-		}
-		else
-		{
+		} else {
 			targetBuffer = super.transmitBuffers;
 			roundRobinIndex = tranmissionPositionIndex;
 		}
-		
-		
+
 		Vector<Link> selectedLinks = new Vector<>();
-		
-		
-		TreeMap<Link, Buffer> sortedBuffer = targetBuffer.sort();
+
+		TreeMap<Link, Buffer> sortedBuffer = targetBuffer.sortByTraffic();
 		int index = 0;
 		int inserted = 0;
-		for (Entry<Link, Buffer> lb : sortedBuffer.entrySet())
-		{
-			
-			
-			
-			if(index == roundRobinIndex)
-			{
-				selectedLinks.add(lb.getKey() );	
+		for (Entry<Link, Buffer> lb : sortedBuffer.entrySet()) {
+			if (index == roundRobinIndex) {
+				selectedLinks.add(lb.getKey());
 				inserted++;
 				roundRobinIndex++;
-				
-				if(isSourceBuffer)
+				if (isSourceBuffer) {
 					sourcePositionIndex++;
-				else
+				} else {
 					tranmissionPositionIndex++;
+				}
 			}
-			if(super.k == inserted)
+			if (super.k == inserted) {
 				break;
-			
+			}
 			index++;
-
 		}
 		return selectedLinks;
 	}

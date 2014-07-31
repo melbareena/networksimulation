@@ -116,24 +116,25 @@ public class BufferMap implements Map<Link, Buffer>
 		return collections.values();
 	}
 	
-	public TreeMap<Link,Buffer> sort()
-	{
-		 TreeMap<Link,Buffer> sorted = new TreeMap<Link,Buffer>(new Comparator<Link>()
-		{
-
+	/**Sort the BufferMap looking at the amount of traffic in the buffers.
+	 * The first element will be the one with the largest amount of traffic.
+	 * @return A TreeMap containing the whole BufferMap sorted.
+	 */
+	public TreeMap<Link, Buffer> sortByTraffic() {
+		TreeMap<Link, Buffer> sorted = new TreeMap<Link, Buffer>(new Comparator<Link>() {
 			@Override
-			public int compare(Link o1, Link o2)
-			{
-				if(collections.size() == 0 || o1.getId() == o2.getId()) return 0;
-				if (collections.get(o1).size() >= collections.get(o2).size())
+			public int compare(Link o1, Link o2) {
+				if (collections.size() == 0 || o1.getId() == o2.getId())
+					return 0;
+				if (collections.get(o1).size() >= collections.get(o2)
+						.size())
 					return -1;
 				else
 					return 1;
 			}
 		});
-		 
-		 sorted.putAll(collections);
-		 return sorted;
+		sorted.putAll(collections);
+		return sorted;
 	}
 
 	public Packet sendPacket(Link link, int dataRate, BufferMap transmissionBuffer, int currentTimeSlot)

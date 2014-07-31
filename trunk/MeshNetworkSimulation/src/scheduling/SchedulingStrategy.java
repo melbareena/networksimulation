@@ -419,5 +419,5 @@ public abstract class SchedulingStrategy
 		return results;
 	}
 	
-	abstract protected String getName();
+	protected abstract String getName();
 }

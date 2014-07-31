@@ -613,7 +613,7 @@ public class TransmissionConfiguration {
 	private TCUnit Enlarge(TCUnit tConfUnit)
 	{
 	
-		Link[] links = TrafficEstimatingFacade.getSourceBuffers(0).sort().keySet().toArray(new Link[0]);
+		Link[] links = TrafficEstimatingFacade.getSourceBuffers(0).sortByTraffic().keySet().toArray(new Link[0]);
 
 		
 		//List<Link> links = TrafficEstimatingFacade.getOptimalLinks();
