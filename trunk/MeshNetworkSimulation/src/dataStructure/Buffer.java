@@ -3,6 +3,7 @@ package dataStructure;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Buffer
 {
@@ -79,6 +80,14 @@ public class Buffer
 	public String toString() 
 	{
 		return "Packet size:" + packets.size() + ", Traffic:" + this.size();
+	}
+	
+	/*TODO*/
+	/**Return a map containing the list of packet for a given destination.
+	 * @return A map containing the list of packet for a given destination.
+	 */
+	public Map<Vertex, List<Packet>> getPacketDestinationMap() {
+		return null;
 	}
 
 
