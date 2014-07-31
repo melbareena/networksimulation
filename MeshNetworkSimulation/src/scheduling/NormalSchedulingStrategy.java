@@ -27,7 +27,7 @@ public class NormalSchedulingStrategy extends SchedulingStrategy
 		Vector<Link> selectedLinks = new Vector<>();
 		
 		
-		TreeMap<Link, Buffer> sortedBuffer = targetBuffer.sort();
+		TreeMap<Link, Buffer> sortedBuffer = targetBuffer.sortByTraffic();
 		int index = 0;
 		for (Entry<Link, Buffer> lb : sortedBuffer.entrySet())
 		{
