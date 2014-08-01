@@ -15,6 +15,8 @@ public class Results {
 	private String trafficGenerator;
 	
 	private double totalTrafficGenerated;
+	
+	private double averagePacketDelay;
 
 	protected void setThroughputData(Vector<Double> throughputData) {
 		this.throughputData = throughputData;
@@ -62,6 +64,14 @@ public class Results {
 
 	public double getTotalTrafficGenerated() {
 		return totalTrafficGenerated;
+	}
+
+	public double getAveragePacketDelay() {
+		return averagePacketDelay;
+	}
+
+	public void setAveragePacketDelay(double averagePacketsDelay) {
+		this.averagePacketDelay = averagePacketsDelay;
 	}
 
 }

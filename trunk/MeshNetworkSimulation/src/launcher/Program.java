@@ -7,6 +7,7 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 import scheduling.BackPressureSchedulingStrategy;
+import scheduling.NormalSchedulingStrategy;
 import scheduling.RoundRobinSchedulingStrategy;
 import scheduling.SchedulingStrategy;
 import setting.ApplicationSettingFacade;
@@ -16,6 +17,8 @@ import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.StartOptionsDialog;
 
 public class Program {
+	
+	public static String schedulingStrategy;
 	
 	public static LoadingDialog loadingDialog = new LoadingDialog(null, "simulation", false);
 	
@@ -50,8 +53,19 @@ public class Program {
 	
 	public static void launch() {
 		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
-		//final SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
-		final SchedulingStrategy s = new BackPressureSchedulingStrategy(dtg);
+		SchedulingStrategy sprime = null;
+		switch(schedulingStrategy) {
+		case "Normal" :
+			sprime = new NormalSchedulingStrategy(dtg);
+			break;
+		case "Round Robin" :
+			sprime = new RoundRobinSchedulingStrategy(dtg);
+			break;
+		case "Back Pressure" :
+			sprime = new BackPressureSchedulingStrategy(dtg);
+			break;
+		}
+		final SchedulingStrategy s = sprime;
 	
 		loadingDialog.setVisible(true);
 		try {

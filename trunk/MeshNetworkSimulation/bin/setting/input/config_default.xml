@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <AppConfiguration>
     <ChannelAssignment Strategy="OriginalSterategy"/>
-    <Channels Mode="Partially">
-        <Add Value="1"/>
-        <!-- <Add Value="2"/>
-        <Add Value="3"/>
-        <Add Value="4"/>
-        <Add Value="5"/>
-        <Add Value="6"/>
-        <Add Value="7"/>
-        <Add Value="8"/>
-        <Add Value="9"/>
-        <Add Value="10"/>
-        <Add Value="11"/> -->
-    </Channels>
+    <Channels Mode="All"/>
     <DataRate>
         <Add Rate="54" SINR="429.57"/>
         <Add Rate="12" SINR="13.48"/>
@@ -45,7 +33,7 @@
         <Add Key="10" Value="0.0"/>
     </IFactor>
     <OutputFolder GenerateFileAsOutput="false" IntermidiateConsoleOutput="false" Path="null"/>
-    <Routers Address="/setting/input/routers.txt" MinDistance="50" Radio="2" TransmissionRate="200" TypeOfGeneration="File"/>
+    <Routers MinDistance="50" Number="80" Radio="2" SaftyTest="500" Seed="2024613503222317195" TransmissionRate="200" TypeOfGeneration="Random"/>
     <SINR Alpha="4" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
-    <Traffic AddressDown="/setting/input/trafficDown.txt" AddressUp="/setting/input/trafficUp.txt" Duration="100000" Generator="File" NbOfNewEmittingNodes="5" Rate="0.5" Ratio="2" Seed="8742698923912998120" Type="Dynamic"/>
+    <Traffic DownSeed="7219788518493917102" Duration="100000" Generator="Random" NbOfNewEmittingNodes="5" Rate="0.5" Ratio="2" Seed="7654972806568228792" Type="Dynamic" UpSeed="6072384161720914880"/>
 </AppConfiguration>

@@ -4,12 +4,21 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.Buffer;
 import dataStructure.BufferMap;
 import dataStructure.Link;
 
 public class NormalSchedulingStrategy extends SchedulingStrategy
 {
+	
+	public NormalSchedulingStrategy(DynamicTrafficGenerator dtg) {
+		super(dtg);
+	}
+	
+	public NormalSchedulingStrategy() {
+		super();
+	}
 	
 
 	@Override

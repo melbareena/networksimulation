@@ -145,6 +145,11 @@ public class StartOptionsDialog extends JDialog {
 	private final JLabel lblStrategy = new JLabel("Strategy:");
 	private final JComboBox channelStrategyComboBox = new JComboBox();
 	private final JLabel lbluseCtrlTo = new JLabel("(use Ctrl to select mutiples)");
+	private final JLabel lblSchedulingStrategy = new JLabel("Scheduling");
+	private final JPanel schedulingPanel = new JPanel();
+	private final JComboBox schedulingComboBox = new JComboBox();
+	private final JLabel lblStrategy_1 = new JLabel("Strategy:");
+	
 	
 	private final JButton defaultButton = new JButton("Use Default and Run");
 	
@@ -198,10 +203,6 @@ public class StartOptionsDialog extends JDialog {
 			upTrafficTextField.setToolTipText("/setting/input/trafficUp.txt");
 			upTrafficTextField.setEditable(false);
 			upTrafficTextField.setColumns(10);
-			outputFolderPathTextField.setFont(new Font("Tahoma", Font.ITALIC, 11));
-			outputFolderPathTextField.setText("Output folder...");
-			outputFolderPathTextField.setEditable(false);
-			outputFolderPathTextField.setColumns(10);	
 		}
 		
 		/*------------------*/
@@ -214,51 +215,47 @@ public class StartOptionsDialog extends JDialog {
 			getContentPane().setLayout(new BorderLayout());
 			contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 			getContentPane().add(contentPanel, BorderLayout.CENTER);
-			contentPanel.setLayout(new MigLayout("", "[90px,grow]10[157px,grow]10[95px]10[157px,grow]", "[min!]10[min!,grow]20[grow]10[grow]10[min!,grow]10[min!,grow]"));
+			contentPanel.setLayout(new MigLayout("", "[90px,grow]10[157px,grow]10[95px]10[157px,grow]", "[min!]10[min!]10[min!,grow]10[min!,grow]10[min!,grow]10[min!,grow]10[min!,grow]"));
 		}
 		
 		/*-------------*/
 		/* Environment */
 		/*-------------*/
+		lblEnvironment.setHorizontalAlignment(SwingConstants.TRAILING);
+		contentPanel.add(lblEnvironment, "cell 0 0,grow");
+		
+		contentPanel.add(environmentPanel, "cell 1 0,growx,aligny center");
+		environmentPanel.setLayout(new MigLayout("insets 0 0 0 0", "[min!][150px]", "[25px][25px]"));
+		environmentPanel.add(lblX);
+		
+		envXSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
+		environmentPanel.add(envXSpinner, "wrap,grow");
+		environmentPanel.add(lblY);
+		envYSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
+		environmentPanel.add(envYSpinner, "grow");
+		
+		contentPanel.add(lblSchedulingStrategy, "flowy,cell 2 0,alignx trailing");
 		{
-			lblEnvironment.setHorizontalAlignment(SwingConstants.TRAILING);
-			contentPanel.add(lblEnvironment, "cell 0 0,grow");
-			
-			contentPanel.add(environmentPanel, "cell 1 0,growx,aligny center");
-			environmentPanel.setLayout(new MigLayout("insets 0 0 0 0", "[min!][150px]", "[25px][25px]"));
-			environmentPanel.add(lblX);
-			
-			envXSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
-			environmentPanel.add(envXSpinner, "wrap,grow");
-			environmentPanel.add(lblY);
-			envYSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
-			environmentPanel.add(envYSpinner, "grow");
 			lblGateways.setHorizontalAlignment(SwingConstants.TRAILING);
 		}
 		
 		/*----------*/
 		/* Gateways */
 		/*----------*/
-		{
-			contentPanel.add(lblGateways, "cell 2 0,grow");
-			
-			contentPanel.add(gatewaysPanel, "cell 3 0,growx,aligny center");
-			gatewaysPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
-			
-			gatewaysPanel.add(gatewaysTextField, "cell 0 0,grow");
-			gatewaysButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					gatewaysDialog.showDialog(true);
-				}
-			});
-			gatewaysPanel.add(gatewaysButton, "cell 1 0,alignx center,aligny center");
-		}
 		
-		/*--------*/
-		/* Output */
-		/*--------*/
+		contentPanel.add(schedulingPanel, "cell 3 0,grow");
+		schedulingPanel.setLayout(new MigLayout("", "[grow]", "[grow]"));
+		schedulingComboBox.setMaximumRowCount(3);
+		schedulingComboBox.setModel(new DefaultComboBoxModel(new String[] {"Normal", "Round Robin", "Back Pressure"}));
+		schedulingComboBox.setSelectedIndex(1);
+		
+		schedulingPanel.add(schedulingComboBox, "cell 0 0,growx,aligny center");
+		contentPanel.add(lblOutput, "cell 0 1,alignx trailing,aligny center");
+		outputFolderPathTextField.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		outputFolderPathTextField.setText("Output folder...");
+		outputFolderPathTextField.setEditable(false);
+		outputFolderPathTextField.setColumns(10);	
 		{
-			contentPanel.add(lblOutput, "cell 0 1,alignx trailing,aligny center");
 			
 			contentPanel.add(outputPanel, "cell 1 1,grow");
 			outputPanel.setLayout(new MigLayout("insets 0 0 0 0", "[5][150px][min!]", "[][23px]"));
@@ -281,6 +278,24 @@ public class StartOptionsDialog extends JDialog {
 			btnOutput.setEnabled(false);
 			outputPanel.add(btnOutput, "cell 2 1,growx,aligny top");
 		}
+		{
+			contentPanel.add(lblGateways, "cell 2 1,grow");
+			
+			contentPanel.add(gatewaysPanel, "cell 3 1,growx,aligny center");
+			gatewaysPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
+			
+			gatewaysPanel.add(gatewaysTextField, "cell 0 0,grow");
+			gatewaysButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					gatewaysDialog.showDialog(true);
+				}
+			});
+			gatewaysPanel.add(gatewaysButton, "cell 1 0,alignx center,aligny center");
+		}
+		
+		/*--------*/
+		/* Output */
+		/*--------*/
 		
 		/*---------*/
 		/* Routers */
@@ -288,9 +303,9 @@ public class StartOptionsDialog extends JDialog {
 		{
 			lblRouters.setHorizontalAlignment(SwingConstants.TRAILING);
 			
-			contentPanel.add(lblRouters, "cell 2 1,grow");
+			contentPanel.add(lblRouters, "cell 2 2,grow");
 			
-			contentPanel.add(routersPanel, "cell 3 1,growx,aligny center");
+			contentPanel.add(routersPanel, "cell 3 2,growx,aligny center");
 			routersPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 			
 			routersPanel.add(routersTextField, "cell 0 1,grow");
@@ -306,7 +321,7 @@ public class StartOptionsDialog extends JDialog {
 		/* Traffic */
 		/*---------*/
 		{
-			contentPanel.add(trafficLabelPanel, "cell 0 2 1 2,growx,aligny center");
+			contentPanel.add(trafficLabelPanel, "cell 0 2 1 3,growx,aligny center");
 			
 			trafficLabelPanel.setLayout(new MigLayout("", "[grow]", "[min!]10[min!][min!]"));
 			trafficLabelPanel.add(lblTraffic, "cell 0 0,growx");
@@ -415,11 +430,11 @@ public class StartOptionsDialog extends JDialog {
 		{
 			lblIfactor.setHorizontalAlignment(SwingConstants.TRAILING);
 			
-			contentPanel.add(lblIfactor, "cell 2 2,growx,aligny center");
+			contentPanel.add(lblIfactor, "cell 2 3,growx,aligny center");
 			IFactorTextField.setEditable(false);
 			IFactorTextField.setColumns(10);
 			
-			contentPanel.add(IFactorPanel, "cell 3 2,growx,aligny center");
+			contentPanel.add(IFactorPanel, "cell 3 3,growx,aligny center");
 			IFactorPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 			
 			IFactorPanel.add(IFactorTextField, "cell 0 0,grow");
@@ -436,9 +451,9 @@ public class StartOptionsDialog extends JDialog {
 		/*-----------*/
 		{
 			lblDatarates.setHorizontalAlignment(SwingConstants.TRAILING);
-			contentPanel.add(lblDatarates, "cell 2 3,growx,aligny center");
+			contentPanel.add(lblDatarates, "cell 2 4,growx,aligny center");
 			
-			contentPanel.add(dataratesPanel, "cell 3 3,growx,aligny center");
+			contentPanel.add(dataratesPanel, "cell 3 4,growx,aligny center");
 			dataratesPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 			
 			dataratesPanel.add(dataratesTextField, "cell 0 0,grow");
@@ -455,10 +470,10 @@ public class StartOptionsDialog extends JDialog {
 		/*------------*/
 		{
 			lblAlgorithm.setHorizontalAlignment(SwingConstants.TRAILING);
-			contentPanel.add(lblAlgorithm, "cell 0 4,grow");
+			contentPanel.add(lblAlgorithm, "cell 0 5,grow");
 	
 			JPanel rdbtnPanel = new JPanel();
-			contentPanel.add(rdbtnPanel, "cell 1 4,alignx left,growy");
+			contentPanel.add(rdbtnPanel, "cell 1 5,alignx left,growy");
 			rdbtnPanel.setLayout(new GridLayout(2, 0, 0, 0));
 			
 			JRadioButton rdbtnOriginal = new JRadioButton("Original algorithm");
@@ -484,7 +499,7 @@ public class StartOptionsDialog extends JDialog {
 			
 			newAlgoPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "New algorithm parameters", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 			
-			contentPanel.add(newAlgoPanel, "cell 0 5 2 1,alignx center,aligny center");
+			contentPanel.add(newAlgoPanel, "cell 0 6 2 1,alignx center,aligny center");
 			newAlgoPanel.setLayout(new MigLayout("insets 5 0 0 0", "[min!]10[157px]", "[83px][83px]"));
 			newAlgoPanel.add(ratioLabelsPanel, "cell 0 0,alignx trailing,aligny center");
 			ratioLabelsPanel.setLayout(new MigLayout("insets 0 0 0 0", "[157px]", "[min!][min!]"));
@@ -520,9 +535,9 @@ public class StartOptionsDialog extends JDialog {
 		/* SINR */
 		/*------*/
 		{
-			contentPanel.add(lblSinr, "cell 2 4,growx,aligny center");
+			contentPanel.add(lblSinr, "cell 2 5,growx,aligny center");
 			
-			contentPanel.add(SINRPanel, "cell 3 4,growx,aligny center");
+			contentPanel.add(SINRPanel, "cell 3 5,growx,aligny center");
 			SINRPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
 			
 			SINRPanel.add(SINRTextField, "cell 0 0,grow");
@@ -538,9 +553,9 @@ public class StartOptionsDialog extends JDialog {
 		/* Channels */
 		/*----------*/
 		{
-			contentPanel.add(lblChannels, "cell 2 5,growx,aligny center");
+			contentPanel.add(lblChannels, "cell 2 6,growx,aligny center");
 			
-			contentPanel.add(channelsPanel, "cell 3 5,grow");
+			contentPanel.add(channelsPanel, "cell 3 6,grow");
 			channelsPanel.setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
 			
 			channelsPanel.add(lblMode, "cell 0 0,alignx trailing");
@@ -589,6 +604,8 @@ public class StartOptionsDialog extends JDialog {
 			
 			channelsPanel.add(channelStrategyComboBox, "cell 1 2,grow");
 		}
+		
+		contentPanel.add(lblStrategy_1, "cell 2 0,alignx trailing");
 
 		/*---------*/
 		/* Buttons */
@@ -608,6 +625,7 @@ public class StartOptionsDialog extends JDialog {
 					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+					Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					configFile = "/setting/input/config_default.xml";
 					JOptionPane.showMessageDialog(null,
@@ -631,6 +649,7 @@ public class StartOptionsDialog extends JDialog {
 					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+					Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					JTextField blank = new JTextField();
 					showFileChooser(blank, "configuration to load", false, 10);
@@ -654,6 +673,7 @@ public class StartOptionsDialog extends JDialog {
 					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
+					Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					writeConfiguration();
 					if(configFile != null) {
@@ -721,7 +741,7 @@ public class StartOptionsDialog extends JDialog {
 			}
 		}
 		
-		contentPanel.add(trafficPanel, "cell 1 2 1 2,grow");
+		contentPanel.add(trafficPanel, "cell 1 2 1 3,grow");
 		
 		this.revalidate();
 		this.repaint();
