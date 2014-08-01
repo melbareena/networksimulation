@@ -27,18 +27,18 @@ public abstract class SchedulingStrategy
 	protected int k = 3;
 	protected BufferMap sourceBuffers;
 	protected BufferMap transmitBuffers;
-	private List<TCUnit> configurations;
+	protected List<TCUnit> configurations;
 	
 	/** The generator used to generate dynamically some new traffic in the network. */
-	private DynamicTrafficGenerator dynamicTrafficGenerator;
+	protected DynamicTrafficGenerator dynamicTrafficGenerator;
 	
 	/* For collecting results */
-	private Vector<Double> throughput;
-	private Vector<Double> trafficSource;
-	private Vector<Double> trafficTransit;
-	private Vector<Integer> packetsDelay;
-	private double totalTrafficGenerated;
-	private String trafficGenerator;
+	protected Vector<Double> throughput;
+	protected Vector<Double> trafficSource;
+	protected Vector<Double> trafficTransit;
+	protected Vector<Integer> packetsDelay;
+	protected double totalTrafficGenerated;
+	protected String trafficGenerator;
 	
 	private void Initiation() {
  		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
@@ -58,7 +58,6 @@ public abstract class SchedulingStrategy
 	protected SchedulingStrategy() {
 		this.Initiation();
 	}
-	
 	
 	public void scheduling()
 	{
@@ -224,9 +223,10 @@ public abstract class SchedulingStrategy
 				throughput.add(slotThroughtput);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
-				/*----------------------*/
-				/* Generate new traffic */
-				/*----------------------*/
+				/*----------------------*
+				 * Generate new traffic *
+				 * And display progress *
+				 *----------------------*/
 				timeSlot++;
 				if(timeSlot < durationOfTrafficGenerating) {
 					totalTrafficGenerated += updateTraffic(timeSlot);
@@ -272,9 +272,10 @@ public abstract class SchedulingStrategy
 				throughput.add(slotThroughtput);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
-				/*----------------------*/
-				/* Generate new traffic */
-				/*----------------------*/
+				/*----------------------*
+				 * Generate new traffic *
+				 * And display progress *
+				 *----------------------*/
 				timeSlot++;
 				if(timeSlot < durationOfTrafficGenerating) {
 					totalTrafficGenerated += updateTraffic(timeSlot);
@@ -312,7 +313,7 @@ public abstract class SchedulingStrategy
 	/**Update the current traffic in the network. Some new packets may be added
 	 * to some source buffers randomly.
 	 */
-	private double updateTraffic(int currentTimeSlot) {
+	protected double updateTraffic(int currentTimeSlot) {
 		double currentTrafficAmount = 0.0;
 		if(sourceBuffers != null) {
 			currentTrafficAmount = sourceBuffers.trafficSize();
@@ -420,4 +421,5 @@ public abstract class SchedulingStrategy
 	}
 	
 	protected abstract String getName();
+
 }

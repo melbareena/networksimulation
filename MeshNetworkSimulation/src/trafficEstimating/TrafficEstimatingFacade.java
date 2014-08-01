@@ -176,6 +176,7 @@ public class TrafficEstimatingFacade
 		}
 		return optimalLinks;
 	}
+	
 	public static List<Link> getOptimalLinks(Vertex v, LinkType lt)
 	{
 		List<Link> result = new ArrayList<>();
