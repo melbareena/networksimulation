@@ -1,6 +1,5 @@
 package scheduling;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,55 +7,179 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import GraphicVisualization.GraphViewer;
+import launcher.Program;
+import common.FileGenerator;
+import trafficEstimating.TrafficEstimatingFacade;
 import dataStructure.Buffer;
-import dataStructure.BufferMap;
 import dataStructure.Link;
 import dataStructure.LinkType;
 import dataStructure.Packet;
+import dataStructure.TCUnit;
 import dataStructure.Vertex;
 
+/** Scheduling strategy for dynamic routing.
+ * Every time slot it seeks to route data in directions that maximize the
+ * differential backlog between neighboring nodes.
+ * @see <a href="http://en.wikipedia.org/wiki/Backpressure_routing">Backpressure Routing</a>
+ * @author Benjamin
+ */
 public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 
-	/**1- For each link (a,b), select the optimal commodity Copt to use.<br/>
-	 * 2- Determine which transmission configuration to use.<br/>
-	 * 3- Determine the amount of commodity to transmit over the link (a,b).
-	 * @see scheduling.SchedulingStrategy#getBufferStrategy(boolean)
-	 */
 	@Override
 	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) {
-		// TODO
-		BufferMap targetBuffers = (isSourceBuffer) ? this.sourceBuffers : this.transmitBuffers;
-		
-		
-		/*2nd phase: determining which transmission configuration to use */
-		
-		
 		return null;
 	}
 	
-	/*1st phase: selecting the optimal commodity */
-	private void phase1() {
+	@Override
+	public void scheduling() {
+		GraphViewer.showErrorDialog("Error using Back Pressure Scheduling Strategy",
+				"Back Pressure Scheduling Strategy only\n"
+				+ "implemented for dynamic traffic.\n"
+				+ "Unable to use it for static traffic.");
+		System.exit(0);
+	}
+	
+	@Override
+	public void dynamicScheduling(long durationOfTrafficGenerating) {
+		trafficGenerator = "Dynamic";
+		
+		int timeSlot = 0; // Current number of time slot
+		
+		sourceBuffers = null;
+		do {
+			updateTraffic(0); // Fill the source buffers with random traffic
+		} while(sourceBuffers.trafficSize() == 0);
+
+		totalTrafficGenerated = 0.0;
+		double maxTrafficSource = -1.0;
+		double maxTrafficTransmit = -1.0;
+		double slotThroughtput = 0;
+		
+		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating) {
+			slotThroughtput = 0;
+			TCUnit tcu = getMatchingTC(getOptimalWeightMap());
+			for (Link link : tcu.getLinks()) {
+				// Source buffers
+				if(sourceBuffers.containsKey(link)) {
+					int dataRate = tcu.getRate(link);
+					Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers,timeSlot);
+					if(moved.isReceived()) {
+						double movedTraffic = moved.getTraffic();
+						packetsDelay.add(moved.getDelay());
+						slotThroughtput += movedTraffic;
+						tcu.addThroughput(movedTraffic);
+					}
+				}
+				// Transit buffers
+				if(transmitBuffers.containsKey(link)) {
+					int dataRate = tcu.getRate(link);
+					Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
+					if(moved.isReceived()) {
+						double movedTraffic = moved.getTraffic();
+						packetsDelay.add(moved.getDelay());
+						slotThroughtput += movedTraffic;
+						tcu.addThroughput(movedTraffic);
+					}
+				}
+			}
+			throughput.add(slotThroughtput);
+			trafficSource.add(sourceBuffers.trafficSize());
+			trafficTransit.add(transmitBuffers.trafficSize());
+			
+			/*----------------------*
+			 * Generate new traffic *
+			 * And display progress *
+			 *----------------------*/
+			timeSlot++;
+			if(timeSlot < durationOfTrafficGenerating) {
+				totalTrafficGenerated += updateTraffic(timeSlot);
+				Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
+						"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
+			} else {
+				if(maxTrafficSource < 0) {
+					maxTrafficSource = sourceBuffers.trafficSize();
+					Program.loadingDialog.setProgress(0);
+				}
+				if(sourceBuffers.trafficSize() == 0) {
+					if(maxTrafficTransmit < 0) {
+						maxTrafficTransmit = transmitBuffers.trafficSize();
+						Program.loadingDialog.setProgress(0);
+					}
+					Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
+							"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
+				} else {
+					Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/maxTrafficSource)),
+							"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
+				}
+			}
+		}
+		FileGenerator.TCThroughput(configurations);
+		FileGenerator.Throughput(throughput);
+		
+		int sum = 0;
+		for(int i = 0; i < packetsDelay.size(); i++) {
+			sum += packetsDelay.get(i);
+		}
+		System.out.println("Average delay: "+(sum / packetsDelay.size())+" timeslots");
+	}
+	
+	/** 1st phase: Selecting the optimal commodity and computing the weight map.<br/>
+	 * Note: A "commodity c data" is considered to be the data destined to node c.
+	 * @return The weight map: <em>Key: link (a,b) -> Value: weight</em>.
+	 */
+	private Map<Link, Double> getOptimalWeightMap() {
 		// Collecting the buffers with traffic from a node
 		Map<Vertex, Buffer> nodeBuffersMap = new HashMap<Vertex, Buffer>();
 		for(Link l : getAllLinksWithTraffic()) {
 			nodeBuffersMap.put(l.getSource(), getBufferFromLink(l));
 		}
-		
-		for(Vertex currentNode : nodeBuffersMap.keySet()) {
-			Buffer b = nodeBuffersMap.get(currentNode);
-			Map<Vertex, List<Packet>> packetDestinationMap = b.getPacketDestinationMap();
-			for(Vertex destination : packetDestinationMap.keySet()) {
-				double totalTrafficTowardDestination = 0.0;
-				for(Packet p : packetDestinationMap.get(destination)) {
-					totalTrafficTowardDestination += p.getTraffic();
+		// Initializing the weight map:
+		// Key: link (a,b) -> Value: weight
+		Map<Link, Double> weightsMap = new HashMap<Link, Double>();
+		// Considering each node a with traffic
+		for(Vertex a : nodeBuffersMap.keySet()) {
+			Buffer aBuffer = nodeBuffersMap.get(a);
+			Map<Vertex, List<Packet>> aPacketDestMap = aBuffer.getPacketDestinationMap();
+			// Looking at each a's neighbors b
+			List<Link> neighborsLinks = TrafficEstimatingFacade.getOptimalLinks(a, LinkType.Outgoing);
+			for(Link l : neighborsLinks) {
+				Vertex b = l.getDestination();
+				Buffer bBuffer = nodeBuffersMap.get(b);
+				// Initializing the weight for link (a,b)
+				double abWeight = 0.0;
+				// Searching the optimal commodity for the link (a,b)
+				for(Vertex destination : aPacketDestMap.keySet()) {
+					double aCommodityAmount = aBuffer.getTrafficTowardDestination(destination);
+					double bCommodityAmount = bBuffer.getTrafficTowardDestination(destination);
+					// Refreshing the weight of link (a,b)
+					abWeight = Math.max(aCommodityAmount - bCommodityAmount, abWeight);
 				}
-				/*TODO*/
-				/* Regarder TrafficEstimatingFacade.getOptimalLinks(Vertex v, LinkType lt)
-				 * Pour comparer totalTrafficTowardDestination avec le traffic pour
-				 * la meme destination dans le buffer des voisins du noeud courant
-				 */
+				// Adding weight for optimal commodity
+				weightsMap.put(l, abWeight);
 			}
 		}
+		return weightsMap;
+	}
+	
+	/** 2nd phase: Selecting the TCUnit that matches best the current weight map.
+	 * @param weightsMap The weight map: <em>Key: link (a,b) -> Value: weight</em>.
+	 * @return The selected TCUnit.
+	 */
+	private TCUnit getMatchingTC(Map<Link, Double> weightsMap) {
+		TCUnit selectedTCU = null;
+		double matchingFactor = 0.0;
+		for(TCUnit tcu : this.configurations) {
+			double sum = 0.0;
+			for(Link l : weightsMap.keySet()) {
+				sum += weightsMap.get(l) * tcu.getRate(l);
+			}
+			if(sum > matchingFactor) {
+				matchingFactor = sum;
+				selectedTCU = tcu;
+			}
+		}
+		return selectedTCU;
 	}
 	
 	private Buffer getBufferFromLink(Link l) {

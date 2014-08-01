@@ -1,47 +1,41 @@
 package dataStructure;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Buffer
-{
+public class Buffer {
 
 	private List<Packet> packets;
 	
-	public Buffer()
-	{
+	public Buffer() {
 		this.packets = new ArrayList<>();
 	}
 
-	public List<Packet> getPackets()
-	{
+	public List<Packet> getPackets() {
 		return packets;
 	}
-	public Packet getPacket()
-	{
+	
+	public Packet getFirstPacket() {
 		if(packets.size() > 0)
 			return packets.get(0);
 		return null;
 	}
-	public void add (Packet newP)
-	{
+	
+	public void add(Packet newP) {
 		Packet mergedPacket = null;
-		
-		for (Packet p : packets)
-		{
+		for (Packet p : packets) {
 			if(p.equals(newP))
 				mergedPacket = p;
 		}
-		
-		if(mergedPacket != null)
+		if(mergedPacket != null) {
 			mergedPacket.addTarffic(newP.getTraffic());
-		else
+		} else {
 			this.packets.add(newP);
-		
+		}
 		Collections.sort(packets, Collections.reverseOrder());
-			
 	}
 	
 	public double size()
@@ -55,13 +49,11 @@ public class Buffer
 		return size;
 	}
 	
-	public Packet getMax()
-	{
+	public Packet getMax() {
 		if(packets.size() > 0)
 			return packets.get(0);	
 		return null;
 	}
-
 
 	public Packet send(int dataRate, int currentTimeSlot)
 	{
@@ -87,8 +79,27 @@ public class Buffer
 	 * @return A map containing the list of packet for a given destination.
 	 */
 	public Map<Vertex, List<Packet>> getPacketDestinationMap() {
-		return null;
+		Map<Vertex, List<Packet>> result = new HashMap<Vertex, List<Packet>>();
+		for(Packet p : packets) {
+			if(!result.containsKey(p.getDestination())) {
+				List<Packet> list = new ArrayList<Packet>();
+				result.put(p.getDestination(), list);
+			}
+			result.get(p.getDestination()).add(p);
+		}
+		return result;
 	}
 
+	/**Return the amount of traffic in this buffer toward the given destination.
+	 * @param destination The destination node to look for in the buffer.
+	 * @return The amount of traffic.
+	 */
+	public double getTrafficTowardDestination(Vertex destination) {
+		double totalTraffic = 0.0;
+		for(Packet p : getPacketDestinationMap().get(destination)) {
+			totalTraffic += p.getTraffic();
+		}
+		return totalTraffic;
+	}
 
 }
