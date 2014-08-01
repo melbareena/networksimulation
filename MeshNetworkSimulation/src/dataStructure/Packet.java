@@ -24,6 +24,7 @@ public class Packet implements Comparable<Packet>
 		this.currentNode = source;
 		this.isReceived = false;
 		this.traffic = traffic;
+
 		this.orginalPath = path;
 		
 		this.dateOfBirth = currentTimeSlot;
@@ -35,7 +36,6 @@ public class Packet implements Comparable<Packet>
 		this.destination = path.getDestination();
 		this.source = path.getSource();
 		this.traffic = traffic;
-		
 
 		this.packetPath = packetPathLinks;
 		this.orginalPath = path;

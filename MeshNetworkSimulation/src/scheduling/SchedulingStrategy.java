@@ -192,11 +192,9 @@ public abstract class SchedulingStrategy
 		
 		sourceBuffers = null;
 		do {
-			updateTraffic(0); // Fill the source buffers with random traffic
+			totalTrafficGenerated = updateTraffic(0); // Fill the source buffers with random traffic
 		} while(sourceBuffers.trafficSize() == 0);
-		
-		
-		totalTrafficGenerated = 0.0;
+
 		double maxTrafficSource = -1.0;
 		double maxTrafficTransmit = -1.0;
 		
@@ -322,7 +320,7 @@ public abstract class SchedulingStrategy
 		return sourceBuffers.trafficSize() - currentTrafficAmount;
 	}
 	
-	private void calcWeight(boolean isSourceBufferTraffic)
+	protected void calcWeight(boolean isSourceBufferTraffic)
 	{
 		BufferMap targetMap;		
 		if(isSourceBufferTraffic)

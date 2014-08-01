@@ -119,7 +119,9 @@ public class DynamicTrafficGenerator {
 		if(routers != null) {
 			for(Vertex router : routers) {
 				int rate = getPoissonArrival(this.lambda, this.randomGenerator);
-				uplinkTraffic.add(router, rate*this.rateCoeff);
+				if(rate > 0) {
+					uplinkTraffic.add(router, rate*this.rateCoeff);
+				}
 			}
 		}
 		return uplinkTraffic;
@@ -139,16 +141,20 @@ public class DynamicTrafficGenerator {
 		DownlinkTraffic downlinkTraffic = new DownlinkTraffic();
 		if(gateways != null) {
 			for(Vertex gateway : gateways) {
-				TreeMap<Vertex,Float> gatewayTrafficMap = new TreeMap<>();
+				TreeMap<Vertex,Float> gatewayTrafficMap = new TreeMap<Vertex,Float>();
 				// Shuffling the list of path from the gateway
 				Collections.shuffle(downlinks.get(gateway), this.randomGenerator);
 				// Adding traffic for n links
 				for(int i = 0; i < n; i++) {
 					Path p = downlinks.get(gateway).get(i);
 					int rate = getPoissonArrival(this.lambda, this.randomGenerator);
-					gatewayTrafficMap.put(p.getDestination(), rate*this.rateCoeff*1.0F);
+					if(rate > 0) {
+						gatewayTrafficMap.put(p.getDestination(), rate*this.rateCoeff*1.0F);
+					}
 				}
-				downlinkTraffic.add(gateway, gatewayTrafficMap);
+				if(gatewayTrafficMap.size() > 0) {
+					downlinkTraffic.add(gateway, gatewayTrafficMap);
+				}
 			}
 		}
 		return downlinkTraffic;

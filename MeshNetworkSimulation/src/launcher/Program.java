@@ -6,6 +6,7 @@ import java.lang.management.ManagementFactory;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
+import scheduling.BackPressureSchedulingStrategy;
 import scheduling.RoundRobinSchedulingStrategy;
 import scheduling.SchedulingStrategy;
 import setting.ApplicationSettingFacade;
@@ -49,7 +50,8 @@ public class Program {
 	
 	public static void launch() {
 		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
-		final SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
+		//final SchedulingStrategy s = new RoundRobinSchedulingStrategy(dtg);
+		final SchedulingStrategy s = new BackPressureSchedulingStrategy(dtg);
 	
 		loadingDialog.setVisible(true);
 		try {
