@@ -96,8 +96,13 @@ public class Buffer {
 	 */
 	public double getTrafficTowardDestination(Vertex destination) {
 		double totalTraffic = 0.0;
-		for(Packet p : getPacketDestinationMap().get(destination)) {
-			totalTraffic += p.getTraffic();
+		Map<Vertex, List<Packet>> map = getPacketDestinationMap();
+		if(!map.containsKey(destination)) {
+			return 0.0;
+		} else {
+			for(Packet p : map.get(destination)) {
+				totalTraffic += p.getTraffic();
+			}
 		}
 		return totalTraffic;
 	}

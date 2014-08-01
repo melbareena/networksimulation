@@ -138,17 +138,21 @@ public class TrafficEstimatingFacade
 			// Add uplink traffic if there is
 			if(uplinkTraffic.hasUplinkTraffic(v)) {
 				int upTraffic = uplinkTraffic.getUplinkTraffic(v);
-				for (Path p : uplinks.get(v)) {		
-					Packet newPacket = new Packet(p, upTraffic, currentTimeslot);
-					bfMap.put( p.getEdgePath().getFirst(), newPacket);
+				for (Path p : uplinks.get(v)) {
+					if(upTraffic > 0) {
+						Packet newPacket = new Packet(p, upTraffic, currentTimeslot);
+						bfMap.put( p.getEdgePath().getFirst(), newPacket);
+					}
 				}
 			}
 			// Add downlink traffic if there is
 			if(downlinkTraffic.hasTraffic(v)) {
 				for (Path p : downlinks.get(v)) {
 					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
-					Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
-					bfMap.put( p.getEdgePath().getFirst(), newPacket);
+					if(downTraffic > 0) {
+						Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
+						bfMap.put( p.getEdgePath().getFirst(), newPacket);
+					}
 				}
 			}
 		}

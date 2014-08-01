@@ -11,6 +11,7 @@ import GraphicVisualization.GraphViewer;
 import launcher.Program;
 import common.FileGenerator;
 import trafficEstimating.TrafficEstimatingFacade;
+import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.Buffer;
 import dataStructure.Link;
 import dataStructure.LinkType;
@@ -25,6 +26,10 @@ import dataStructure.Vertex;
  * @author Benjamin
  */
 public class BackPressureSchedulingStrategy extends SchedulingStrategy {
+	
+	public BackPressureSchedulingStrategy(DynamicTrafficGenerator dtg) {
+		super(dtg);
+	}
 
 	@Override
 	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) {
@@ -42,16 +47,17 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	
 	@Override
 	public void dynamicScheduling(long durationOfTrafficGenerating) {
+		
+					System.out.println("Starting dynamic scheduling...");
 		trafficGenerator = "Dynamic";
 		
 		int timeSlot = 0; // Current number of time slot
 		
 		sourceBuffers = null;
 		do {
-			updateTraffic(0); // Fill the source buffers with random traffic
+			totalTrafficGenerated = updateTraffic(0); // Fill the source buffers with random traffic
 		} while(sourceBuffers.trafficSize() == 0);
 
-		totalTrafficGenerated = 0.0;
 		double maxTrafficSource = -1.0;
 		double maxTrafficTransmit = -1.0;
 		double slotThroughtput = 0;
@@ -61,6 +67,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 			TCUnit tcu = getMatchingTC(getOptimalWeightMap());
 			for (Link link : tcu.getLinks()) {
 				// Source buffers
+				calcWeight(true);
 				if(sourceBuffers.containsKey(link)) {
 					int dataRate = tcu.getRate(link);
 					Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers,timeSlot);
@@ -72,6 +79,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 					}
 				}
 				// Transit buffers
+				calcWeight(false);
 				if(transmitBuffers.containsKey(link)) {
 					int dataRate = tcu.getRate(link);
 					Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
@@ -151,7 +159,8 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 				// Searching the optimal commodity for the link (a,b)
 				for(Vertex destination : aPacketDestMap.keySet()) {
 					double aCommodityAmount = aBuffer.getTrafficTowardDestination(destination);
-					double bCommodityAmount = bBuffer.getTrafficTowardDestination(destination);
+					double bCommodityAmount = (bBuffer != null) ? 
+							bBuffer.getTrafficTowardDestination(destination) : 0.0;
 					// Refreshing the weight of link (a,b)
 					abWeight = Math.max(aCommodityAmount - bCommodityAmount, abWeight);
 				}
@@ -167,17 +176,28 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	 * @return The selected TCUnit.
 	 */
 	private TCUnit getMatchingTC(Map<Link, Double> weightsMap) {
-		TCUnit selectedTCU = null;
-		double matchingFactor = 0.0;
-		for(TCUnit tcu : this.configurations) {
-			double sum = 0.0;
-			for(Link l : weightsMap.keySet()) {
-				sum += weightsMap.get(l) * tcu.getRate(l);
+		TCUnit selectedTCU = null;		
+		try {
+			double matchingFactor = 0.0;
+			for(TCUnit tcu : this.configurations) {
+				double sum = 0.0;
+				for(Link l : weightsMap.keySet()) {
+					/*TODO
+					 * Only add optimal path links... */
+					if(this.sourceBuffers.containsKey(l) || this.transmitBuffers.containsKey(l)) {
+						if(tcu.containsKey(l)) {
+							sum += weightsMap.get(l) * tcu.getRate(l);
+						}
+					}
+				}
+				if(sum > matchingFactor) {
+					matchingFactor = sum;
+					selectedTCU = tcu;
+				}
 			}
-			if(sum > matchingFactor) {
-				matchingFactor = sum;
-				selectedTCU = tcu;
-			}
+		} catch(Exception e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
 		}
 		return selectedTCU;
 	}
