@@ -430,6 +430,9 @@ public class HistogramViewer extends JFrame {
 				+"<u>Overall throughput:</u> <em>"
 				+ String.format("%,d", (int) sum)
 				+"</em>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;"
+				+"<u>Average packet delay:</u> <em>"
+				+ String.format("%,d", (int) results.getAveragePacketDelay()) + " timeslots"
+				+"</em>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;"
 				+"<em>"+String.format("%,d", samplesNumber)+"</em> samples.</html>");
 		lblInfos.setHorizontalAlignment(JLabel.TRAILING);
 		toolBar.add(lblInfos);

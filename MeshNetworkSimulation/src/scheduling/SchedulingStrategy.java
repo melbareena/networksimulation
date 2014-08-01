@@ -415,6 +415,11 @@ public abstract class SchedulingStrategy
 		results.setSourceData(trafficSource);
 		results.setTransmitData(trafficTransit);
 		results.setTotalTrafficGenerated(totalTrafficGenerated);
+		int sum = 0;
+		for(int i = 0; i < packetsDelay.size(); i++) {
+			sum += packetsDelay.get(i);
+		}
+		results.setAveragePacketDelay(sum / packetsDelay.size());
 		return results;
 	}
 	
