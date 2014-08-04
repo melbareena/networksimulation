@@ -387,14 +387,12 @@ public class FileGenerator
 
 	public static void Throughput(Vector<Double> throughput)
 	{
-		//if(!ISFILEENABLE) return;
+		if(!ISFILEENABLE) return;
 		
 		try
 		{
 			
-			//int filenumber = 0;
 			String path = FILEOUTPUTPATH;
-			System.out.println(path);
 			if(FILEOUTPUTPATH.equals("null")) {
 				path = FileGenerator.class.getResource("/output/").getPath();
 			}

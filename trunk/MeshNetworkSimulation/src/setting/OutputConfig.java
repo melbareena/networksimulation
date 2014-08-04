@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import common.PrintConsole;
+
 class OutputConfig extends BaseConfiguration
 {
 	private static OutputConfig _selfObject;
@@ -77,14 +79,23 @@ class OutputConfig extends BaseConfiguration
 	{
 		eElement.getAttributes();
 		if(!eElement.hasAttribute(ATTOUTPUT))
-			throw new Exception(ATTOUTPUT + " attribute in " + TAG + " tag is missing. the following template may help you." +
+		{
+			PrintConsole.printErr(ATTOUTPUT + " attribute in " + TAG + " tag is missing. the following template may help you." +
 					"\n <OutputFolder Path=\"src/output/\" GenerateFileAsOutput=\"True\"  IntermidiateConsoleOutput=\"false\"  />");
+			System.exit(0);
+		}
 		if(!eElement.hasAttribute(ATTFILEASOUTPUT))
-			throw new Exception(ATTFILEASOUTPUT + " attribute in " + TAG + " tag is missing. the following template may help you." +
+		{
+			PrintConsole.printErr(ATTFILEASOUTPUT + " attribute in " + TAG + " tag is missing. the following template may help you." +
 					"\n <OutputFolder Path=\"src/output/\" GenerateFileAsOutput=\"True\"  IntermidiateConsoleOutput=\"false\"  />");
+			System.exit(0);
+		}
 		if(!eElement.hasAttribute(ATTINTERMIDIATE))
-			throw new Exception(ATTINTERMIDIATE + " attribute in " + TAG + " tag is missing. the following template may help you." +
+		{
+			PrintConsole.printErr(ATTINTERMIDIATE + " attribute in " + TAG + " tag is missing. the following template may help you." +
 					"\n <OutputFolder Path=\"src/output/\" GenerateFileAsOutput=\"True\"  IntermidiateConsoleOutput=\"false\" />");
+			System.exit(0);
+		}
 		return true;
 	}
 }
