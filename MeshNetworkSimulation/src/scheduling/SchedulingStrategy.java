@@ -40,6 +40,8 @@ public abstract class SchedulingStrategy
 	protected Vector<Integer> packetsDelay;
 	protected double totalTrafficGenerated;
 	protected String trafficGenerator;
+	protected double maxTrafficSource;
+	protected double maxTrafficTransmit;
 
 	protected SchedulingStrategy() {
 		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
@@ -49,6 +51,8 @@ public abstract class SchedulingStrategy
 		trafficSource = new Vector<Double>();
 		trafficTransit = new Vector<Double>();
 		packetsDelay = new Vector<Integer>();
+		maxTrafficSource = -1.0;
+		maxTrafficTransmit = -1.0;
 	}
 	
 	public SchedulingResult staticScheduling()
@@ -60,7 +64,6 @@ public abstract class SchedulingStrategy
 		int timeSlot = 0;
 		
 		totalTrafficGenerated = sourceBuffers.trafficSize();
-		double maxTrafficTransmit = -1.0;
 		
 		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 )
 		{
@@ -92,17 +95,7 @@ public abstract class SchedulingStrategy
 					}
 				}
 				timeSlot++;
-				if(sourceBuffers.trafficSize() == 0) {
-					if(maxTrafficTransmit < 0) {
-						maxTrafficTransmit = transmitBuffers.trafficSize();
-						Program.loadingDialog.setProgress(0);
-					}
-					Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
-							"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-				} else {
-					Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/totalTrafficGenerated)),
-							"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-				}
+				updateProgress(timeSlot);
 				throughput.add(slotThroughtput);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
@@ -132,17 +125,7 @@ public abstract class SchedulingStrategy
 					}
 				}
 				timeSlot++;
-				if(sourceBuffers.trafficSize() == 0) {
-					if(maxTrafficTransmit < 0) {
-						maxTrafficTransmit = transmitBuffers.trafficSize();
-						Program.loadingDialog.setProgress(0);
-					}
-					Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
-							"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-				} else {
-					Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/totalTrafficGenerated)),
-							"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-				}
+				updateProgress(timeSlot);
 				throughput.add(slotThroughtput);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
@@ -182,9 +165,6 @@ public abstract class SchedulingStrategy
 			totalTrafficGenerated = updateTraffic(0); // Fill the source buffers with random traffic
 		} while(sourceBuffers.trafficSize() == 0);
 
-		double maxTrafficSource = -1.0;
-		double maxTrafficTransmit = -1.0;
-		
 		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating) {
 			// Source Buffers
 			this.calcWeight(true);
@@ -218,21 +198,7 @@ public abstract class SchedulingStrategy
 					Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
 							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 				} else {
-					if(maxTrafficSource < 0) {
-						maxTrafficSource = sourceBuffers.trafficSize();
-						Program.loadingDialog.setProgress(0);
-					}
-					if(sourceBuffers.trafficSize() == 0) {
-						if(maxTrafficTransmit < 0) {
-							maxTrafficTransmit = transmitBuffers.trafficSize();
-							Program.loadingDialog.setProgress(0);
-						}
-						Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
-								"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-					} else {
-						Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/maxTrafficSource)),
-								"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-					}
+					updateProgress(timeSlot);
 				}
 			}
  			
@@ -267,21 +233,7 @@ public abstract class SchedulingStrategy
 					Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
 							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 				} else {
-					if(maxTrafficSource < 0) {
-						maxTrafficSource = sourceBuffers.trafficSize();
-						Program.loadingDialog.setProgress(0);
-					}
-					if(sourceBuffers.trafficSize() == 0) {
-						if(maxTrafficTransmit < 0) {
-							maxTrafficTransmit = transmitBuffers.trafficSize();
-							Program.loadingDialog.setProgress(0);
-						}
-						Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
-								"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-					} else {
-						Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/maxTrafficSource)),
-								"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-					}
+					updateProgress(timeSlot);
 				}
 			}
 		}
@@ -404,6 +356,26 @@ public abstract class SchedulingStrategy
 		}
 		results.setAveragePacketDelay(sum / packetsDelay.size());
 		return results;
+	}
+	
+	protected void updateProgress(int timeSlot) {
+		if (maxTrafficSource < 0) {
+			maxTrafficSource = sourceBuffers.trafficSize();
+			Program.loadingDialog.setProgress(0);
+		}
+		if (sourceBuffers.trafficSize() == 0) {
+			if (maxTrafficTransmit < 0) {
+				maxTrafficTransmit = transmitBuffers.trafficSize();
+				Program.loadingDialog.setProgress(0);
+			}
+			Program.loadingDialog.setProgress((int) (100 - (99 * transmitBuffers.trafficSize() / maxTrafficTransmit)),
+							"Disposing of transmit traffic ("+ transmitBuffers.trafficSize()
+							+ " remaining, timeslot " + timeSlot + ")");
+		} else {
+			Program.loadingDialog.setProgress((int) (100 - (99 * sourceBuffers.trafficSize() / maxTrafficSource)),
+							"Disposing of source traffic (" + sourceBuffers.trafficSize()
+									+ " remaining, timeslot " + timeSlot + ")");
+		}
 	}
 	
 	protected abstract String getName();
