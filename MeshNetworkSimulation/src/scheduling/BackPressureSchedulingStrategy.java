@@ -32,26 +32,18 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 		return null;
 	}
 	
-	
-	
 	@Override
 	public SchedulingResult staticScheduling() 
 	{
-		
-		System.out.println("Starting Back Pressure with static traffic...");
-		trafficGenerator = "Static";
-		
-		Program.loadingDialog.setIndeterminate(false);
+		trafficGenerator = "Dynamic";
 		
 		int timeSlot = 0; // Current number of time slot
-		
-		
+
 		double maxTrafficSource = -1.0;
 		double maxTrafficTransmit = -1.0;
 		double slotThroughtput = 0;
-
-		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0)
-		{
+		
+		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0) {
 			slotThroughtput = 0;
 			TCUnit tcu = getMatchingTC(getOptimalWeightMap());
 			for (Link link : tcu.getLinks()) {
@@ -84,24 +76,22 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 			trafficSource.add(sourceBuffers.trafficSize());
 			trafficTransit.add(transmitBuffers.trafficSize());
 			
-
+			/*------------------*
+			 * Display progress *
+			 *------------------*/
 			timeSlot++;
-			if(maxTrafficSource < 0) 
-			{
+			if(maxTrafficSource < 0) {
 				maxTrafficSource = sourceBuffers.trafficSize();
 				Program.loadingDialog.setProgress(0);
 			}
-			if(sourceBuffers.trafficSize() == 0) 
-			{
-				if(maxTrafficTransmit < 0) 
-				{
+			if(sourceBuffers.trafficSize() == 0) {
+				if(maxTrafficTransmit < 0) {
 					maxTrafficTransmit = transmitBuffers.trafficSize();
 					Program.loadingDialog.setProgress(0);
 				}
 				Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
 						"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-			} else 
-			{
+			} else {
 				Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/maxTrafficSource)),
 						"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
 			}
@@ -115,7 +105,6 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	@Override
 	public SchedulingResult dynamicScheduling(long durationOfTrafficGenerating) {
 		
-					System.out.println("Starting dynamic scheduling...");
 		trafficGenerator = "Dynamic";
 		
 		int timeSlot = 0; // Current number of time slot

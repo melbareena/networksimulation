@@ -33,7 +33,7 @@
         <Add Key="10" Value="0.0"/>
     </IFactor>
     <OutputFolder GenerateFileAsOutput="false" IntermidiateConsoleOutput="false" Path="null"/>
-    <Routers MinDistance="50" Number="80" Radio="2" SaftyTest="500" Seed="2024613503222317195" TransmissionRate="200" TypeOfGeneration="Random"/>
+    <Routers Address="/setting/input/routers.txt" MinDistance="50" Radio="2" TransmissionRate="200" TypeOfGeneration="File"/>
     <SINR Alpha="4" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
-    <Traffic DownSeed="7219788518493917102" Duration="100000" Generator="Random" NbOfNewEmittingNodes="5" Rate="0.5" Ratio="2" Seed="7654972806568228792" Type="Dynamic" UpSeed="6072384161720914880"/>
+    <Traffic AddressDown="/setting/input/trafficDown.txt" AddressUp="/setting/input/trafficUp.txt" Generator="File" Type="Static"/>
 </AppConfiguration>

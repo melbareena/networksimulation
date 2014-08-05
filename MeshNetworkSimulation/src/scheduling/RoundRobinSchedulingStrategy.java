@@ -4,7 +4,6 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.Buffer;
 import dataStructure.BufferMap;
 import dataStructure.Link;
