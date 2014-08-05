@@ -16,6 +16,7 @@ import dataStructure.Buffer;
 import dataStructure.Link;
 import dataStructure.LinkType;
 import dataStructure.Packet;
+import dataStructure.SchedulingResult;
 import dataStructure.TCUnit;
 import dataStructure.Vertex;
 
@@ -27,8 +28,9 @@ import dataStructure.Vertex;
  */
 public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	
-	public BackPressureSchedulingStrategy(DynamicTrafficGenerator dtg) {
-		super(dtg);
+	public BackPressureSchedulingStrategy()
+	{
+		super();
 	}
 
 	@Override
@@ -37,18 +39,74 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	}
 	
 	@Override
-	public void scheduling() {
-		GraphViewer.showErrorDialog("Error using Back Pressure Scheduling Strategy",
-				"Back Pressure Scheduling Strategy only\n"
-				+ "implemented for dynamic traffic.\n"
-				+ "Unable to use it for static traffic.");
-		System.exit(0);
+	public SchedulingResult staticScheduling()
+	{
+		System.out.println("Starting Back Pressure scheduling with static traffic...");
+		trafficGenerator = "Static";
+		Program.loadingDialog.setIndeterminate(false);
+
+		int timeSlot = 0;
+		double slotThroughtput = 0;
+		totalTrafficGenerated = sourceBuffers.trafficSize();
+		double maxTrafficTransmit = -1.0;
+		
+		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 )
+		{
+			TCUnit tcu = getMatchingTC(getOptimalWeightMap());
+			for (Link link : tcu.getLinks()) 
+			{
+				// Source buffers
+				calcWeight(true);
+				if(sourceBuffers.containsKey(link))
+				{
+					int dataRate = tcu.getRate(link);
+					Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers,timeSlot);
+					if(moved.isReceived())
+					{
+						double movedTraffic = moved.getTraffic();
+						packetsDelay.add(moved.getDelay());
+						slotThroughtput += movedTraffic;
+						tcu.addThroughput(movedTraffic);
+					}
+				}
+				// Transit buffers
+				calcWeight(false);
+				if(transmitBuffers.containsKey(link))
+				{
+					int dataRate = tcu.getRate(link);
+					Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
+					if(moved.isReceived()) 
+					{
+						double movedTraffic = moved.getTraffic();
+						packetsDelay.add(moved.getDelay());
+						slotThroughtput += movedTraffic;
+						tcu.addThroughput(movedTraffic);
+					}
+				}
+			}
+			
+			timeSlot++;
+			
+			
+			throughput.add(slotThroughtput);
+			trafficSource.add(sourceBuffers.trafficSize());
+			trafficTransit.add(transmitBuffers.trafficSize());
+			
+		}
+		FileGenerator.TCThroughput(configurations);
+		FileGenerator.Throughput(throughput);
+		
+		return super.getResults();
 	}
 	
 	@Override
-	public void dynamicScheduling(long durationOfTrafficGenerating) {
+	public SchedulingResult dynamicScheduling(long durationOfTrafficGenerating) {
 		
-					System.out.println("Starting dynamic scheduling...");
+		
+		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
+		this.dynamicTrafficGenerator = dtg;
+		
+		System.out.println("Starting Back Pressure scheduling with dynamic traffic...");
 		trafficGenerator = "Dynamic";
 		
 		int timeSlot = 0; // Current number of time slot
@@ -68,10 +126,12 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 			for (Link link : tcu.getLinks()) {
 				// Source buffers
 				calcWeight(true);
-				if(sourceBuffers.containsKey(link)) {
+				if(sourceBuffers.containsKey(link)) 
+				{
 					int dataRate = tcu.getRate(link);
 					Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers,timeSlot);
-					if(moved.isReceived()) {
+					if(moved.isReceived()) 
+					{
 						double movedTraffic = moved.getTraffic();
 						packetsDelay.add(moved.getDelay());
 						slotThroughtput += movedTraffic;
@@ -80,10 +140,12 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 				}
 				// Transit buffers
 				calcWeight(false);
-				if(transmitBuffers.containsKey(link)) {
+				if(transmitBuffers.containsKey(link)) 
+				{
 					int dataRate = tcu.getRate(link);
 					Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
-					if(moved.isReceived()) {
+					if(moved.isReceived())
+					{
 						double movedTraffic = moved.getTraffic();
 						packetsDelay.add(moved.getDelay());
 						slotThroughtput += movedTraffic;
@@ -100,23 +162,30 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 			 * And display progress *
 			 *----------------------*/
 			timeSlot++;
-			if(timeSlot < durationOfTrafficGenerating) {
+			if(timeSlot < durationOfTrafficGenerating) 
+			{
 				totalTrafficGenerated += updateTraffic(timeSlot);
 				Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
 						"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
-			} else {
-				if(maxTrafficSource < 0) {
+			} 
+			else 
+			{
+				if(maxTrafficSource < 0) 
+				{
 					maxTrafficSource = sourceBuffers.trafficSize();
 					Program.loadingDialog.setProgress(0);
 				}
-				if(sourceBuffers.trafficSize() == 0) {
-					if(maxTrafficTransmit < 0) {
+				if(sourceBuffers.trafficSize() == 0) 
+				{
+					if(maxTrafficTransmit < 0)
+					{
 						maxTrafficTransmit = transmitBuffers.trafficSize();
 						Program.loadingDialog.setProgress(0);
 					}
 					Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
 							"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-				} else {
+				} else 
+				{
 					Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/maxTrafficSource)),
 							"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
 				}
@@ -125,11 +194,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
 		
-		int sum = 0;
-		for(int i = 0; i < packetsDelay.size(); i++) {
-			sum += packetsDelay.get(i);
-		}
-		System.out.println("Average delay: "+(sum / packetsDelay.size())+" timeslots");
+		return super.getResults();
 	}
 	
 	/** 1st phase: Selecting the optimal commodity and computing the weight map.<br/>
