@@ -625,7 +625,7 @@ public class StartOptionsDialog extends JDialog {
 					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
-					Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
+					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					configFile = "/setting/input/config_default.xml";
 					JOptionPane.showMessageDialog(null,
@@ -649,7 +649,7 @@ public class StartOptionsDialog extends JDialog {
 					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
-					Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
+					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					JTextField blank = new JTextField();
 					showFileChooser(blank, "configuration to load", false, 10);
@@ -673,7 +673,7 @@ public class StartOptionsDialog extends JDialog {
 					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
-					Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
+					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					writeConfiguration();
 					if(configFile != null) {

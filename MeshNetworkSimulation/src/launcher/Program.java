@@ -6,8 +6,10 @@ import java.lang.management.ManagementFactory;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
+import dataStructure.SchedulingResult;
 import scheduling.NormalSchedulingStrategy;
 import scheduling.RoundRobinSchedulingStrategy;
+import scheduling.SchedulingFacade;
 import scheduling.SchedulingStrategy;
 import setting.ApplicationSettingFacade;
 import trafficGenerator.DynamicTrafficGenerator;
@@ -49,43 +51,27 @@ public class Program {
 	}
 	
 	public static void launch() {
-		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
-		final SchedulingStrategy scheduling = new RoundRobinSchedulingStrategy(dtg);
-		final SchedulingStrategy normalScheduling = new NormalSchedulingStrategy();
-	
+			
 		loadingDialog.setVisible(true);
 		try 
 		{
-			if(ApplicationSettingFacade.Traffic.isDynamicType()) 
-			{
+			
 				SwingWorker<Object, String> worker = new SwingWorker<Object, String>() 
 				{
 					@Override
-					protected Object doInBackground() throws Exception {
-						scheduling.dynamicScheduling();
+					protected Object doInBackground() throws Exception 
+					{
+						SchedulingResult result = SchedulingFacade.getScheduling();
 						Program.loadingDialog.setIndeterminate(true);
 						Program.loadingDialog.setLabel("Building user interface...");
-						new GraphViewer(scheduling.getResults());
+						new GraphViewer(result);
 						return null;
 					}
 				};
 				worker.execute();
-			} 
-			else 
-			{
-				SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
-					@Override
-					protected Object doInBackground() throws Exception {
-						normalScheduling.scheduling();
-						Program.loadingDialog.setIndeterminate(true);
-						Program.loadingDialog.setLabel("Building user interface...");
-						new GraphViewer(normalScheduling.getResults());
-						return null;
-					}
-				};
-				worker.execute();
-			}
-		} catch(Exception e) {
+
+		}
+		catch(Exception e) {
 			GraphViewer.showErrorDialog(e.getClass().toString(),
 					e.getClass().toString()+": "+e.getMessage().toString());
 			e.printStackTrace(System.err);
