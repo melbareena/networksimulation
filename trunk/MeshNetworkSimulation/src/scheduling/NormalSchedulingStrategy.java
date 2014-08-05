@@ -12,11 +12,8 @@ import dataStructure.Link;
 public class NormalSchedulingStrategy extends SchedulingStrategy
 {
 	
-	protected NormalSchedulingStrategy(DynamicTrafficGenerator dtg) {
-		super(dtg);
-	}
 	
-	protected NormalSchedulingStrategy() {
+	public NormalSchedulingStrategy() {
 		super();
 	}
 	

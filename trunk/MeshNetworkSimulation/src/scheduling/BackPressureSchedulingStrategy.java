@@ -7,11 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import GraphicVisualization.GraphViewer;
 import launcher.Program;
 import common.FileGenerator;
 import trafficEstimating.TrafficEstimatingFacade;
-import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.Buffer;
 import dataStructure.Link;
 import dataStructure.LinkType;
@@ -28,10 +26,6 @@ import dataStructure.Vertex;
  */
 public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	
-	public BackPressureSchedulingStrategy()
-	{
-		super();
-	}
 
 	@Override
 	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) {
@@ -39,30 +33,33 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	}
 	
 	@Override
-	public SchedulingResult staticScheduling()
+	public SchedulingResult staticScheduling() 
 	{
-		System.out.println("Starting Back Pressure scheduling with static traffic...");
+		System.out.println("Starting Back Pressure with static traffic...");
 		trafficGenerator = "Static";
-		Program.loadingDialog.setIndeterminate(false);
-
-		int timeSlot = 0;
-		double slotThroughtput = 0;
-		totalTrafficGenerated = sourceBuffers.trafficSize();
-		double maxTrafficTransmit = -1.0;
 		
-		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 )
+		int timeSlot = 0; // Current number of time slot
+		
+		sourceBuffers = null;
+		do {
+			totalTrafficGenerated = updateTraffic(0); // Fill the source buffers with random traffic
+		} while(sourceBuffers.trafficSize() == 0);
+
+		double maxTrafficSource = -1.0;
+		double maxTrafficTransmit = -1.0;
+		double slotThroughtput = 0;
+
+		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0)
 		{
+			slotThroughtput = 0;
 			TCUnit tcu = getMatchingTC(getOptimalWeightMap());
-			for (Link link : tcu.getLinks()) 
-			{
+			for (Link link : tcu.getLinks()) {
 				// Source buffers
 				calcWeight(true);
-				if(sourceBuffers.containsKey(link))
-				{
+				if(sourceBuffers.containsKey(link)) {
 					int dataRate = tcu.getRate(link);
 					Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers,timeSlot);
-					if(moved.isReceived())
-					{
+					if(moved.isReceived()) {
 						double movedTraffic = moved.getTraffic();
 						packetsDelay.add(moved.getDelay());
 						slotThroughtput += movedTraffic;
@@ -71,12 +68,10 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 				}
 				// Transit buffers
 				calcWeight(false);
-				if(transmitBuffers.containsKey(link))
-				{
+				if(transmitBuffers.containsKey(link)) {
 					int dataRate = tcu.getRate(link);
 					Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
-					if(moved.isReceived()) 
-					{
+					if(moved.isReceived()) {
 						double movedTraffic = moved.getTraffic();
 						packetsDelay.add(moved.getDelay());
 						slotThroughtput += movedTraffic;
@@ -84,14 +79,12 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 					}
 				}
 			}
-			
-			timeSlot++;
-			
-			
 			throughput.add(slotThroughtput);
 			trafficSource.add(sourceBuffers.trafficSize());
 			trafficTransit.add(transmitBuffers.trafficSize());
 			
+
+			timeSlot++;
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
@@ -102,11 +95,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	@Override
 	public SchedulingResult dynamicScheduling(long durationOfTrafficGenerating) {
 		
-		
-		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
-		this.dynamicTrafficGenerator = dtg;
-		
-		System.out.println("Starting Back Pressure scheduling with dynamic traffic...");
+					System.out.println("Starting dynamic scheduling...");
 		trafficGenerator = "Dynamic";
 		
 		int timeSlot = 0; // Current number of time slot
@@ -120,18 +109,17 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 		double maxTrafficTransmit = -1.0;
 		double slotThroughtput = 0;
 		
-		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating) {
+		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating)
+		{
 			slotThroughtput = 0;
 			TCUnit tcu = getMatchingTC(getOptimalWeightMap());
 			for (Link link : tcu.getLinks()) {
 				// Source buffers
 				calcWeight(true);
-				if(sourceBuffers.containsKey(link)) 
-				{
+				if(sourceBuffers.containsKey(link)) {
 					int dataRate = tcu.getRate(link);
 					Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers,timeSlot);
-					if(moved.isReceived()) 
-					{
+					if(moved.isReceived()) {
 						double movedTraffic = moved.getTraffic();
 						packetsDelay.add(moved.getDelay());
 						slotThroughtput += movedTraffic;
@@ -140,12 +128,10 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 				}
 				// Transit buffers
 				calcWeight(false);
-				if(transmitBuffers.containsKey(link)) 
-				{
+				if(transmitBuffers.containsKey(link)) {
 					int dataRate = tcu.getRate(link);
 					Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
-					if(moved.isReceived())
-					{
+					if(moved.isReceived()) {
 						double movedTraffic = moved.getTraffic();
 						packetsDelay.add(moved.getDelay());
 						slotThroughtput += movedTraffic;
@@ -162,30 +148,23 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 			 * And display progress *
 			 *----------------------*/
 			timeSlot++;
-			if(timeSlot < durationOfTrafficGenerating) 
-			{
+			if(timeSlot < durationOfTrafficGenerating) {
 				totalTrafficGenerated += updateTraffic(timeSlot);
 				Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
 						"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
-			} 
-			else 
-			{
-				if(maxTrafficSource < 0) 
-				{
+			} else {
+				if(maxTrafficSource < 0) {
 					maxTrafficSource = sourceBuffers.trafficSize();
 					Program.loadingDialog.setProgress(0);
 				}
-				if(sourceBuffers.trafficSize() == 0) 
-				{
-					if(maxTrafficTransmit < 0)
-					{
+				if(sourceBuffers.trafficSize() == 0) {
+					if(maxTrafficTransmit < 0) {
 						maxTrafficTransmit = transmitBuffers.trafficSize();
 						Program.loadingDialog.setProgress(0);
 					}
 					Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
 							"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
-				} else 
-				{
+				} else {
 					Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/maxTrafficSource)),
 							"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
 				}

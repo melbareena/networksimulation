@@ -15,11 +15,7 @@ public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 	private int sourcePositionIndex;
 	private int tranmissionPositionIndex;
 	
-	protected RoundRobinSchedulingStrategy(DynamicTrafficGenerator dtg) {
-		super(dtg);
-		sourcePositionIndex = 0;
-		tranmissionPositionIndex = 0;
-	}
+	
 	
 	protected RoundRobinSchedulingStrategy() {
 		super();
