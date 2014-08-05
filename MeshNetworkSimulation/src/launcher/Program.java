@@ -6,7 +6,6 @@ import java.lang.management.ManagementFactory;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
-import scheduling.BackPressureSchedulingStrategy;
 import scheduling.NormalSchedulingStrategy;
 import scheduling.RoundRobinSchedulingStrategy;
 import scheduling.SchedulingStrategy;
@@ -17,8 +16,6 @@ import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.StartOptionsDialog;
 
 public class Program {
-	
-	public static String schedulingStrategy;
 	
 	public static LoadingDialog loadingDialog = new LoadingDialog(null, "simulation", false);
 	
@@ -53,42 +50,36 @@ public class Program {
 	
 	public static void launch() {
 		DynamicTrafficGenerator dtg = new DynamicTrafficGenerator();
-		SchedulingStrategy sprime = null;
-		switch(schedulingStrategy) {
-		case "Normal" :
-			sprime = new NormalSchedulingStrategy(dtg);
-			break;
-		case "Round Robin" :
-			sprime = new RoundRobinSchedulingStrategy(dtg);
-			break;
-		case "Back Pressure" :
-			sprime = new BackPressureSchedulingStrategy(dtg);
-			break;
-		}
-		final SchedulingStrategy s = sprime;
+		final SchedulingStrategy scheduling = new RoundRobinSchedulingStrategy(dtg);
+		final SchedulingStrategy normalScheduling = new NormalSchedulingStrategy();
 	
 		loadingDialog.setVisible(true);
-		try {
-			if(ApplicationSettingFacade.Traffic.isDynamicType()) {
-				SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
+		try 
+		{
+			if(ApplicationSettingFacade.Traffic.isDynamicType()) 
+			{
+				SwingWorker<Object, String> worker = new SwingWorker<Object, String>() 
+				{
 					@Override
 					protected Object doInBackground() throws Exception {
-						s.dynamicScheduling();
+						scheduling.dynamicScheduling();
 						Program.loadingDialog.setIndeterminate(true);
 						Program.loadingDialog.setLabel("Building user interface...");
-						new GraphViewer(s.getResults());
+						new GraphViewer(scheduling.getResults());
 						return null;
 					}
 				};
 				worker.execute();
-			} else {
+			} 
+			else 
+			{
 				SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
 					@Override
 					protected Object doInBackground() throws Exception {
-						s.scheduling();
+						normalScheduling.scheduling();
 						Program.loadingDialog.setIndeterminate(true);
 						Program.loadingDialog.setLabel("Building user interface...");
-						new GraphViewer(s.getResults());
+						new GraphViewer(normalScheduling.getResults());
 						return null;
 					}
 				};
