@@ -46,7 +46,7 @@ import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.TextAnchor;
 import org.jfree.util.ShapeUtilities;
 
-import scheduling.Results;
+import dataStructure.SchedulingResult;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.TypeOfGenerationEnum;
 
@@ -86,7 +86,7 @@ public class HistogramViewer extends JFrame {
 	
 	public int stepTransmit;
 	
-	public Results results;
+	public SchedulingResult results;
 	
 	public final static String[] colors = new String[] {"Blue", "Cyan", "Red", "Magenta", "Green", "Orange",
 		"Yellow", "Pink", "Gray", "Black"};
@@ -104,7 +104,7 @@ public class HistogramViewer extends JFrame {
 	 * Create the frame.
 	 * @param throughputData 
 	 */
-	public HistogramViewer(Results results, int step) {
+	public HistogramViewer(SchedulingResult results, int step) {
 		this.self = this;		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Results plot " + GraphViewer.optionsTitle

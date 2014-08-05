@@ -28,7 +28,7 @@ public class ApplicationSettingFacade
 	private static TrafficGenerator _tConf = TrafficGenerator.Initiating();
 	private static DataRateConfig _dCong = DataRateConfig.Initiating();
 	private static ChannelAssignmentConfig _chCong = ChannelAssignmentConfig.Initiating();
-	
+	private static SchedulingConfig _schConf = SchedulingConfig.Initiating();
 	public static class ChannelAssignment
 	{
 		public static String getSterategyClassName()
@@ -36,6 +36,15 @@ public class ApplicationSettingFacade
 			return _chCong.getClassName();
 		}
 	}
+	
+	public static class Scheduling
+	{
+		public static String getSterategyClassName()
+		{
+			return _schConf.getClassName();
+		}
+	}
+	
 	public static class DataRate
 	{
 		private static int max = 0;

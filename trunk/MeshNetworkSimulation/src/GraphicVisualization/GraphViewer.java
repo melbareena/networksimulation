@@ -54,7 +54,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import launcher.Program;
-import scheduling.Results;
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
 import transConf.TCFacade;
@@ -67,6 +66,7 @@ import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
 
 import dataStructure.Path;
+import dataStructure.SchedulingResult;
 import dataStructure.TCUnit;
 import dataStructure.Vertex;
  
@@ -171,7 +171,7 @@ public class GraphViewer extends JFrame {
 	/** Initiate and show the Frame.
 	 * @param throughputData The data for the throughput plot.
 	 */
-	public GraphViewer(Results results) {
+	public GraphViewer(SchedulingResult results) {
 		super();
 		
 		String title = "Mesh Network Simulation " + GraphViewer.optionsTitle
