@@ -34,6 +34,7 @@
     </IFactor>
     <OutputFolder GenerateFileAsOutput="false" IntermidiateConsoleOutput="false" Path="null"/>
     <Routers Address="/setting/input/routers.txt" MinDistance="50" Radio="2" TransmissionRate="200" TypeOfGeneration="File"/>
+    <Scheduling Strategy="RoundRobinSchedulingStrategy"/>
     <SINR Alpha="4" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
-    <Traffic AddressDown="/setting/input/trafficDown.txt" AddressUp="/setting/input/trafficUp.txt" Generator="File" Type="Static"/>
+    <Traffic AddressDown="/setting/input/trafficDown.txt" AddressUp="/setting/input/trafficUp.txt" Duration="100000" Generator="File" NbOfNewEmittingNodes="5" Rate="0.5" Ratio="2" Seed="8606954748871943253" Type="Dynamic"/>
 </AppConfiguration>
