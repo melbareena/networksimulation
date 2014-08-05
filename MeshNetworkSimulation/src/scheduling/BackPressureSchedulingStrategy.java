@@ -32,19 +32,20 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 		return null;
 	}
 	
+	
+	
 	@Override
 	public SchedulingResult staticScheduling() 
 	{
+		
 		System.out.println("Starting Back Pressure with static traffic...");
 		trafficGenerator = "Static";
 		
+		Program.loadingDialog.setIndeterminate(false);
+		
 		int timeSlot = 0; // Current number of time slot
 		
-		sourceBuffers = null;
-		do {
-			totalTrafficGenerated = updateTraffic(0); // Fill the source buffers with random traffic
-		} while(sourceBuffers.trafficSize() == 0);
-
+		
 		double maxTrafficSource = -1.0;
 		double maxTrafficTransmit = -1.0;
 		double slotThroughtput = 0;
@@ -85,6 +86,25 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 			
 
 			timeSlot++;
+			if(maxTrafficSource < 0) 
+			{
+				maxTrafficSource = sourceBuffers.trafficSize();
+				Program.loadingDialog.setProgress(0);
+			}
+			if(sourceBuffers.trafficSize() == 0) 
+			{
+				if(maxTrafficTransmit < 0) 
+				{
+					maxTrafficTransmit = transmitBuffers.trafficSize();
+					Program.loadingDialog.setProgress(0);
+				}
+				Program.loadingDialog.setProgress((int) (100-(99*transmitBuffers.trafficSize()/maxTrafficTransmit)),
+						"Disposing of transmit traffic ("+transmitBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
+			} else 
+			{
+				Program.loadingDialog.setProgress((int) (100-(99*sourceBuffers.trafficSize()/maxTrafficSource)),
+						"Disposing of source traffic ("+sourceBuffers.trafficSize()+" remaining, timeslot "+timeSlot+")");
+			}
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);

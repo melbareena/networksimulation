@@ -41,7 +41,7 @@ public abstract class SchedulingStrategy
 	protected double totalTrafficGenerated;
 	protected String trafficGenerator;
 	
-	private void Initiation() {
+	protected void Initiation() {
  		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
 		configurations = TCFacade.getConfigurations();
 		transmitBuffers = new BufferMap();
