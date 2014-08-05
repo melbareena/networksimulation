@@ -40,21 +40,15 @@ public abstract class SchedulingStrategy
 	protected Vector<Integer> packetsDelay;
 	protected double totalTrafficGenerated;
 	protected String trafficGenerator;
-	
-	protected void Initiation() {
- 		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
+
+	protected SchedulingStrategy() {
+		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
 		configurations = TCFacade.getConfigurations();
 		transmitBuffers = new BufferMap();
 		throughput = new Vector<Double>();
 		trafficSource = new Vector<Double>();
 		trafficTransit = new Vector<Double>();
 		packetsDelay = new Vector<Integer>();
-	}
-	
-	
-	
-	protected SchedulingStrategy() {
-		this.Initiation();
 	}
 	
 	public SchedulingResult staticScheduling()

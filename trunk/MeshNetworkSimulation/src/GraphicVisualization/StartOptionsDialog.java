@@ -874,6 +874,9 @@ public class StartOptionsDialog extends JDialog {
 					(long) routersResult.get("seed"));
 		}
 		
+		XMLWriter.writeSchedulingStrategy(((String) this.schedulingComboBox.getSelectedItem()).replaceAll("\\s+","")
+				+ "SchedulingStrategy");
+		
 		HashMap<String, Object> sinrResult = sinrDialog.getResults();
 		XMLWriter.writeSINR((int) sinrResult.get("alpha"), (int) sinrResult.get("w"),
 				(int) sinrResult.get("power"), (double) sinrResult.get("beta"),

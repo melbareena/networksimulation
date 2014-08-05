@@ -74,6 +74,12 @@ public class XMLWriter {
 		e.setAttribute("IntermidiateConsoleOutput", "false");
 	}
 	
+	public static void writeSchedulingStrategy(String schedulingStrategy) {
+		Element e = doc.createElement("Scheduling");
+		rootElement.appendChild(e);
+		e.setAttribute("Strategy", schedulingStrategy);
+	}
+	
 	public static void writeTraffic(boolean dynamic, String generator, String addrUp, String addrDown,
 			long upseed, long downseed, double rate, long seed, int nodes, int ratio, long duration) {
 		Element e = doc.createElement("Traffic");
