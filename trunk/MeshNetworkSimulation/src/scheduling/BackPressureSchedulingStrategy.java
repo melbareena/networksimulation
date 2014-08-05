@@ -10,6 +10,7 @@ import java.util.Vector;
 import launcher.Program;
 import common.FileGenerator;
 import trafficEstimating.TrafficEstimatingFacade;
+import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.Buffer;
 import dataStructure.Link;
 import dataStructure.LinkType;
@@ -51,6 +52,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 
 	@Override
 	public SchedulingResult dynamicScheduling(long durationOfTrafficGenerating) {
+		dynamicTrafficGenerator = new DynamicTrafficGenerator();
 
 		trafficGenerator = "Dynamic";
 
