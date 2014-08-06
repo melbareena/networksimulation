@@ -104,6 +104,7 @@ public class Program {
 							.setLabel("Building user interface...");
 					new GraphViewer(result, getAvailableChannels());
 				}
+
 			};
 			worker.execute();
 		} catch (Exception e) {
