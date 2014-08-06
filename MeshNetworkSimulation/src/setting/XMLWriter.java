@@ -24,7 +24,7 @@ public class XMLWriter {
 	
 	private static Element rootElement;
 	
-	public static void Initialize() {
+	public static void Initialize(String mode) {
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -32,6 +32,7 @@ public class XMLWriter {
 			// root elements
 			doc = docBuilder.newDocument();
 			rootElement = doc.createElement("AppConfiguration");
+			rootElement.setAttribute("Mode", mode);
 			doc.appendChild(rootElement);
 		} catch (Exception e) {}
 	}

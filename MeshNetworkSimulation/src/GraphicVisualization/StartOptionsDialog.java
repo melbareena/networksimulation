@@ -561,11 +561,11 @@ public class StartOptionsDialog extends JDialog {
 			channelsPanel.add(lblMode, "cell 0 0,alignx trailing");
 			channelModeComboBox.addItemListener(new ItemListener() {
 				public void itemStateChanged(ItemEvent e) {
-					channelList.setEnabled(channelModeComboBox.getSelectedIndex() != 0);
-					lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() != 0);
+					channelList.setEnabled(channelModeComboBox.getSelectedIndex() == 1);
+					lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() == 1);
 				}
 			});
-			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Partially"}));
+			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Some channels", "All combinations"}));
 			channelModeComboBox.setSelectedIndex(0);
 			
 			channelsPanel.add(channelModeComboBox, "cell 1 0,grow");
@@ -807,7 +807,8 @@ public class StartOptionsDialog extends JDialog {
 	}
 	
 	private void writeConfiguration() {
-		XMLWriter.Initialize();
+		String mode = (channelModeComboBox.getSelectedIndex() == 2) ? "Multi" : "Single";
+		XMLWriter.Initialize(mode);
 		
 		String channelAssignment = "";
 		switch(channelStrategyComboBox.getSelectedItem().toString()) {
@@ -836,7 +837,7 @@ public class StartOptionsDialog extends JDialog {
 		for(int i : channelList.getSelectedIndices()) {
 			channelSet.add(i+1);
 		}
-		XMLWriter.writeChannels(((channelModeComboBox.getSelectedIndex() == 0) ? "All" : "Partially"),
+		XMLWriter.writeChannels(((channelModeComboBox.getSelectedIndex() == 1) ? "Partially" : "All"),
 				channelSet);
 		
 		XMLWriter.writeDatarates((HashMap<Double, Integer>) datarateDialog.getResults().get("datarate"));

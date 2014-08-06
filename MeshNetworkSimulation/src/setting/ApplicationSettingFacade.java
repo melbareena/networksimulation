@@ -10,7 +10,6 @@ import launcher.Program;
 import setting.BaseConfiguration.AppExecMode;
 import setting.BaseConfiguration.ChannelMode;
 import setting.BaseConfiguration.TypeOfGenerationEnum;
-import dataStructure.Channel;
 import dataStructure.IFactorMap;
 import dataStructure.Vertex;
 
