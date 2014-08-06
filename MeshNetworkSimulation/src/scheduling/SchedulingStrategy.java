@@ -88,7 +88,9 @@ public abstract class SchedulingStrategy
 						if(moved.isReceived())
 						{
 							double movedTraffic = moved.getTraffic();
-							packetsDelay.add(moved.getDelay());
+							if(!moved.isFragment()) {
+								packetsDelay.add(moved.getDelay());
+							}
 							slotThroughtput += movedTraffic;
 							tcunit.addThroughput(movedTraffic);
 						}
@@ -118,7 +120,9 @@ public abstract class SchedulingStrategy
 						if(moved.isReceived())
 						{
 							double movedTraffic = moved.getTraffic();
-							packetsDelay.add(moved.getDelay());
+							if(!moved.isFragment()) {
+								packetsDelay.add(moved.getDelay());
+							}
 							slotThroughtput += movedTraffic;
 							tcunit.addThroughput(movedTraffic);
 						}
@@ -189,7 +193,9 @@ public abstract class SchedulingStrategy
 						Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
 						if(moved.isReceived()) {
 							double movedTraffic = moved.getTraffic();
-							packetsDelay.add(moved.getDelay());
+							if(!moved.isFragment()) {
+								packetsDelay.add(moved.getDelay());
+							}
 							slotThroughtput += movedTraffic;
 							tcunit.addThroughput(movedTraffic);
 						}
@@ -224,7 +230,9 @@ public abstract class SchedulingStrategy
 						Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
 						if(moved.isReceived()) {
 							double movedTraffic = moved.getTraffic();
-							packetsDelay.add(moved.getDelay());
+							if(!moved.isFragment()) {
+								packetsDelay.add(moved.getDelay());
+							}
 							slotThroughtput += movedTraffic;
 							tcunit.addThroughput(movedTraffic);
 						}
@@ -360,10 +368,12 @@ public abstract class SchedulingStrategy
 		results.setSourceData(trafficSource);
 		results.setTransmitData(trafficTransit);
 		results.setTotalTrafficGenerated(totalTrafficGenerated);
-		int sum = 0;
+		double sum = 0;
 		for(int i = 0; i < packetsDelay.size(); i++) {
 			sum += packetsDelay.get(i);
 		}
+		System.out.println("Somme: "+sum);
+		System.out.println("Mean: "+ (sum / packetsDelay.size()));
 		results.setAveragePacketDelay(sum / packetsDelay.size());
 		return results;
 	}

@@ -94,7 +94,9 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 				Packet moved = sourceBuffers.sendPacket(link, dataRate,	transmitBuffers, timeSlot);
 				if (moved.isReceived()) {
 					double movedTraffic = moved.getTraffic();
-					packetsDelay.add(moved.getDelay());
+					if(!moved.isFragment()) {
+						packetsDelay.add(moved.getDelay());
+					}
 					slotThroughtput += movedTraffic;
 					tcu.addThroughput(movedTraffic);
 				}
@@ -106,7 +108,9 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 				Packet moved = transmitBuffers.sendPacket(link, dataRate, transmitBuffers, timeSlot);
 				if (moved.isReceived()) {
 					double movedTraffic = moved.getTraffic();
-					packetsDelay.add(moved.getDelay());
+					if(!moved.isFragment()) {
+						packetsDelay.add(moved.getDelay());
+					}
 					slotThroughtput += movedTraffic;
 					tcu.addThroughput(movedTraffic);
 				}
