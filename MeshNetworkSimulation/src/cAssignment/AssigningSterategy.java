@@ -36,9 +36,9 @@ public  class AssigningSterategy
 	protected static final float BETA = ApplicationSettingFacade.SINR.getBeta();
 	protected static final double MUE = ApplicationSettingFacade.SINR.getMue();
 	protected static final float POWER = ApplicationSettingFacade.SINR.getPower();	
-	protected static final List<Channel> availableChannels = ApplicationSettingFacade.Channel.getChannel();
+	protected List<Channel> availableChannels = ApplicationSettingFacade.Channel.getChannel();
 	protected static final IFactorMap iFactor = ApplicationSettingFacade.IFactor.getIFactorMap();
-	protected static ChannelOccuranceMap ChannelOccurance = new ChannelOccuranceMap();
+	protected ChannelOccuranceMap ChannelOccurance = new ChannelOccuranceMap();
 	public ChannelOccuranceMap getChannelOccurance()
 	{
 		return ChannelOccurance;

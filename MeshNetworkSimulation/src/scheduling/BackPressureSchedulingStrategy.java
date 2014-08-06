@@ -202,7 +202,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 
 	@Override
 	protected String getName() {
-		return "Back Pressure Scheduling Strategy";
+		return "BPSS";
 	}
 
 }

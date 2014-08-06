@@ -5,8 +5,12 @@ import java.lang.management.ManagementFactory;
 
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.plaf.multi.MultiInternalFrameUI;
 
+import common.PrintConsole;
 import scheduling.SchedulingFacade;
+import setting.ApplicationSettingFacade;
+import setting.BaseConfiguration.AppExecMode;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.StartOptionsDialog;
@@ -16,6 +20,17 @@ public class Program {
 
 	public static LoadingDialog loadingDialog = new LoadingDialog(null,
 			"simulation", false);
+	
+	
+	private static String getAvailableChannels()
+	{
+		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
+		{
+			return ApplicationSettingFacade.Channel.getChannelMode().name();
+		}
+		
+		return "1.." + multiExecIndex;
+	}
 
 	public static void restartApplication() {
 		try {
@@ -49,19 +64,47 @@ public class Program {
 		StartOptionsDialog startOptionDialog = new StartOptionsDialog();
 		startOptionDialog.setVisible(true);
 	}
-
+	public static int multiExecIndex = 1;
 	public static void launch() {
 		loadingDialog.setVisible(true);
 		try {
 			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
 				@Override
 				protected Object doInBackground() throws Exception {
+					
+					if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
+						singleMode();
+					else
+						multiMode();
+					
+					return null;
+				}
+
+				private void multiMode()
+				{
+					PrintConsole.print("********************** Application is in multi execution mode ************************");
+					for(multiExecIndex = 1 ; multiExecIndex < 12; multiExecIndex++ )
+					{
+						PrintConsole.print("Exceute Number : " + multiExecIndex);
+						SchedulingResult result = SchedulingFacade.getScheduling();
+						Program.loadingDialog.setIndeterminate(true);
+						Program.loadingDialog
+							.setLabel("Building user interface...");
+						new GraphViewer(result, getAvailableChannels());
+					}
+					
+				}
+
+				
+
+				private void singleMode()
+				{
+					PrintConsole.print("********************** Application is in single execution mode ************************");
 					SchedulingResult result = SchedulingFacade.getScheduling();
 					Program.loadingDialog.setIndeterminate(true);
 					Program.loadingDialog
 							.setLabel("Building user interface...");
-					new GraphViewer(result);
-					return null;
+					new GraphViewer(result , getAvailableChannels());
 				}
 			};
 			worker.execute();

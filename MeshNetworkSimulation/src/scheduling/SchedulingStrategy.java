@@ -44,6 +44,8 @@ public abstract class SchedulingStrategy
 	protected double maxTrafficTransmit;
 
 	protected SchedulingStrategy() {
+		
+		PrintConsole.printErr("Intiate Scheduling..........");
 		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
 		configurations = TCFacade.getConfigurations();
 		transmitBuffers = new BufferMap();
@@ -57,6 +59,7 @@ public abstract class SchedulingStrategy
 	
 	public SchedulingResult staticScheduling()
 	{
+		
 		trafficGenerator = "Static";
 		Program.loadingDialog.setIndeterminate(false);
 		Vector<Link> selectedBuffers = null;

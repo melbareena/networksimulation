@@ -35,7 +35,10 @@ class ChannelConfig extends BaseConfiguration
 	}
 	
 	private ChannelMode _mode;
-	
+	public ChannelMode getMode()
+	{
+		return _mode;
+	}
 	private static final String TAG = "Channels";
 	private static final String ATTMODE = "Mode";
 	private static final String CHILD = "Add";

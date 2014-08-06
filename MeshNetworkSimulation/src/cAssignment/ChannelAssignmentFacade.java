@@ -3,6 +3,9 @@ package cAssignment;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import common.PrintConsole;
+
+import launcher.Program;
 import setting.ApplicationSettingFacade;
 import dataStructure.ChannelOccuranceMap;
 import dataStructure.LinksChannelMap;
@@ -12,9 +15,13 @@ public class ChannelAssignmentFacade
 	
 	private static LinksChannelMap linksChannel;
 	private static ChannelOccuranceMap channelOccurance;
+	
+	private static int multiExecIndex = 0;
+	
+	
 	public static LinksChannelMap getChannels()
 	{
-		if(linksChannel == null)
+		if(linksChannel == null || multiExecIndex != Program.multiExecIndex)
 		{
 			getDynamicChannel();
 		}
@@ -22,7 +29,7 @@ public class ChannelAssignmentFacade
 	}
 	public static ChannelOccuranceMap getChannelOccurance()
 	{
-		if(linksChannel == null)
+		if(linksChannel == null || multiExecIndex != Program.multiExecIndex)
 		{
 			getDynamicChannel();
 		}
@@ -32,8 +39,10 @@ public class ChannelAssignmentFacade
 	
 	private static LinksChannelMap getDynamicChannel()
 	{
-		if(linksChannel == null)
+		if(linksChannel == null || multiExecIndex != Program.multiExecIndex)
 		{
+			PrintConsole.print("Channel Assignment Configuration Start.......");
+			multiExecIndex = Program.multiExecIndex;
 			String className = "";
 			try
 			{

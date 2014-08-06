@@ -107,8 +107,8 @@ public class HistogramViewer extends JFrame {
 	public HistogramViewer(SchedulingResult results, int step) {
 		this.self = this;		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle("Results plot " + GraphViewer.optionsTitle
-				+ " - " + results.getSchedulingStrategy() + " - " + results.getTrafficGenerator() + " traffic");
+		setTitle(GraphViewer._availableChannels
+				+ " - " + results.getSchedulingStrategy() + " - Traffic Generator: " + results.getTrafficGenerator() + " ");
 		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
 
 		contentPane = new JPanel();
@@ -463,11 +463,11 @@ public class HistogramViewer extends JFrame {
 		
 		System.out.println("Finished, displaying...");
 		
-		String titleString = "Results " + GraphViewer.optionsTitle + "\n"
-				+ results.getSchedulingStrategy() + " - "
+		String titleString = GraphViewer._availableChannels + "\n"
+				+ "Scheduling: " + results.getSchedulingStrategy() + " - "
 				+ ((ApplicationSettingFacade.Router.getTypeOfGeneration() == TypeOfGenerationEnum.RANDOM) ?
-						"Random Topolgy" : "Static Topology") + "\n"
-				+ results.getTrafficGenerator() + " traffic"
+						"Topolgy: Random " : "Topology: Static ") + "\n"
+				+ "Traffic Generator: " + results.getTrafficGenerator()
 				+ ((ApplicationSettingFacade.Traffic.isDynamicType()) ? " (lambda "
 				+ ApplicationSettingFacade.Traffic.getTrafficRate()
 				+ " ; " + ApplicationSettingFacade.Traffic.getNumberOfNewEmittingNodes()
