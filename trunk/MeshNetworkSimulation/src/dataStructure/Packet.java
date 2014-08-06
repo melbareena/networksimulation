@@ -13,6 +13,8 @@ public class Packet implements Comparable<Packet>
 	private int dateOfBirth;
 	private int dateOfDeath;
 	
+	private boolean isFragment;
+	
 	private boolean isReceived;
 	private Path orginalPath;
 	
@@ -23,6 +25,7 @@ public class Packet implements Comparable<Packet>
 		this.packetPath = path.Clone().getEdgePath();
 		this.currentNode = source;
 		this.isReceived = false;
+		this.isFragment = false;
 		this.traffic = traffic;
 
 		this.orginalPath = path;
@@ -31,7 +34,8 @@ public class Packet implements Comparable<Packet>
 		this.dateOfDeath = 0;
 	}
 	
-	public Packet(Path path,Vertex currentNode, LinkedList<Link> packetPathLinks, double traffic, int currentTimeSlot)
+	public Packet(Path path,Vertex currentNode, LinkedList<Link> packetPathLinks, double traffic,
+			int currentTimeSlot)
 	{
 		this.destination = path.getDestination();
 		this.source = path.getSource();
@@ -43,6 +47,8 @@ public class Packet implements Comparable<Packet>
 		this.currentNode = currentNode;
 		
 		this.dateOfBirth = currentTimeSlot;
+		
+		this.isFragment = true;
 		
 		if(currentNode == this.destination) {
 			this.isReceived = true;
@@ -57,7 +63,7 @@ public class Packet implements Comparable<Packet>
 	}
 	
 	public int getDelay() {
-		return isReceived ? (dateOfDeath - dateOfBirth) : 0;
+		return isReceived ? Math.max(dateOfDeath - dateOfBirth, 0) : 0;
 	}
 	
 	public double getTraffic()
@@ -83,6 +89,10 @@ public class Packet implements Comparable<Packet>
 	public boolean isReceived()
 	{
 		return isReceived;
+	}
+	public boolean isFragment()
+	{
+		return isFragment;
 	}
 	public Link getCurrentLink()
 	{
@@ -120,7 +130,8 @@ public class Packet implements Comparable<Packet>
 			LinkedList<Link> sentPacketPath = (LinkedList<Link>) this.packetPath.clone();
 			Link l = sentPacketPath.remove();
 			
-			Packet sentPacket = new Packet(this.orginalPath ,l.getDestination(), sentPacketPath, dataRate, this.dateOfBirth);
+			Packet sentPacket = new Packet(this.orginalPath ,l.getDestination(), sentPacketPath, dataRate,
+					currentTimeSlot);
 			return sentPacket;
 				
 		}
