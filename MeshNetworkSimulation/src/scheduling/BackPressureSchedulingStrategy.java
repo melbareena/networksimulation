@@ -165,26 +165,21 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	 */
 	private TCUnit getMatchingTC(Map<Link, Double> weightsMap) {
 		TCUnit selectedTCU = null;
-		try {
-			double matchingFactor = 0.0;
-			for (TCUnit tcu : this.configurations) {
-				double sum = 0.0;
-				for (Link l : weightsMap.keySet()) {
-					/* Only add optimal path links */
-					if (this.sourceBuffers.containsKey(l) || this.transmitBuffers.containsKey(l)) {
-						if (tcu.containsKey(l)) {
-							sum += weightsMap.get(l) * tcu.getRate(l);
-						}
+		double matchingFactor = 0.0;
+		for (TCUnit tcu : this.configurations) {
+			double sum = 0.0;
+			for (Link l : weightsMap.keySet()) {
+				/* Only add optimal path links */
+				if (this.sourceBuffers.containsKey(l) || this.transmitBuffers.containsKey(l)) {
+					if (tcu.containsKey(l)) {
+						sum += weightsMap.get(l) * tcu.getRate(l);
 					}
 				}
-				if (sum > matchingFactor) {
-					matchingFactor = sum;
-					selectedTCU = tcu;
-				}
 			}
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
+			if (sum >= matchingFactor) {
+				matchingFactor = sum;
+				selectedTCU = tcu;
+			}
 		}
 		return selectedTCU;
 	}
