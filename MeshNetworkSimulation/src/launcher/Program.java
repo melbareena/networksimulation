@@ -20,15 +20,12 @@ public class Program {
 
 	public static LoadingDialog loadingDialog = new LoadingDialog(null,
 			"simulation", false);
-	
-	
-	private static String getAvailableChannels()
-	{
-		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
-		{
+
+	private static String getAvailableChannels() {
+		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
 			return ApplicationSettingFacade.Channel.getChannelMode().name();
 		}
-		
+
 		return "1.." + multiExecIndex;
 	}
 
@@ -64,47 +61,48 @@ public class Program {
 		StartOptionsDialog startOptionDialog = new StartOptionsDialog();
 		startOptionDialog.setVisible(true);
 	}
+
 	public static int multiExecIndex = 1;
+
 	public static void launch() {
 		loadingDialog.setVisible(true);
 		try {
 			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
 				@Override
 				protected Object doInBackground() throws Exception {
-					
-					if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
+
+					if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
 						singleMode();
 					else
 						multiMode();
-					
+
 					return null;
 				}
 
-				private void multiMode()
-				{
-					PrintConsole.print("********************** Application is in multi execution mode ************************");
-					for(multiExecIndex = 1 ; multiExecIndex < 12; multiExecIndex++ )
-					{
-						PrintConsole.print("Exceute Number : " + multiExecIndex);
-						SchedulingResult result = SchedulingFacade.getScheduling();
+				private void multiMode() {
+					PrintConsole
+							.print("********************** Application is in multi execution mode ************************");
+					for (multiExecIndex = 1; multiExecIndex < 12; multiExecIndex++) {
+						PrintConsole
+								.print("Exceute Number : " + multiExecIndex);
+						SchedulingResult result = SchedulingFacade
+								.getScheduling();
 						Program.loadingDialog.setIndeterminate(true);
 						Program.loadingDialog
-							.setLabel("Building user interface...");
+								.setLabel("Building user interface...");
 						new GraphViewer(result, getAvailableChannels());
 					}
-					
+
 				}
 
-				
-
-				private void singleMode()
-				{
-					PrintConsole.print("********************** Application is in single execution mode ************************");
+				private void singleMode() {
+					PrintConsole
+							.print("********************** Application is in single execution mode ************************");
 					SchedulingResult result = SchedulingFacade.getScheduling();
 					Program.loadingDialog.setIndeterminate(true);
 					Program.loadingDialog
 							.setLabel("Building user interface...");
-					new GraphViewer(result , getAvailableChannels());
+					new GraphViewer(result, getAvailableChannels());
 				}
 			};
 			worker.execute();
