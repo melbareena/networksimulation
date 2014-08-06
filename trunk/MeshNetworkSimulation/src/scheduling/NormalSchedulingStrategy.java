@@ -50,7 +50,7 @@ public class NormalSchedulingStrategy extends SchedulingStrategy
 
 	@Override
 	protected String getName() {
-		return "Normal Scheduling Strategy";
+		return "NSS";
 	}
 
 }

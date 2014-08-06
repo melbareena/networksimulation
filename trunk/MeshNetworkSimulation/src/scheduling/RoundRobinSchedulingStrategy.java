@@ -68,7 +68,7 @@ public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 	
 	@Override
 	protected String getName() {
-		return "Round Robin Scheduling Strategy";
+		return "RRSS";
 	}
 	
 }

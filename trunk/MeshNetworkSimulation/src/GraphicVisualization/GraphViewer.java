@@ -161,21 +161,17 @@ public class GraphViewer extends JFrame {
 	/* HistogramViewer frame */
 	private final HistogramViewer histogramViewerFrame;
 	
-	public static final String optionsTitle = "(" + ((TCFacade.newAlgortihm) ? "new algo." : "origin. algo.")
-			+ " ; ratio " + TCFacade.downOverUpRatio
-			+ ((TCFacade.alternateOrder) ? " ; alt. order" : "")
-			+ ((TCFacade.repeatLinksToRespectRatio) ? " ; repeat links" : "")
-			+ ((TCFacade.enlargeByGateways) ? " ; enlarge by gw" : "")
-			+ ")";
+	public static String _availableChannels; 
  
 	/** Initiate and show the Frame.
 	 * @param throughputData The data for the throughput plot.
 	 */
-	public GraphViewer(SchedulingResult results) {
+	public GraphViewer(SchedulingResult results, String avalibleChannel) {
 		super();
 		
-		String title = "Mesh Network Simulation " + GraphViewer.optionsTitle
-				+ " - " + results.getSchedulingStrategy() + " - " + results.getTrafficGenerator() + " traffic";
+		_availableChannels = "AC:" + avalibleChannel;
+		String title = "Mesh Network Simulation - " + avalibleChannel
+				+ " - Scheduling:" + results.getSchedulingStrategy() + " - Traffic: " + results.getTrafficGenerator();
 		
 		this.setTitle(title);
 		

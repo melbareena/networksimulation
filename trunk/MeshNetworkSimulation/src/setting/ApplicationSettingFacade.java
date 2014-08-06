@@ -1,11 +1,16 @@
 package setting;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import launcher.Program;
+import setting.BaseConfiguration.AppExecMode;
+import setting.BaseConfiguration.ChannelMode;
 import setting.BaseConfiguration.TypeOfGenerationEnum;
+import dataStructure.Channel;
 import dataStructure.IFactorMap;
 import dataStructure.Vertex;
 
@@ -29,6 +34,14 @@ public class ApplicationSettingFacade
 	private static DataRateConfig _dCong = DataRateConfig.Initiating();
 	private static ChannelAssignmentConfig _chCong = ChannelAssignmentConfig.Initiating();
 	private static SchedulingConfig _schConf = SchedulingConfig.Initiating();
+	private static AppConfig _appConf = AppConfig.Initiating();
+	
+	public static AppExecMode getApplicationExecutionMode()
+	{
+		return _appConf.getAppExceMode();
+	}
+	
+	
 	public static class ChannelAssignment
 	{
 		public static String getSterategyClassName()
@@ -345,9 +358,117 @@ public class ApplicationSettingFacade
 	
 	public static class Channel
 	{
+		public static ChannelMode getChannelMode()
+		{
+			return _cCong.getMode();
+		}
+		
+		private static int multiExecIndex = 0; 
+		private static List<dataStructure.Channel> chans = null;
 		public static List<dataStructure.Channel> getChannel()
 		{
-			return _cCong.getChannel();
+			if(_appConf.getAppExceMode() != AppExecMode.Multi)
+				return _cCong.getChannel();
+			
+			if(chans == null || multiExecIndex != Program.multiExecIndex)
+			{
+				chans = new ArrayList<dataStructure.Channel>();
+				multiExecIndex = Program.multiExecIndex;
+				switch (Program.multiExecIndex)
+				{
+					case 1:
+						chans.add(new dataStructure.Channel(1));
+						break;
+					case 2:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						break;
+					case 3:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						break;
+					case 4:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						chans.add(new dataStructure.Channel(4));
+						break;
+					case 5:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(5));
+						break;
+					case 6:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(5));
+						chans.add(new dataStructure.Channel(6));
+						break;
+					case 7:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(5));
+						chans.add(new dataStructure.Channel(6));
+						chans.add(new dataStructure.Channel(7));
+						break;
+					case 8:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(5));
+						chans.add(new dataStructure.Channel(6));
+						chans.add(new dataStructure.Channel(7));
+						chans.add(new dataStructure.Channel(8));
+						break;
+					case 9:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(5));
+						chans.add(new dataStructure.Channel(6));
+						chans.add(new dataStructure.Channel(7));
+						chans.add(new dataStructure.Channel(8));
+						chans.add(new dataStructure.Channel(9));
+						break;
+					case 10:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(5));
+						chans.add(new dataStructure.Channel(6));
+						chans.add(new dataStructure.Channel(7));
+						chans.add(new dataStructure.Channel(8));
+						chans.add(new dataStructure.Channel(9));
+						chans.add(new dataStructure.Channel(10));
+						break;
+					case 11:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(3));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(5));
+						chans.add(new dataStructure.Channel(6));
+						chans.add(new dataStructure.Channel(7));
+						chans.add(new dataStructure.Channel(8));
+						chans.add(new dataStructure.Channel(9));
+						chans.add(new dataStructure.Channel(11));
+						break;
+						
+				}
+			}
+			return chans;
+			
+			
 		}
 	}
 
