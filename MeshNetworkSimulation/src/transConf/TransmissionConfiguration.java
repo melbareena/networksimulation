@@ -698,15 +698,7 @@ public class TransmissionConfiguration {
 		return tConfUnit;
 	}
 
-	private Vertex isEndpointsGateway2(Link l)
-	{
-		
-		if(forceGatewayLinks == LinkType.Outgoing && ApplicationSettingFacade.Gateway.isGateway(l.getSource()))
-			return l.getSource();
-		if(forceGatewayLinks == LinkType.Incoming && ApplicationSettingFacade.Gateway.isGateway(l.getDestination()))
-			return l.getDestination();
-		return null;
-	}
+	
 
 	private DataRate computeRate(double sinr)
 	{
