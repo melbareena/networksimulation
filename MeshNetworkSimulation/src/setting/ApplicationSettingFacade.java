@@ -370,7 +370,7 @@ public class ApplicationSettingFacade
 				return _cCong.getChannel();
 			
 			else if(_appConf.getAppExceMode() == AppExecMode.AllCombination &&
-					chans == null || multiExecIndex != Program.multiExecIndex)
+					(chans == null || multiExecIndex != Program.multiExecIndex))
 			{
 				chans = new ArrayList<dataStructure.Channel>();
 				multiExecIndex = Program.multiExecIndex;
@@ -473,89 +473,20 @@ public class ApplicationSettingFacade
 				}
 			}
 			
-			else if(_appConf.getAppExceMode() != AppExecMode.ApartCombination &&
-					chans == null || multiExecIndex == Program.multiExecIndex)
+			else if(_appConf.getAppExceMode() == AppExecMode.ApartCombination &&
+					(chans == null || multiExecIndex != Program.multiExecIndex))
 			{
 				chans = new ArrayList<dataStructure.Channel>();
 				multiExecIndex = Program.multiExecIndex;
 				switch (Program.multiExecIndex)
 				{
-				case 1:
-					chans.add(new dataStructure.Channel(1));
-					break;
+				
 				case 2:
 					chans.add(new dataStructure.Channel(1));
-					chans.add(new dataStructure.Channel(11));
-					break;
-				case 3:
-					chans.add(new dataStructure.Channel(1));
 					chans.add(new dataStructure.Channel(6));
 					chans.add(new dataStructure.Channel(11));
 					break;
-				case 4:
-					chans.add(new dataStructure.Channel(1));
-					chans.add(new dataStructure.Channel(4));
-					chans.add(new dataStructure.Channel(7));
-					chans.add(new dataStructure.Channel(10));
-					break;
-				case 5:
-					chans.add(new dataStructure.Channel(1));
-					chans.add(new dataStructure.Channel(3));
-					chans.add(new dataStructure.Channel(5));
-					chans.add(new dataStructure.Channel(7));
-					chans.add(new dataStructure.Channel(9));
-					break;
-				case 6:
-					chans.add(new dataStructure.Channel(1));
-					chans.add(new dataStructure.Channel(3));
-					chans.add(new dataStructure.Channel(5));
-					chans.add(new dataStructure.Channel(7));
-					chans.add(new dataStructure.Channel(9));
-					chans.add(new dataStructure.Channel(11));
-					break;
-				case 7:
-					chans.add(new dataStructure.Channel(1));
-					chans.add(new dataStructure.Channel(2));
-					chans.add(new dataStructure.Channel(4));
-					chans.add(new dataStructure.Channel(5));
-					chans.add(new dataStructure.Channel(7));
-					chans.add(new dataStructure.Channel(8));
-					chans.add(new dataStructure.Channel(10));
-					break;
-				case 8:
-					chans.add(new dataStructure.Channel(1));
-					chans.add(new dataStructure.Channel(2));
-					chans.add(new dataStructure.Channel(4));
-					chans.add(new dataStructure.Channel(5));
-					chans.add(new dataStructure.Channel(7));
-					chans.add(new dataStructure.Channel(8));
-					chans.add(new dataStructure.Channel(10));
-					chans.add(new dataStructure.Channel(11));
-					break;
-				case 9:
-					chans.add(new dataStructure.Channel(1));
-					chans.add(new dataStructure.Channel(2));
-					chans.add(new dataStructure.Channel(3));
-					chans.add(new dataStructure.Channel(5));
-					chans.add(new dataStructure.Channel(6));
-					chans.add(new dataStructure.Channel(7));
-					chans.add(new dataStructure.Channel(9));
-					chans.add(new dataStructure.Channel(10));
-					chans.add(new dataStructure.Channel(11));
-					break;
-				case 10:
-					chans.add(new dataStructure.Channel(1));
-					chans.add(new dataStructure.Channel(2));
-					chans.add(new dataStructure.Channel(3));
-					chans.add(new dataStructure.Channel(4));
-					chans.add(new dataStructure.Channel(5));
-					chans.add(new dataStructure.Channel(7));
-					chans.add(new dataStructure.Channel(8));
-					chans.add(new dataStructure.Channel(9));
-					chans.add(new dataStructure.Channel(10));
-					chans.add(new dataStructure.Channel(11));
-					break;
-				case 11:
+				case 1:
 					chans.add(new dataStructure.Channel(1));
 					chans.add(new dataStructure.Channel(2));
 					chans.add(new dataStructure.Channel(3));
