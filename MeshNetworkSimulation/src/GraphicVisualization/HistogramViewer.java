@@ -27,6 +27,8 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
+import launcher.Program;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -107,7 +109,7 @@ public class HistogramViewer extends JFrame {
 	public HistogramViewer(SchedulingResult results, int step) {
 		this.self = this;		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle(GraphViewer._availableChannels
+		setTitle("AC:" + Program.getAvailableChannels()
 				+ " - " + results.getSchedulingStrategy() + " - Traffic Generator: " + results.getTrafficGenerator() + " ");
 		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
 
@@ -463,7 +465,7 @@ public class HistogramViewer extends JFrame {
 		
 		System.out.println("Finished, displaying...");
 		
-		String titleString = GraphViewer._availableChannels + "\n"
+		String titleString = "AC:"+Program.getAvailableChannels() + "\n"
 				+ "Scheduling: " + results.getSchedulingStrategy() + " - "
 				+ ((ApplicationSettingFacade.Router.getTypeOfGeneration() == TypeOfGenerationEnum.RANDOM) ?
 						"Topolgy: Random " : "Topology: Static ") + "\n"
