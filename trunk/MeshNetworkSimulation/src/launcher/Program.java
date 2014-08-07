@@ -12,6 +12,7 @@ import scheduling.SchedulingFacade;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.AppExecMode;
 import GraphicVisualization.GraphViewer;
+import GraphicVisualization.HistogramViewer;
 import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.StartOptionsDialog;
 import dataStructure.Channel;
@@ -25,7 +26,7 @@ public class Program {
 
 	private static int numberOfExecution = 1;
 	
-	private static String getAvailableChannels() {
+	public static String getAvailableChannels() {
 		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
 			return ApplicationSettingFacade.Channel.getChannelMode().name();
 		}
@@ -116,7 +117,12 @@ public class Program {
 						SchedulingResult result = SchedulingFacade.getScheduling(index-1);
 						Program.loadingDialog.setIndeterminate(index-1, true);
 						Program.loadingDialog.setLabel(index-1, "Building user interface...");
-						new GraphViewer(result, getAvailableChannels(), index-1);
+						int step = result.getThroughputData().size()/100;
+						HistogramViewer histogramViewerFrame = new HistogramViewer(result, step);
+						histogramViewerFrame.showGraph();
+						histogramViewerFrame.setVisible(true);
+						Program.loadingDialog.addProgress(index, 100 - Program.loadingDialog.getProgress(index),
+								"Done!");
 					}
 
 				}
