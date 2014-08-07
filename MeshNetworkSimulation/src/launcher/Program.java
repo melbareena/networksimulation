@@ -25,8 +25,9 @@ public class Program {
 		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
 			return ApplicationSettingFacade.Channel.getChannelMode().name();
 		}
-
-		return "1.." + multiExecIndex;
+		if(multiExecIndex != 12)
+			return "1.." + multiExecIndex;
+		return "1,6,12";
 	}
 
 	public static void restartApplication() {
@@ -82,7 +83,7 @@ public class Program {
 				private void multiMode() {
 					PrintConsole
 							.print("********************** Application is in multi execution mode ************************");
-					for (multiExecIndex = 1; multiExecIndex < 12; multiExecIndex++) {
+					for (multiExecIndex = 1; multiExecIndex <= 12; multiExecIndex++) {
 						PrintConsole
 								.print("Exceute Number : " + multiExecIndex);
 						SchedulingResult result = SchedulingFacade
