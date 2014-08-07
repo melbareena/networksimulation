@@ -462,6 +462,11 @@ public class ApplicationSettingFacade
 						chans.add(new dataStructure.Channel(9));
 						chans.add(new dataStructure.Channel(11));
 						break;
+					case 12:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(6));
+						chans.add(new dataStructure.Channel(11));
+						break;
 						
 				}
 			}
