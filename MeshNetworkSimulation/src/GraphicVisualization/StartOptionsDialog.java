@@ -565,7 +565,7 @@ public class StartOptionsDialog extends JDialog {
 					lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() == 1);
 				}
 			});
-			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Some channels", "All combination", "Apart combination"}));
+			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Some channels", "All combinations", "Apart combinations"}));
 			channelModeComboBox.setSelectedIndex(0);
 			
 			channelsPanel.add(channelModeComboBox, "cell 1 0,grow");

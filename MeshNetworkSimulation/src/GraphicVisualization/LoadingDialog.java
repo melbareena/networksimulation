@@ -2,7 +2,6 @@ package GraphicVisualization;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Frame;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -13,7 +12,14 @@ import javax.swing.event.ChangeListener;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import setting.ApplicationSettingFacade;
+import setting.BaseConfiguration.AppExecMode;
+
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.miginfocom.swing.MigLayout;
 
 public class LoadingDialog extends JDialog {
 
@@ -21,15 +27,15 @@ public class LoadingDialog extends JDialog {
 
 	private JPanel contentPanel = new JPanel();
 	
-	private JProgressBar progressBar;
+	private List<JProgressBar> progressBarList;
 	
-	private JLabel lblText;
+	private List<JLabel> labelList;
 	
 	/**
 	 * Create the dialog.
 	 */
-	public LoadingDialog(Frame parent, String title, boolean indeterminate) {
-		setTitle("Loading "+title+"...");
+	public LoadingDialog() {
+		setTitle("Loading...");
 		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setSize(500, 80);
@@ -37,70 +43,187 @@ public class LoadingDialog extends JDialog {
 		
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPanel.setLayout(new MigLayout("", "[490px]", "[min!,grow][min!,grow]"));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new BorderLayout(0, 0));
 		
-		progressBar = new JProgressBar();
-		progressBar.setValue(0);
-		progressBar.setIndeterminate(indeterminate);
-		progressBar.setStringPainted(!indeterminate);
-		progressBar.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				if(isDone()) {
-					System.out.println("Progress done...");
-					dispose();
-					setVisible(false);
-				}
-			}
-		});
-		contentPanel.add(progressBar, BorderLayout.CENTER);
-		
-		lblText = new JLabel("Loading...");
-		lblText.setFont(new Font("Tahoma", Font.ITALIC, 12));
-		lblText.setHorizontalAlignment(SwingConstants.CENTER);
-		contentPanel.add(lblText, BorderLayout.SOUTH);
+		progressBarList = new ArrayList<JProgressBar>();
+		labelList = new ArrayList<JLabel>();
+
+		addBar();
 		
 		setAlwaysOnTop(true);
-		setLocationRelativeTo(parent);
+		setLocationRelativeTo(null);
 		setCursor(new Cursor(Cursor.WAIT_CURSOR));
 	}
 	
-	public void addProgress(int n) {
-		if((this.progressBar.getValue()+n) <= 100) {
-			this.progressBar.setValue(this.progressBar.getValue()+n);
+	/**Update the Layout of the contentPane, with 2*<code>nBars</code> rows.
+	 * @param nBars The number of progress bars the panel will contain.
+	 */
+	private void updateLayout(int nBars) {
+		StringBuilder rConstr = new StringBuilder();
+		for(int i = 0; i < nBars; i++) {
+			rConstr.append("[min!,grow][min!,grow]");
+		}
+		((MigLayout) contentPanel.getLayout()).setRowConstraints(rConstr.toString());
+	}
+	
+	/**Add a progress bar with its label to the dialog.
+	 * @return The index of the progress bar added.
+	 */
+	public int addBar() {
+		this.updateLayout(this.getBarCount()+1);
+		
+		JProgressBar progressBar = new JProgressBar();
+		progressBar.setValue(0);
+		progressBar.setIndeterminate(false);
+		progressBar.setStringPainted(true);
+		this.progressBarList.add(progressBar);
+		final int barIndex = this.progressBarList.size()-1;
+		progressBar.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if(isDone(barIndex)) {
+					if(isAllDone()) {
+						dispose();
+						setVisible(false);
+					}
+				}
+			}
+		});
+		contentPanel.add(progressBar, "cell 0 "+(2*barIndex)+",grow");
+		
+		JLabel lblText = new JLabel();
+		lblText.setFont(new Font("Tahoma", Font.ITALIC, 12));
+		lblText.setHorizontalAlignment(SwingConstants.CENTER);
+		this.labelList.add(lblText);
+		final int labelIndex = this.labelList.size()-1;
+		contentPanel.add(lblText, "cell 0 "+(2*labelIndex+1)+",grow");
+		this.setLabel(barIndex, "Waiting...");
+		
+		pack();
+		setLocationRelativeTo(null);
+		
+		return barIndex;
+	}
+	
+	/**Remove the specified progress bar and its label from the dialog.
+	 * @param barIndex The index of the bar to remove.
+	 */
+	public void removeBar(int barIndex) {
+		System.err.println("Removing bar #"+barIndex);
+		contentPanel.remove(this.progressBarList.get(barIndex));
+		contentPanel.remove(this.labelList.get(barIndex));
+		this.updateLayout(getBarCount()-1);
+		this.progressBarList.remove(barIndex);
+		this.labelList.remove(barIndex);
+		pack();
+		setLocationRelativeTo(null);
+	}
+	
+	public int getBarCount() {
+		return this.progressBarList.size();
+	}
+	
+ 	public void addProgress(int barIndex, int n) {
+ 		int value = this.getProgress(barIndex);
+		if((value + n) <= 100) {
+			this.setProgress(barIndex, value + n);
 		}
 	}
 	
-	public void addProgress(int n, String s) {
-		addProgress(n);
-		setLabel(s);
+	public void addProgress(int barIndex, int n, String s) {
+		this.addProgress(barIndex, n);
+		this.setLabel(barIndex, s);
 	}
 	
-	public void setProgress(int n) {
-		this.progressBar.setValue(n);
+	public void setProgress(int barIndex, int n) {
+		if(n <= 100) {
+			this.progressBarList.get(barIndex).setValue(n);
+		}
 	}
 	
-	public void setProgress(int n, String s) {
-		this.progressBar.setValue(n);
-		setLabel(s);
+	public void setProgress(int barIndex, int n, String s) {
+		this.setProgress(barIndex, n);
+		this.setLabel(barIndex, s);
 	}
 	
-	public void setLabel(String s) {
-		this.lblText.setText(s);
+	public void setLabel(int barIndex, String s) {
+		this.labelList.get(barIndex).setText(this.getChannelsString(barIndex)+s);
 	}
 	
-	public int getProgress() {
-		return this.progressBar.getValue();
+	public int getProgress(int barIndex) {
+		return this.progressBarList.get(barIndex).getValue();
 	}
 	
-	public boolean isDone() {
-		return this.progressBar.getValue() == 100;
+	public boolean isAllDone() {
+		for(int i = 0; i < this.getBarCount(); i++) {
+			if(!isDone(i)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
-	public void setIndeterminate(boolean indeterminate) {
-		progressBar.setIndeterminate(indeterminate);
-		progressBar.setStringPainted(!indeterminate);
+	public boolean isDone(int barIndex) {
+		return this.progressBarList.get(barIndex).getValue() == 100;
+	}
+	
+	public void setIndeterminate(int barIndex, boolean indeterminate) {
+		this.progressBarList.get(barIndex).setIndeterminate(indeterminate);
+		//this.progressBarList.get(barIndex).setStringPainted(!indeterminate);
+		pack();
+		setLocationRelativeTo(null);
+	}
+	
+	private String getChannelsString(int index) {
+		String result = "";
+		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
+			result = ApplicationSettingFacade.Channel.getChannelMode().name();
+		} else if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.AllCombination) {
+			if(index != 11) {
+				result = "1.." + (index+1);
+			} else {
+				result = "1, 6, 11";
+			}
+		} else {
+			switch(index+1) {
+			case 1:
+				result = "1";
+				break;
+			case 2:
+				result = "1, 11";
+				break;
+			case 3:
+				result = "1, 6, 11";
+				break;
+			case 4:
+				result = "1, 4, 7, 10";
+				break;
+			case 5:
+				result = "1, 3, 5, 7, 9";
+				break;
+			case 6:
+				result = "1, 3, 5, 7, 9, 11";
+				break;
+			case 7:
+				result = "1, 2, 4, 5, 7, 8, 10";
+				break;
+			case 8:
+				result = "1, 2, 4, 5, 7, 8, 10, 11";
+				break;
+			case 9:
+				result = "1..3, 5..7, 9..11";
+				break;
+			case 10:
+				result = "1..5, 7..11";
+				break;
+			case 11:
+				result = "1..11";
+				break;
+			
+			}
+		}
+		return "Channels "+result+": ";
 	}
 
 }

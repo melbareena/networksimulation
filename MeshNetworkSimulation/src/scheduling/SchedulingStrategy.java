@@ -42,26 +42,26 @@ public abstract class SchedulingStrategy
 	protected String trafficGenerator;
 	protected double maxTrafficSource;
 	protected double maxTrafficTransmit;
+	
+	protected int instanceIndex;
 
-	protected SchedulingStrategy() {
-		
+	public SchedulingStrategy(int instanceIndex) {
 		PrintConsole.printErr("Intiate Scheduling..........");
-		sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
-		configurations = TCFacade.getConfigurations();
-		transmitBuffers = new BufferMap();
-		throughput = new Vector<Double>();
-		trafficSource = new Vector<Double>();
-		trafficTransit = new Vector<Double>();
-		packetsDelay = new Vector<Integer>();
-		maxTrafficSource = -1.0;
-		maxTrafficTransmit = -1.0;
+		this.sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
+		this.configurations = TCFacade.getConfigurations();
+		this.transmitBuffers = new BufferMap();
+		this.throughput = new Vector<Double>();
+		this.trafficSource = new Vector<Double>();
+		this.trafficTransit = new Vector<Double>();
+		this.packetsDelay = new Vector<Integer>();
+		this.maxTrafficSource = -1.0;
+		this.maxTrafficTransmit = -1.0;
+		this.instanceIndex = instanceIndex;
 	}
 	
-	public SchedulingResult staticScheduling()
-	{
+	public SchedulingResult staticScheduling() {
 		
 		trafficGenerator = "Static";
-		Program.loadingDialog.setIndeterminate(false);
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfiguraions = null;
 		int timeSlot = 0;
@@ -214,7 +214,8 @@ public abstract class SchedulingStrategy
 				timeSlot++;
 				if(timeSlot < durationOfTrafficGenerating) {
 					totalTrafficGenerated += updateTraffic(timeSlot);
-					Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
+					Program.loadingDialog.setProgress(this.instanceIndex,
+							(int) (99*timeSlot/durationOfTrafficGenerating),
 							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 				} else {
 					updateProgress(timeSlot);
@@ -251,7 +252,8 @@ public abstract class SchedulingStrategy
 				timeSlot++;
 				if(timeSlot < durationOfTrafficGenerating) {
 					totalTrafficGenerated += updateTraffic(timeSlot);
-					Program.loadingDialog.setProgress((int) (99*timeSlot/durationOfTrafficGenerating),
+					Program.loadingDialog.setProgress(this.instanceIndex,
+							(int) (99*timeSlot/durationOfTrafficGenerating),
 							"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 				} else {
 					updateProgress(timeSlot);
@@ -384,20 +386,22 @@ public abstract class SchedulingStrategy
 	protected void updateProgress(int timeSlot) {
 		if (maxTrafficSource < 0) {
 			maxTrafficSource = sourceBuffers.trafficSize();
-			Program.loadingDialog.setProgress(0);
+			Program.loadingDialog.setProgress(this.instanceIndex, 0);
 		}
 		if (sourceBuffers.trafficSize() == 0) {
 			if (maxTrafficTransmit < 0) {
 				maxTrafficTransmit = transmitBuffers.trafficSize();
-				Program.loadingDialog.setProgress(0);
+				Program.loadingDialog.setProgress(this.instanceIndex, 0);
 			}
-			Program.loadingDialog.setProgress((int) (100 - (99 * transmitBuffers.trafficSize() / maxTrafficTransmit)),
-							"Disposing of transmit traffic ("+ transmitBuffers.trafficSize()
+			Program.loadingDialog.setProgress(this.instanceIndex,
+					(int) (100 - (99 * transmitBuffers.trafficSize() / maxTrafficTransmit)),
+					"Disposing of transmit traffic ("+ transmitBuffers.trafficSize()
 							+ " remaining, timeslot " + timeSlot + ")");
 		} else {
-			Program.loadingDialog.setProgress((int) (100 - (99 * sourceBuffers.trafficSize() / maxTrafficSource)),
-							"Disposing of source traffic (" + sourceBuffers.trafficSize()
-									+ " remaining, timeslot " + timeSlot + ")");
+			Program.loadingDialog.setProgress(this.instanceIndex,
+					(int) (100 - (99 * sourceBuffers.trafficSize() / maxTrafficSource)),
+					"Disposing of source traffic (" + sourceBuffers.trafficSize()
+							+ " remaining, timeslot " + timeSlot + ")");
 		}
 	}
 	

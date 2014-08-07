@@ -10,12 +10,11 @@ import dataStructure.Link;
 
 public class NormalSchedulingStrategy extends SchedulingStrategy
 {
-	
-	
-	public NormalSchedulingStrategy() {
-		super();
+
+
+	public NormalSchedulingStrategy(int instanceIndex) {
+		super(instanceIndex);
 	}
-	
 
 	@Override
 	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer)

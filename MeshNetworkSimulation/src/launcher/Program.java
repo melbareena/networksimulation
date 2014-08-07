@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.plaf.multi.MultiInternalFrameUI;
 
 import common.PrintConsole;
 import scheduling.SchedulingFacade;
@@ -20,32 +19,30 @@ import dataStructure.SchedulingResult;
 
 public class Program {
 
-	public static LoadingDialog loadingDialog = new LoadingDialog(null,
-			"simulation", false);
+	public static LoadingDialog loadingDialog;
+	
+	public static int multiExecIndex = 1;
 
-	private static int numberOfExceution = 1;
-	private static String getAvailableChannels() 
-	{
-		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
-		{
+	private static int numberOfExecution = 1;
+	
+	private static String getAvailableChannels() {
+		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
 			return ApplicationSettingFacade.Channel.getChannelMode().name();
 		}
-		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.AllCombination)
-		{
-			numberOfExceution = 12;
+		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.AllCombination) {
+			numberOfExecution = 12;
 			if(multiExecIndex != 12)
 				return "1.." + multiExecIndex;
 			return "1,6,11";
 		}
 		String str = "";
-		 List<Channel> channls = ApplicationSettingFacade.Channel.getChannel();
-		 numberOfExceution = channls.size();
-		 for (Channel channel : channls)
-		 {
-		  	str += channel.getChannel() + ",";
-		 }
-		 str = str.substring(0, str.length() - 1 );
-		 return str;
+		List<Channel> channels = ApplicationSettingFacade.Channel.getChannel();
+		numberOfExecution = 11;
+		for (Channel channel : channels) {
+		 	str += channel.getChannel() + ",";
+		}
+		str = str.substring(0, str.length() - 1 );
+		return str;
 	}
 
 	public static void restartApplication() {
@@ -61,9 +58,6 @@ public class Program {
 					.append(ManagementFactory.getRuntimeMXBean().getClassPath())
 					.append(" ");
 			cmd.append(Program.class.getName()).append(" ");
-			/*
-			 * for (String arg : args) { cmd.append(arg).append(" "); }
-			 */
 			Runtime.getRuntime().exec(cmd.toString());
 			System.exit(0);
 		} catch (Exception e) {
@@ -81,47 +75,58 @@ public class Program {
 		startOptionDialog.setVisible(true);
 	}
 
-	public static int multiExecIndex = 1;
-
 	public static void launch() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (Exception e) {
+			System.err.println("Unable to set the UI look and feel...");
+		}
+		
+		getAvailableChannels();
+		
+		loadingDialog = new LoadingDialog();
 		loadingDialog.setVisible(true);
+		int nbBars = 1;
+		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.AllCombination) {
+			nbBars = 12;
+		} else if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.ApartCombination) {
+			nbBars = 11;
+		}
+		for(int i = 1; i < nbBars; i++) {
+			Program.loadingDialog.addBar();
+		}
+		
 		try {
 			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
 				@Override
 				protected Object doInBackground() throws Exception {
-
-					if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
+					if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
 						singleMode();
-					else
+					} else {
 						multiMode();
-
+					}
 					return null;
 				}
 
 				private void multiMode() {
-					PrintConsole
-							.print("********************** Application is in multi execution mode ************************");
-					for (multiExecIndex = 1; multiExecIndex <= numberOfExceution; multiExecIndex++) {
-						PrintConsole
-								.print("Exceute Number : " + multiExecIndex);
-						SchedulingResult result = SchedulingFacade
-								.getScheduling();
-						Program.loadingDialog.setIndeterminate(true);
-						Program.loadingDialog
-								.setLabel("Building user interface...");
-						new GraphViewer(result, getAvailableChannels());
+					PrintConsole.print("********************** Application is in multi execution mode ************************");
+					for (multiExecIndex = 1; multiExecIndex <= numberOfExecution; multiExecIndex++) {
+						final int index = multiExecIndex;
+						PrintConsole.print("Exceute Number : " + index);
+						SchedulingResult result = SchedulingFacade.getScheduling(index-1);
+						Program.loadingDialog.setIndeterminate(index-1, true);
+						Program.loadingDialog.setLabel(index-1, "Building user interface...");
+						new GraphViewer(result, getAvailableChannels(), index-1);
 					}
 
 				}
 
 				private void singleMode() {
-					PrintConsole
-							.print("********************** Application is in single execution mode ************************");
-					SchedulingResult result = SchedulingFacade.getScheduling();
-					Program.loadingDialog.setIndeterminate(true);
-					Program.loadingDialog
-							.setLabel("Building user interface...");
-					new GraphViewer(result, getAvailableChannels());
+					PrintConsole.print("********************** Application is in single execution mode ************************");
+					SchedulingResult result = SchedulingFacade.getScheduling(0);
+					Program.loadingDialog.setIndeterminate(0, true);
+					Program.loadingDialog.setLabel(0, "Building user interface...");
+					new GraphViewer(result, getAvailableChannels(), 0);
 				}
 
 			};
@@ -130,13 +135,6 @@ public class Program {
 			GraphViewer.showErrorDialog(e.getClass().toString(), e.getClass()
 					.toString() + ": " + e.getMessage().toString());
 			e.printStackTrace(System.err);
-		}
-
-		try {
-			UIManager.setLookAndFeel(UIManager
-					.getCrossPlatformLookAndFeelClassName());
-		} catch (Exception e) {
-			System.err.println("Unable to set the UI look and feel...");
 		}
 
 	}
