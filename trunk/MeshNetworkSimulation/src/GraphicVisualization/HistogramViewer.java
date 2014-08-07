@@ -104,7 +104,6 @@ public class HistogramViewer extends JFrame {
 	
 	/**
 	 * Create the frame.
-	 * @param throughputData 
 	 */
 	public HistogramViewer(SchedulingResult results, int step) {
 		this.self = this;		
