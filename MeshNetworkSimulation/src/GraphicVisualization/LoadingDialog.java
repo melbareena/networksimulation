@@ -84,8 +84,8 @@ public class LoadingDialog extends JDialog {
 			public void stateChanged(ChangeEvent e) {
 				if(isDone(barIndex)) {
 					if(isAllDone()) {
-						dispose();
-						setVisible(false);
+						//dispose();
+						//setVisible(false);
 					}
 				}
 			}
