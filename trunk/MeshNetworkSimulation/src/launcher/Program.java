@@ -38,7 +38,7 @@ public class Program {
 		}
 		String str = "";
 		List<Channel> channels = ApplicationSettingFacade.Channel.getChannel();
-		numberOfExecution = 11;
+		numberOfExecution = 2;
 		for (Channel channel : channels) {
 		 	str += channel.getChannel() + ",";
 		}
@@ -87,12 +87,8 @@ public class Program {
 		
 		loadingDialog = new LoadingDialog();
 		loadingDialog.setVisible(true);
-		int nbBars = 1;
-		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.AllCombination) {
-			nbBars = 12;
-		} else if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.ApartCombination) {
-			nbBars = 11;
-		}
+		int nbBars = numberOfExecution;
+		
 		for(int i = 1; i < nbBars; i++) {
 			Program.loadingDialog.addBar();
 		}
