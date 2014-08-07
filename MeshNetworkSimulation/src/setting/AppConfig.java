@@ -62,7 +62,7 @@ public class AppConfig extends BaseConfiguration
 		if(!eElement.hasAttribute(ATTMODE))
 		{
 			PrintConsole.printErr(TAG + " must have an attribute. the following template may help you " +
-					"\n	<AppConfiguration Mode=\"Single or Multi \"> " );
+					"\n	<AppConfiguration Mode=\"AllCombination, Single or ApartCombination  \"> " );
 			System.exit(0);
 		}
 		return true;
