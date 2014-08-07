@@ -38,7 +38,7 @@ public class Program {
 		}
 		String str = "";
 		List<Channel> channels = ApplicationSettingFacade.Channel.getChannel();
-		numberOfExecution = 1;
+		numberOfExecution = 11;
 		for (Channel channel : channels) {
 		 	str += channel.getChannel() + ",";
 		}
