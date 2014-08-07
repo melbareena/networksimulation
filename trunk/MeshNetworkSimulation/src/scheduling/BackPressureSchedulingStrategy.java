@@ -29,6 +29,10 @@ import dataStructure.Vertex;
  */
 public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 
+	public BackPressureSchedulingStrategy(int instanceIndex) {
+		super(instanceIndex);
+	}
+
 	@Override
 	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) {
 		return null;
@@ -71,7 +75,8 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 			timeSlot++;
 			if (timeSlot < durationOfTrafficGenerating) {
 				totalTrafficGenerated += updateTraffic(timeSlot);
-				Program.loadingDialog.setProgress((int) (99 * timeSlot / durationOfTrafficGenerating),
+				Program.loadingDialog.setProgress(this.instanceIndex,
+						(int) (99 * timeSlot / durationOfTrafficGenerating),
 						"Generating traffic (slot " + timeSlot + " over " + durationOfTrafficGenerating + ")");
 			} else {
 				updateProgress(timeSlot);

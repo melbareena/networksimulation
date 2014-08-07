@@ -14,8 +14,8 @@ public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 	private int sourcePositionIndex;
 	private int tranmissionPositionIndex;
 
-	protected RoundRobinSchedulingStrategy() {
-		super();
+	public RoundRobinSchedulingStrategy(int instanceIndex) {
+		super(instanceIndex);
 		sourcePositionIndex = 0;
 		tranmissionPositionIndex = 0;
 	}

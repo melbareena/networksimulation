@@ -166,11 +166,11 @@ public class GraphViewer extends JFrame {
 	/** Initiate and show the Frame.
 	 * @param throughputData The data for the throughput plot.
 	 */
-	public GraphViewer(SchedulingResult results, String avalibleChannel) {
+	public GraphViewer(SchedulingResult results, String availableChannels, int instanceIndex) {
 		super();
 		
-		_availableChannels = "AC:" + avalibleChannel;
-		String title = "Mesh Network Simulation - " + avalibleChannel
+		_availableChannels = "AC:" + availableChannels;
+		String title = "Mesh Network Simulation - " + availableChannels
 				+ " - Scheduling:" + results.getSchedulingStrategy() + " - Traffic: " + results.getTrafficGenerator();
 		
 		this.setTitle(title);
@@ -293,7 +293,7 @@ public class GraphViewer extends JFrame {
 		});
 		
 		setVisible(true);
-		Program.loadingDialog.addProgress(100 - Program.loadingDialog.getProgress(),
+		Program.loadingDialog.addProgress(instanceIndex, 100 - Program.loadingDialog.getProgress(instanceIndex),
 				"Done!");
     }
 	

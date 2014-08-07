@@ -1,5 +1,6 @@
 package scheduling;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -8,7 +9,7 @@ import dataStructure.SchedulingResult;
 
 public class SchedulingFacade
 {
-	public static SchedulingResult getScheduling()
+	public static SchedulingResult getScheduling(int instanceIndex)
 	{
 		
 		String className = "";
@@ -16,6 +17,7 @@ public class SchedulingFacade
 		{
 			className = ApplicationSettingFacade.Scheduling.getSterategyClassName();
 			Class<?> myClass = Class.forName("scheduling." + className);
+			Constructor<?> myConstructor = myClass.getConstructor(int.class);
 			
 			String methodName = "";
 			
@@ -27,7 +29,7 @@ public class SchedulingFacade
 			
 			Method m = myClass.getMethod(methodName);
 			
-		    Object o =	m.invoke(myClass.newInstance());
+		    Object o =	m.invoke(myConstructor.newInstance(instanceIndex));
 		    
 		    return (SchedulingResult) o;
 			
