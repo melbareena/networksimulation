@@ -2,6 +2,7 @@ package launcher;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.util.List;
 
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -14,6 +15,7 @@ import setting.BaseConfiguration.AppExecMode;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.StartOptionsDialog;
+import dataStructure.Channel;
 import dataStructure.SchedulingResult;
 
 public class Program {
@@ -21,13 +23,29 @@ public class Program {
 	public static LoadingDialog loadingDialog = new LoadingDialog(null,
 			"simulation", false);
 
-	private static String getAvailableChannels() {
-		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
+	private static int numberOfExceution = 1;
+	private static String getAvailableChannels() 
+	{
+		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
+		{
 			return ApplicationSettingFacade.Channel.getChannelMode().name();
 		}
-		if(multiExecIndex != 12)
-			return "1.." + multiExecIndex;
-		return "1,6,12";
+		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.AllCombination)
+		{
+			numberOfExceution = 12;
+			if(multiExecIndex != 12)
+				return "1.." + multiExecIndex;
+			return "1,6,11";
+		}
+		String str = "";
+		 List<Channel> channls = ApplicationSettingFacade.Channel.getChannel();
+		 numberOfExceution = channls.size();
+		 for (Channel channel : channls)
+		 {
+		  	str += channel.getChannel() + ",";
+		 }
+		 str = str.substring(0, str.length() - 1 );
+		 return str;
 	}
 
 	public static void restartApplication() {
@@ -83,7 +101,7 @@ public class Program {
 				private void multiMode() {
 					PrintConsole
 							.print("********************** Application is in multi execution mode ************************");
-					for (multiExecIndex = 1; multiExecIndex <= 12; multiExecIndex++) {
+					for (multiExecIndex = 1; multiExecIndex <= numberOfExceution; multiExecIndex++) {
 						PrintConsole
 								.print("Exceute Number : " + multiExecIndex);
 						SchedulingResult result = SchedulingFacade

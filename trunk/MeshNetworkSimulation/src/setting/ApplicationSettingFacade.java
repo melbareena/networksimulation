@@ -366,10 +366,11 @@ public class ApplicationSettingFacade
 		private static List<dataStructure.Channel> chans = null;
 		public static List<dataStructure.Channel> getChannel()
 		{
-			if(_appConf.getAppExceMode() != AppExecMode.Multi)
+			if(_appConf.getAppExceMode() == AppExecMode.Single)
 				return _cCong.getChannel();
 			
-			if(chans == null || multiExecIndex != Program.multiExecIndex)
+			else if(_appConf.getAppExceMode() == AppExecMode.AllCombination &&
+					chans == null || multiExecIndex != Program.multiExecIndex)
 			{
 				chans = new ArrayList<dataStructure.Channel>();
 				multiExecIndex = Program.multiExecIndex;
@@ -468,6 +469,40 @@ public class ApplicationSettingFacade
 						chans.add(new dataStructure.Channel(11));
 						break;
 						
+				}
+			}
+			
+			else if(_appConf.getAppExceMode() != AppExecMode.ApartCombination &&
+					chans == null || multiExecIndex == Program.multiExecIndex)
+			{
+				chans = new ArrayList<dataStructure.Channel>();
+				multiExecIndex = Program.multiExecIndex;
+				switch (Program.multiExecIndex)
+				{
+				
+					case 1:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(10));
+						break;
+					case 2:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(5));
+						chans.add(new dataStructure.Channel(11));
+						break;
+					case 3:
+						chans.add(new dataStructure.Channel(1));
+						chans.add(new dataStructure.Channel(4));
+						chans.add(new dataStructure.Channel(7));
+						chans.add(new dataStructure.Channel(11));
+						break;
+					case 4:
+						chans.add(new dataStructure.Channel(2));
+						chans.add(new dataStructure.Channel(5));
+						chans.add(new dataStructure.Channel(8));
+						chans.add(new dataStructure.Channel(11));
+						break;
+				
 				}
 			}
 			return chans;

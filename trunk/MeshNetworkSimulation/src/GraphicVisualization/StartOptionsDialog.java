@@ -565,7 +565,7 @@ public class StartOptionsDialog extends JDialog {
 					lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() == 1);
 				}
 			});
-			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Some channels", "All combinations"}));
+			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Some channels", "All combination", "Apart combination"}));
 			channelModeComboBox.setSelectedIndex(0);
 			
 			channelsPanel.add(channelModeComboBox, "cell 1 0,grow");
@@ -807,7 +807,9 @@ public class StartOptionsDialog extends JDialog {
 	}
 	
 	private void writeConfiguration() {
-		String mode = (channelModeComboBox.getSelectedIndex() == 2) ? "Multi" : "Single";
+		String mode = "Single";
+		if(channelModeComboBox.getSelectedIndex() == 2) mode = "AllCombination"; 
+		else if (channelModeComboBox.getSelectedIndex() == 3) mode = "ApartCombination"; 
 		XMLWriter.Initialize(mode);
 		
 		String channelAssignment = "";

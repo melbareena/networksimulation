@@ -15,7 +15,7 @@ public abstract class BaseConfiguration
 	
 	public static enum TypeOfGenerationEnum { STATIC , FILE, RANDOM };
 	public static enum ChannelMode { All, Partially };
-	public static enum AppExecMode { Single, Multi };
+	public static enum AppExecMode { Single, AllCombination, ApartCombination };
 	
 	
 	protected abstract void FetchConfig();
