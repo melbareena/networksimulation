@@ -478,15 +478,83 @@ public class ApplicationSettingFacade
 			{
 				chans = new ArrayList<dataStructure.Channel>();
 				multiExecIndex = Program.multiExecIndex;
-				switch (Program.multiExecIndex)
-				{
-				
+				switch (Program.multiExecIndex) {
+				case 1:
+					chans.add(new dataStructure.Channel(1));
+					break;
 				case 2:
+					chans.add(new dataStructure.Channel(1));
+					chans.add(new dataStructure.Channel(11));
+					break;
+				case 3:
 					chans.add(new dataStructure.Channel(1));
 					chans.add(new dataStructure.Channel(6));
 					chans.add(new dataStructure.Channel(11));
 					break;
-				case 1:
+				case 4:
+					chans.add(new dataStructure.Channel(1));
+					chans.add(new dataStructure.Channel(4));
+					chans.add(new dataStructure.Channel(7));
+					chans.add(new dataStructure.Channel(10));
+					break;
+				case 5:
+					chans.add(new dataStructure.Channel(1));
+					chans.add(new dataStructure.Channel(3));
+					chans.add(new dataStructure.Channel(5));
+					chans.add(new dataStructure.Channel(7));
+					chans.add(new dataStructure.Channel(9));
+					break;
+				case 6:
+					chans.add(new dataStructure.Channel(1));
+					chans.add(new dataStructure.Channel(3));
+					chans.add(new dataStructure.Channel(5));
+					chans.add(new dataStructure.Channel(7));
+					chans.add(new dataStructure.Channel(9));
+					chans.add(new dataStructure.Channel(11));
+					break;
+				case 7:
+					chans.add(new dataStructure.Channel(1));
+					chans.add(new dataStructure.Channel(2));
+					chans.add(new dataStructure.Channel(4));
+					chans.add(new dataStructure.Channel(5));
+					chans.add(new dataStructure.Channel(7));
+					chans.add(new dataStructure.Channel(8));
+					chans.add(new dataStructure.Channel(10));
+					break;
+				case 8:
+					chans.add(new dataStructure.Channel(1));
+					chans.add(new dataStructure.Channel(2));
+					chans.add(new dataStructure.Channel(4));
+					chans.add(new dataStructure.Channel(5));
+					chans.add(new dataStructure.Channel(7));
+					chans.add(new dataStructure.Channel(8));
+					chans.add(new dataStructure.Channel(10));
+					chans.add(new dataStructure.Channel(11));
+					break;
+				case 9:
+					chans.add(new dataStructure.Channel(1));
+					chans.add(new dataStructure.Channel(2));
+					chans.add(new dataStructure.Channel(3));
+					chans.add(new dataStructure.Channel(5));
+					chans.add(new dataStructure.Channel(6));
+					chans.add(new dataStructure.Channel(7));
+					chans.add(new dataStructure.Channel(9));
+					chans.add(new dataStructure.Channel(10));
+					chans.add(new dataStructure.Channel(11));
+					break;
+				case 10:
+					chans.add(new dataStructure.Channel(1));
+					chans.add(new dataStructure.Channel(2));
+					chans.add(new dataStructure.Channel(3));
+					chans.add(new dataStructure.Channel(4));
+					chans.add(new dataStructure.Channel(5));
+					chans.add(new dataStructure.Channel(7));
+					chans.add(new dataStructure.Channel(8));
+					chans.add(new dataStructure.Channel(9));
+					chans.add(new dataStructure.Channel(10));
+					chans.add(new dataStructure.Channel(11));
+					break;
+				case 11:
 					chans.add(new dataStructure.Channel(1));
 					chans.add(new dataStructure.Channel(2));
 					chans.add(new dataStructure.Channel(3));
@@ -499,7 +567,6 @@ public class ApplicationSettingFacade
 					chans.add(new dataStructure.Channel(10));
 					chans.add(new dataStructure.Channel(11));
 					break;
-
 				}
 			}
 			return chans;

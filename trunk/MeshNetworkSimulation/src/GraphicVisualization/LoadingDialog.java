@@ -170,9 +170,6 @@ public class LoadingDialog extends JDialog {
 	
 	public void setIndeterminate(int barIndex, boolean indeterminate) {
 		this.progressBarList.get(barIndex).setIndeterminate(indeterminate);
-		//this.progressBarList.get(barIndex).setStringPainted(!indeterminate);
-		pack();
-		setLocationRelativeTo(null);
 	}
 	
 	private String getChannelsString(int index) {
