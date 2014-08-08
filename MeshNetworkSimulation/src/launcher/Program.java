@@ -38,7 +38,7 @@ public class Program {
 		}
 		String str = "";
 		List<Channel> channels = ApplicationSettingFacade.Channel.getChannel();
-		numberOfExecution = 2;
+		numberOfExecution = 11;
 		for (Channel channel : channels) {
 		 	str += channel.getChannel() + ",";
 		}
@@ -117,10 +117,8 @@ public class Program {
 						HistogramViewer histogramViewerFrame = new HistogramViewer(result, step);
 						histogramViewerFrame.showGraph();
 						histogramViewerFrame.setVisible(true);
-						Program.loadingDialog.addProgress(index, 100 - Program.loadingDialog.getProgress(index),
-								"Done!");
+						Program.loadingDialog.setProgress(index-1, 100, "Done!");
 					}
-
 				}
 
 				private void singleMode() {
@@ -129,6 +127,13 @@ public class Program {
 					Program.loadingDialog.setIndeterminate(0, true);
 					Program.loadingDialog.setLabel(0, "Building user interface...");
 					new GraphViewer(result, getAvailableChannels(), 0);
+				}
+				
+				@Override
+				protected void done() {
+					super.done();
+					Program.loadingDialog.dispose();
+					Program.loadingDialog.setVisible(false);
 				}
 
 			};
