@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import launcher.Program;
 import dataStructure.Channel;
 import dataStructure.ChannelOccuranceMap;
 import dataStructure.Link;
@@ -20,6 +21,7 @@ import dataStructure.TCUnit;
 import dataStructure.UplinkTraffic;
 import dataStructure.Vertex;
 import setting.ApplicationSettingFacade;
+import setting.BaseConfiguration.AppExecMode;
 
 
 /**
@@ -338,22 +340,44 @@ public class FileGenerator
 	public static void ChannelsInFile(LinksChannelMap linksChannel)
 	{
 		if(!ISFILEENABLE) return;
-		
-		try
+		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
 		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "channels_assignment.txt"));
-			for(Entry<Link, Channel> LC : linksChannel.entrySet())
+			try
 			{
-				writer.write(LC.getKey().getId() + " " + LC.getValue().getChannel());
-				writer.newLine();
+				BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "channels_assignment.txt"));
+				for(Entry<Link, Channel> LC : linksChannel.entrySet())
+				{
+					writer.write(LC.getKey().getId() + " " + LC.getValue().getChannel());
+					writer.newLine();
+				}
+	
+				writer.close();
+				PrintConsole.print("Channel for each link added in a file sucessfully.");
+			} 
+			catch (Exception ex)
+			{
+				System.err.println("ChannelsInFile/FileGenerator/Message:" + ex.getMessage());
 			}
-
-			writer.close();
-			PrintConsole.print("Channel for each link added in a file sucessfully.");
-		} 
-		catch (Exception ex)
+		}
+		else
 		{
-			System.err.println("ChannelsInFile/FileGenerator/Message:" + ex.getMessage());
+			try
+			{
+				String fileName = "channels_assignment "+ Program.multiExecIndex +".txt";
+				BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + fileName));
+				for(Entry<Link, Channel> LC : linksChannel.entrySet())
+				{
+					writer.write(LC.getKey().getId() + " " + LC.getValue().getChannel());
+					writer.newLine();
+				}
+	
+				writer.close();
+				PrintConsole.print("Channel for each link added in a file sucessfully.");
+			} 
+			catch (Exception ex)
+			{
+				System.err.println("ChannelsInFile/FileGenerator/Message:" + ex.getMessage());
+			}
 		}
 		
 		
@@ -389,29 +413,58 @@ public class FileGenerator
 	{
 		if(!ISFILEENABLE) return;
 		
-		try
+		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
 		{
-			
-			String path = FILEOUTPUTPATH;
-			if(FILEOUTPUTPATH.equals("null")) {
-				path = FileGenerator.class.getResource("/output/").getPath();
-			}
-			BufferedWriter writer = new BufferedWriter(new FileWriter(path + "throughtput.txt"));
-			//int timeIndex = 0;
-			for (Double th : throughput)
+			try
 			{
-				writer.write(th +"");
-				//timeIndex++;
-				writer.newLine();
+				
+				String path = FILEOUTPUTPATH;
+				if(FILEOUTPUTPATH.equals("null")) {
+					path = FileGenerator.class.getResource("/output/").getPath();
+				}
+				BufferedWriter writer = new BufferedWriter(new FileWriter(path + "throughtput.txt"));
+				//int timeIndex = 0;
+				for (Double th : throughput)
+				{
+					writer.write(th +"");
+					//timeIndex++;
+					writer.newLine();
+				}
+				writer.close();
+			
+				PrintConsole.print("throughput inserted in file successfully.");
+			} 
+			catch (Exception ex)
+			{
+				System.err.println("TransmissionConfigStepOne/FileGenerator/Message:" + ex.getMessage());
 			}
-			writer.close();
-		
-			PrintConsole.print("throughput inserted in file successfully.");
-		} 
-		catch (Exception ex)
+		}
+		else
 		{
-			System.err.println("TransmissionConfigStepOne/FileGenerator/Message:" + ex.getMessage());
-		}// TODO Auto-generated method stub
+			try
+			{
+				String fileName = "throughtput "+ Program.multiExecIndex +".txt";
+				String path = FILEOUTPUTPATH;
+				if(FILEOUTPUTPATH.equals("null")) {
+					path = FileGenerator.class.getResource("/output/").getPath();
+				}
+				BufferedWriter writer = new BufferedWriter(new FileWriter(path + fileName));
+				//int timeIndex = 0;
+				for (Double th : throughput)
+				{
+					writer.write(th +"");
+					//timeIndex++;
+					writer.newLine();
+				}
+				writer.close();
+			
+				PrintConsole.print("throughput inserted in file successfully.");
+			} 
+			catch (Exception ex)
+			{
+				System.err.println("TransmissionConfigStepOne/FileGenerator/Message:" + ex.getMessage());
+			}
+		}
 		
 	}
 
