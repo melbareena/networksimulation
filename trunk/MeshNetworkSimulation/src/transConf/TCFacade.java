@@ -26,12 +26,12 @@ public class TCFacade
 			PrintConsole.print("Tranmission Configuration Start.......");
 			multiExecIndex = Program.multiExecIndex;
 			TransmissionConfiguration	tc = new TransmissionConfiguration();
-			//if(newAlgortihm) {
+			if(newAlgortihm) 
 				configurations = tc.ConfiguringBenjamin(downOverUpRatio, alternateOrder,
 						repeatLinksToRespectRatio, enlargeByGateways);
-			//} else {
-			//	configurations = tc.Configuring();
-		//	}
+			else 
+				configurations = tc.Configuring();
+
 		}
 		return configurations;
 	}

@@ -114,7 +114,7 @@ public class DynamicTrafficGenerator {
 	 * @param routers The set of routers to generate uplink traffic for.
 	 * @return The traffic generated.
 	 */
-	protected UplinkTraffic generateTimeSlotUplinkTraffic(Set<Vertex> routers) {
+	private UplinkTraffic generateTimeSlotUplinkTraffic(Set<Vertex> routers) {
 		UplinkTraffic uplinkTraffic = new UplinkTraffic();
 		if(routers != null) {
 			for(Vertex router : routers) {
@@ -136,7 +136,7 @@ public class DynamicTrafficGenerator {
 	 * @param n The number of downlinks to consider per gateway (randomly chosen).
 	 * @return The traffic generated.
 	 */
-	protected DownlinkTraffic generateTimeSlotDownlinkTraffic(Set<Vertex> gateways,
+	private DownlinkTraffic generateTimeSlotDownlinkTraffic(Set<Vertex> gateways,
 			PathMap downlinks, int n) {
 		DownlinkTraffic downlinkTraffic = new DownlinkTraffic();
 		if(gateways != null) {
@@ -165,7 +165,7 @@ public class DynamicTrafficGenerator {
 	 * @param n The number of nodes to pick up.
 	 * @return A list of <code>n</code> randomly chosen.
 	 */
-	public Set<Vertex> pickUpRandomNodes(int n) {
+	private Set<Vertex> pickUpRandomNodes(int n) {
 		List<Vertex> shuffledList = Lists.newArrayList(ApplicationSettingFacade.Nodes.getNodes().values());
 		Collections.shuffle(shuffledList, this.randomGenerator);
 		return Sets.newHashSet(shuffledList.subList(0, n));
@@ -179,7 +179,7 @@ public class DynamicTrafficGenerator {
 	 * @return The number of arrivals, generated ramdomly following the Poisson law (<code>lambda</code>).
 	 * @see <a href="http://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables">D. Knuth algorithm</a>
 	 */
-	public static int getPoissonArrival(double lambda, Random r) {
+	private static int getPoissonArrival(double lambda, Random r) {
 	    double L = Math.exp(-lambda);
 	    int k = 0;
 	    double p = 1.0;

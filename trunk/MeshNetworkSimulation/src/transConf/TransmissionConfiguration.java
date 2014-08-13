@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
 import common.FileGenerator;
+import common.PrintConsole;
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
@@ -29,13 +31,14 @@ public class TransmissionConfiguration {
 	protected TransmissionConfiguration() {
 		InitiateVariable();
 	}
-		
+	
+	List<TCUnit> _TT = new ArrayList<>();
 	protected List<TCUnit> Configuring()
 	{
 		
 		TCUnit tConfUnit;
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
-		List<TCUnit> TT = new ArrayList<>();
+		
 	
 		while(ConsiderLinks.size() < numberOfLinks)
 		{	
@@ -69,7 +72,10 @@ public class TransmissionConfiguration {
 			//*****STEP TWO**************************************************************************
 			if(tConfUnit.size() > 0)
 			{
-				
+				_added_links_step1.clear();
+				TCUnit original = tConfUnit.Clone(); // copy the links which are added in first step
+													 // these links are the originals ones which must be checked at least one of 
+													 // them are in the updated TC after the phase 2 is ran.
 				
 				for(Vertex g : ApplicationSettingFacade.Gateway.getGateway().values())
 				{
@@ -81,14 +87,13 @@ public class TransmissionConfiguration {
 					if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0)
 						tConfUnit = addOutgoingLinks(tConfUnit, g);
 					//------------------------------------------------------------------------
-					
-					
+						
 					
 					//-------------------------PHASE 2----------------------------------------
 					if(tConfUnit.getCounter_g(g, LinkType.Incoming) == 0 )
-						tConfUnit = exchangeIncoming(tConfUnit, g);
+						tConfUnit = exchangeIncoming(tConfUnit, original, g);
 					//if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0 )
-					//	tConfUnit = exchangeOutgoing(tConfUnit, g);
+						//tConfUnit = exchangeOutgoing(tConfUnit, original, g);
 					//---------------------------------------------------------------------------
 			} 
 		}	
@@ -96,67 +101,26 @@ public class TransmissionConfiguration {
 			
 			//*******************************************SETP 3****************************************************
 			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.
-			//tConfUnit = Enlarge(tConfUnit);			
+			tConfUnit = Enlarge(tConfUnit);			
 			//*******************************************SETP 4****************************************************
 			tConfUnit = calcDataRate(tConfUnit);	
 			//*****************************************************************************************************		
-			TT.add(tConfUnit);
+			_TT.add(tConfUnit);
 			resetMARK();
 			
 		}	
 		
 		
-		FileGenerator.TransmissionConfige(TT);
-		FileGenerator.DataRate(TT);
-		return TT;
+		FileGenerator.TransmissionConfige(_TT);
+		FileGenerator.DataRate(_TT);
+		return _TT;
 	}
 
-/*	private TCUnit exchangeOutgoing(TCUnit tConfUnit, Vertex g)
-	{
-		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
-		Triple<Link,Link, Double> triple; // add,remove, sinr
-		
-		boolean canRemoveIncomingLink = false;
-		if(tConfUnit.getCounter_g(g, LinkType.Incoming) > 1)
-			canRemoveIncomingLink = true;
-		
-		List<Link> incmoimgLinks = TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Incoming);
-		
-		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing))
-		{
-			for(Link lprime : tConfUnit.getLinks())
-			{
-				if(!canRemoveIncomingLink && incmoimgLinks.contains(lprime)) continue;
-				List<Link> links = tConfUnit.getLinks();
-				links.remove(lprime);
-				links.add(link);
-				double sinr = SINR.calc(link, links);
-					
-				if(sinr <= BETA)
-				{
-					triple = new Triple<>(link, lprime, sinr);
-					tripleLists.add(triple);
-				}
-			}
-		}
-		
-		if(tripleLists.size() > 0 )
-		{
-			Triple<Link, Link, Double> Triple = minimizing(tripleLists);
-			tConfUnit.removeLink(Triple.getB());
-			ConsiderLinks.remove(Triple.getB());
-			tConfUnit.put(Triple.getA(), computeRate(Triple.getC()).getRate());
-									
-			System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE22222222");
-		}
-		
-		return tConfUnit;
-	}*/
-
+	private List<Link> _added_links_step1 =  new ArrayList<Link>();
 	
-
-	private TCUnit exchangeIncoming(TCUnit tConfUnit, Vertex g)
+	private TCUnit exchangeIncoming(TCUnit tConfUnit, TCUnit original, Vertex g)
 	{
+		System.out.println("SIZE:" + tConfUnit.size());
 		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
 		Triple<Link,Link, Double> triple; // add,remove, sinr
 		
@@ -164,14 +128,16 @@ public class TransmissionConfiguration {
 		if(tConfUnit.getCounter_g(g, LinkType.Outgoing) > 1)
 			canRemoveOutgoinglink = true;
 		
+		TCUnit copyTC = tConfUnit.Clone();
+		
 		List<Link> outgoingLinks = TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing);
 		
 		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Incoming))
 		{
-			for(Link lprime : tConfUnit.getLinks())
+			for(Link lprime : copyTC.getLinks())
 			{
 				if(!canRemoveOutgoinglink && outgoingLinks.contains(lprime)) continue;
-				List<Link> links = tConfUnit.getLinks();
+				List<Link> links = copyTC.getLinks();
 				links.remove(lprime);
 				links.add(link);
 				double sinr = SINR.calc(link, links);
@@ -183,18 +149,42 @@ public class TransmissionConfiguration {
 				}
 			}
 		}
-		
+		Link deletedLink = null;
 		if(tripleLists.size() > 0 )
 		{
-			Triple<Link, Link, Double> maxTriple = minimizing(tripleLists);
-			tConfUnit.removeLink(maxTriple.getB());
-			ConsiderLinks.remove(maxTriple.getB());
-			tConfUnit.put(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
+			Triple<Link, Link, Double> minTriple = minimizing(tripleLists);
+			copyTC.removeLink(minTriple.getB());
+			deletedLink = minTriple.getB();
+			copyTC.put(minTriple.getA(), computeRate(minTriple.getC()).getRate());
 									
-			System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-		}
 		
+		}
+		Set<Link> updatedLinks = new HashSet<Link>(copyTC.getLinks());
+		Set<Link> originalLinks = new HashSet<Link>(original.getLinks());
+		
+		updatedLinks.retainAll(originalLinks);
+		
+		if(updatedLinks.size() > 0 ) // check at least one of the original links 
+									 //(original link is the link which is already added by first phase) remains in 
+									 // in transmission configuration.
+		{
+			System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");		
+			removeFromConsiderList(deletedLink);
+			return copyTC;
+		}
+		System.out.println("No");
 		return tConfUnit;
+	}
+
+	private void removeFromConsiderList(Link deletedLink)
+	{
+		for (TCUnit unit : _TT)
+		{
+			if(unit.containsKey(deletedLink))
+				return;
+		}
+		ConsiderLinks.remove(deletedLink);
+		
 	}
 
 	private Triple<Link, Link, Double> minimizing(
@@ -557,7 +547,7 @@ public class TransmissionConfiguration {
 
 		if(this.checkRadio(newLink))
 		{
-			
+			if(!checkBalanceOfGateway(newLink,tConfig)) return null;
 			tPrime.put(newLink, 0);
 			tPrime.setTCAPZero();
 			
@@ -589,9 +579,48 @@ public class TransmissionConfiguration {
 			//this.tConfUnit.put(newLink, newConfUnit.getRate(newLink));
 			return tPrime;
 		} 	
-		return null;
+		return null;
+
+
 	}
 	
+ 	
+ 	/**
+ 	 * this method check if the new link is incoming or outgoing link to a gateway , the gateway do not have any IN or OUT
+ 	 * link to the gateway
+ 	 * @param tConfig 
+ 	 * @param a new link which wants to add the TC.
+ 	 * @return can be added or not
+ 	 */
+	private boolean checkBalanceOfGateway(Link newLink, TCUnit tConfig)
+	{
+	
+		for (Vertex gateway : 	ApplicationSettingFacade.Gateway.getGateway().values())
+		{
+			if(newLink.getDestination() != gateway && newLink.getSource() != gateway)
+				continue;
+			else 
+			{
+				if(newLink.getDestination() == gateway)
+				{
+					if(tConfig.getCounter_g(gateway, LinkType.Incoming) > 0)
+						return false;
+					else
+						return true;
+				}
+				else if(newLink.getSource() == gateway)
+				{
+					if(tConfig.getCounter_g(gateway, LinkType.Outgoing) > 0)
+						return false;
+					else
+						return true;
+				}
+			}
+				
+		}
+		return true;
+	}
+
 	/*
 	 * calculate all links' data rate in a transfer configuration 
 	 */
