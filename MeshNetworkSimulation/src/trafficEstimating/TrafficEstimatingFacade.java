@@ -115,7 +115,8 @@ public class TrafficEstimatingFacade
 	 * @param trafficGenerator The traffic generator used to add new traffic.
 	 * @return The updated <code>BufferMap</code>.
 	 */
-	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, DynamicTrafficGenerator trafficGenerator,
+	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, 
+			DynamicTrafficGenerator trafficGenerator,
 			int currentTimeslot) {
 		BufferMap bfMap = null;
 		//Creating a new BufferMap if the current one is null
