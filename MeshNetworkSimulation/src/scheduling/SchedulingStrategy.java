@@ -45,6 +45,10 @@ public abstract class SchedulingStrategy
 	
 	protected int instanceIndex;
 
+	/**Creates a new SchedulingStrategy. Initiates all the buffers in the network.
+	 * @param instanceIndex The instance index of the scheduling strategy.
+	 * Used when various scheduling strategy are run in a single instance of the program.
+	 */
 	public SchedulingStrategy(int instanceIndex) {
 		PrintConsole.printErr("Intiate Scheduling..........");
 		this.sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
@@ -59,6 +63,11 @@ public abstract class SchedulingStrategy
 		this.instanceIndex = instanceIndex;
 	}
 	
+	/**Schedules the different transmission configurations to dispose of the traffic
+	 * in the network. Some new traffic will be randomly generated during the
+	 * first time solts.
+	 * @return The results of the scheduling.
+	 */
 	public SchedulingResult staticScheduling() {
 		
 		trafficGenerator = "Static";
@@ -149,23 +158,24 @@ public abstract class SchedulingStrategy
 		return getResults();
 	}
 
-	/**Schedule the different transmission configurations to dispose of the traffic
-	* in the network. Some new traffic will be randomly generated during the
-	* first time solts.
-	* The number of timeslot during which some new traffic will be randomly generated
-	* is parsed from the XML configuration file.
-	* @return The results of the scheduling.
-	*/
+	/**Schedules the different transmission configurations to dispose of the traffic
+	 * in the network. Some new traffic will be randomly generated during the
+	 * first time solts.
+	 * The number of timeslot during which some new traffic will be randomly generated
+	 * is parsed from the XML configuration file.
+	 * @return The results of the scheduling.
+	 */
 	public SchedulingResult dynamicScheduling() {
 		this.dynamicScheduling(ApplicationSettingFacade.Traffic.getDuration());
 		return getResults();
 	}
 	
-	/**Schedule the different transmission configurations to dispose of the traffic
+	/**Schedules the different transmission configurations to dispose of the traffic
 	 * in the network. Some new traffic will be randomly generated during the
 	 * <code>durationOfTrafficGenerating</code> first time solts.
 	 * @param durationOfTrafficGenerating The number of timeslot during which
 	 * some new traffic will be randomly generated.
+	 * @return The results of the scheduling.
 	 */
 	public SchedulingResult dynamicScheduling(long durationOfTrafficGenerating) {
 		
@@ -266,8 +276,11 @@ public abstract class SchedulingStrategy
 		return getResults();
 	}
 	
-	/**Update the current traffic in the network. Some new packets may be added
-	 * to some source buffers randomly.
+	/**Updates the current traffic in the network.
+	 * Some new packets may be added to some source buffers randomly.
+	 * @param currentTimeSlot The current timeslot.
+	 * @return The amount of new traffic generated.
+	 * @see TrafficEstimatingFacade#getDynamicSourceBuffers(BufferMap, DynamicTrafficGenerator, int)
 	 */
 	protected double updateTraffic(int currentTimeSlot) {
 		double currentTrafficAmount = 0.0;
@@ -365,6 +378,11 @@ public abstract class SchedulingStrategy
 	
 	protected abstract Vector<Link> getBufferStrategy(boolean isSourceBuffer);
 	
+	/**Collects and returns the results of the scheduling.
+	 * This should only be used if the scheduling is over, otherwise
+	 * the results collected are not guaranteed.
+	 * @return The results of the scheduling.
+	 */
 	protected SchedulingResult getResults() {
 		SchedulingResult results = new SchedulingResult();
 		results.setSchedulingStrategy(getName());
@@ -383,6 +401,10 @@ public abstract class SchedulingStrategy
 		return results;
 	}
 	
+	/**Updates the progress bar of this scheduling,
+	 * indicating its current state at the current timeslot.
+	 * @param timeSlot The current timeslot.
+	 */
 	protected void updateProgress(int timeSlot) {
 		if (maxTrafficSource < 0) {
 			maxTrafficSource = sourceBuffers.trafficSize();
@@ -405,6 +427,9 @@ public abstract class SchedulingStrategy
 		}
 	}
 	
+	/**
+	 * @return The name of the scheduling strategy.
+	 */
 	protected abstract String getName();
 
 }
