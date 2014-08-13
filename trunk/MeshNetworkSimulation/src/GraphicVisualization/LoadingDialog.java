@@ -21,6 +21,10 @@ import java.util.List;
 
 import net.miginfocom.swing.MigLayout;
 
+/**
+ * @author Benjamin
+ *
+ */
 public class LoadingDialog extends JDialog {
 
 	private static final long serialVersionUID = 7227125764223986323L;
@@ -32,14 +36,14 @@ public class LoadingDialog extends JDialog {
 	private List<JLabel> labelList;
 	
 	/**
-	 * Create the dialog.
+	 * Creates the dialog.
 	 */
 	public LoadingDialog() {
 		setTitle("Loading...");
 		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setSize(500, 80);
-		setUndecorated(true);
+		setUndecorated(false);
 		
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -56,7 +60,7 @@ public class LoadingDialog extends JDialog {
 		setCursor(new Cursor(Cursor.WAIT_CURSOR));
 	}
 	
-	/**Update the Layout of the contentPane, with 2*<code>nBars</code> rows.
+	/**Updates the Layout of the contentPane, with 2*<code>nBars</code> rows.
 	 * @param nBars The number of progress bars the panel will contain.
 	 */
 	private void updateLayout(int nBars) {
@@ -67,7 +71,7 @@ public class LoadingDialog extends JDialog {
 		((MigLayout) contentPanel.getLayout()).setRowConstraints(rConstr.toString());
 	}
 	
-	/**Add a progress bar with its label to the dialog.
+	/**Adds a progress bar with its label to the dialog.
 	 * @return The index of the progress bar added.
 	 */
 	public int addBar() {
@@ -106,7 +110,7 @@ public class LoadingDialog extends JDialog {
 		return barIndex;
 	}
 	
-	/**Remove the specified progress bar and its label from the dialog.
+	/**Removes the specified progress bar and its label from the dialog.
 	 * @param barIndex The index of the bar to remove.
 	 */
 	public void removeBar(int barIndex) {

@@ -149,21 +149,18 @@ public class StartOptionsDialog extends JDialog {
 	private final JPanel schedulingPanel = new JPanel();
 	private final JComboBox schedulingComboBox = new JComboBox();
 	private final JLabel lblStrategy_1 = new JLabel("Strategy:");
-	
-	
 	private final JButton defaultButton = new JButton("Use Default and Run");
+	private String configFile;
+	private final JPanel trafficLabelPanel = new JPanel();
+	private final JRadioButton rdbtnStatic = new JRadioButton("Static");
+	private final JRadioButton rdbtnDynamic = new JRadioButton("Dynamic");
+	private final ButtonGroup groupTraffic = new ButtonGroup();
 	
 	private GatewaysEditOptionDialog gatewaysDialog;
 	private RoutersEditOptionDialog routersDialog;
 	private IFactorEditOptionDialog ifactorDialog;
 	private DatarateEditOptionDialog datarateDialog;
 	private SINREditOptionDialog sinrDialog;
-	
-	private String configFile;
-	private final JPanel trafficLabelPanel = new JPanel();
-	private final JRadioButton rdbtnStatic = new JRadioButton("Static");
-	private final JRadioButton rdbtnDynamic = new JRadioButton("Dynamic");
-	private final ButtonGroup groupTraffic = new ButtonGroup();
 
 	/**
 	 * Create the dialog.
@@ -221,41 +218,68 @@ public class StartOptionsDialog extends JDialog {
 		/*-------------*/
 		/* Environment */
 		/*-------------*/
-		lblEnvironment.setHorizontalAlignment(SwingConstants.TRAILING);
-		contentPanel.add(lblEnvironment, "cell 0 0,grow");
-		
-		contentPanel.add(environmentPanel, "cell 1 0,growx,aligny center");
-		environmentPanel.setLayout(new MigLayout("insets 0 0 0 0", "[min!][150px]", "[25px][25px]"));
-		environmentPanel.add(lblX);
-		
-		envXSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
-		environmentPanel.add(envXSpinner, "wrap,grow");
-		environmentPanel.add(lblY);
-		envYSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
-		environmentPanel.add(envYSpinner, "grow");
-		
-		contentPanel.add(lblSchedulingStrategy, "flowy,cell 2 0,alignx trailing");
 		{
-			lblGateways.setHorizontalAlignment(SwingConstants.TRAILING);
+			lblEnvironment.setHorizontalAlignment(SwingConstants.TRAILING);
+			contentPanel.add(lblEnvironment, "cell 0 0,grow");
+			
+			contentPanel.add(environmentPanel, "cell 1 0,growx,aligny center");
+			environmentPanel.setLayout(new MigLayout("insets 0 0 0 0", "[min!][150px]", "[25px][25px]"));
+			environmentPanel.add(lblX);
+			
+			envXSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
+			environmentPanel.add(envXSpinner, "wrap,grow");
+			environmentPanel.add(lblY);
+			envYSpinner.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(1), null, new Integer(1)));
+			environmentPanel.add(envYSpinner, "grow");
 		}
-		
+
 		/*----------*/
 		/* Gateways */
 		/*----------*/
-		
-		contentPanel.add(schedulingPanel, "cell 3 0,grow");
-		schedulingPanel.setLayout(new MigLayout("", "[grow]", "[grow]"));
-		schedulingComboBox.setMaximumRowCount(3);
-		schedulingComboBox.setModel(new DefaultComboBoxModel(new String[] {"Normal", "Round Robin", "Back Pressure"}));
-		schedulingComboBox.setSelectedIndex(1);
-		
-		schedulingPanel.add(schedulingComboBox, "cell 0 0,growx,aligny center");
-		contentPanel.add(lblOutput, "cell 0 1,alignx trailing,aligny center");
-		outputFolderPathTextField.setFont(new Font("Tahoma", Font.ITALIC, 11));
-		outputFolderPathTextField.setText("Output folder...");
-		outputFolderPathTextField.setEditable(false);
-		outputFolderPathTextField.setColumns(10);	
 		{
+			lblGateways.setHorizontalAlignment(SwingConstants.TRAILING);
+			contentPanel.add(lblGateways, "cell 2 1,grow");
+			
+			contentPanel.add(gatewaysPanel, "cell 3 1,growx,aligny center");
+			gatewaysPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
+			
+			gatewaysPanel.add(gatewaysTextField, "cell 0 0,grow");
+			gatewaysButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					gatewaysDialog.showDialog(true);
+				}
+			});
+			gatewaysPanel.add(gatewaysButton, "cell 1 0,alignx center,aligny center");
+		}
+		
+		/*------------*/
+		/* Scheduling */
+		/*------------*/
+		{
+			contentPanel.add(schedulingPanel, "cell 3 0,grow");
+			schedulingPanel.setLayout(new MigLayout("", "[grow]", "[grow]"));
+			
+			schedulingComboBox.setMaximumRowCount(3);
+			schedulingComboBox.setModel(new DefaultComboBoxModel(new String[] {"Normal", "Round Robin", "Back Pressure"}));
+			schedulingComboBox.setSelectedIndex(1);
+			
+			schedulingPanel.add(schedulingComboBox, "cell 0 0,growx,aligny center");
+			
+			contentPanel.add(lblSchedulingStrategy, "flowy,cell 2 0,alignx trailing");
+			contentPanel.add(lblStrategy_1, "cell 2 0,alignx trailing");
+		}
+
+		
+		/*--------*/
+		/* Output */
+		/*--------*/
+		{
+			contentPanel.add(lblOutput, "cell 0 1,alignx trailing,aligny center");
+			
+			outputFolderPathTextField.setFont(new Font("Tahoma", Font.ITALIC, 11));
+			outputFolderPathTextField.setText("Output folder...");
+			outputFolderPathTextField.setEditable(false);
+			outputFolderPathTextField.setColumns(10);	
 			
 			contentPanel.add(outputPanel, "cell 1 1,grow");
 			outputPanel.setLayout(new MigLayout("insets 0 0 0 0", "[5][150px][min!]", "[][23px]"));
@@ -278,24 +302,6 @@ public class StartOptionsDialog extends JDialog {
 			btnOutput.setEnabled(false);
 			outputPanel.add(btnOutput, "cell 2 1,growx,aligny top");
 		}
-		{
-			contentPanel.add(lblGateways, "cell 2 1,grow");
-			
-			contentPanel.add(gatewaysPanel, "cell 3 1,growx,aligny center");
-			gatewaysPanel.setLayout(new MigLayout("", "[grow][min!]", "[min!]"));
-			
-			gatewaysPanel.add(gatewaysTextField, "cell 0 0,grow");
-			gatewaysButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					gatewaysDialog.showDialog(true);
-				}
-			});
-			gatewaysPanel.add(gatewaysButton, "cell 1 0,alignx center,aligny center");
-		}
-		
-		/*--------*/
-		/* Output */
-		/*--------*/
 		
 		/*---------*/
 		/* Routers */
@@ -350,7 +356,6 @@ public class StartOptionsDialog extends JDialog {
 					updateTrafficPanel(rdbtnDynamic.isSelected(), false);
 				}
 			});
-			
 			
 			trafficLabelPanel.add(rdbtnDynamic, "cell 0 2,alignx right,growy");
 			
@@ -604,8 +609,6 @@ public class StartOptionsDialog extends JDialog {
 			
 			channelsPanel.add(channelStrategyComboBox, "cell 1 2,grow");
 		}
-		
-		contentPanel.add(lblStrategy_1, "cell 2 0,alignx trailing");
 
 		/*---------*/
 		/* Buttons */

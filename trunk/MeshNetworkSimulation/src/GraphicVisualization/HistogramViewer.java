@@ -52,9 +52,9 @@ import dataStructure.SchedulingResult;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.TypeOfGenerationEnum;
 
-/**
+/**A frame to view the main results of the scheduling.
+ * 
  * @author Benjamin
- *
  */
 public class HistogramViewer extends JFrame {
 
@@ -102,8 +102,9 @@ public class HistogramViewer extends JFrame {
 	
 	public final ValueMarker meanThroughput;
 	
-	/**
-	 * Create the frame.
+	/**Creates the frame and collect the data.
+	 * @param results The results from the scheduling.
+	 * @param step The step that will be used to draw the graph.
 	 */
 	public HistogramViewer(SchedulingResult results, int step) {
 		this.self = this;		
@@ -134,6 +135,8 @@ public class HistogramViewer extends JFrame {
         meanThroughput = new ValueMarker(sum / ApplicationSettingFacade.Traffic.getDuration());
 	}
 	
+	/**Shows the graph and build all the components in the frame.
+	 */
 	public void showGraph() {
 		drawGraph(dataThroughput, stepThroughput, dataSource, stepSource, dataTransmit, stepTransmit);
 		
@@ -142,6 +145,8 @@ public class HistogramViewer extends JFrame {
 		buildToolBar();
 	}
 	
+	/**Builds the menu bar of the frame.
+	 */
 	private void buildMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -245,6 +250,12 @@ public class HistogramViewer extends JFrame {
 		cPanel.setPopupMenu(null);
 	}
 	
+	/**Builds a display menu for a given plot (<code>target</code>), with the gven <code>index</code>.
+	 * The returned menu will contain various options to interact with the plot.
+	 * @param target The target plot.
+	 * @param index The index of the target plot.
+	 * @return The built menu.
+	 */
 	private JMenu buildMenuDisplay(final String target, final int index) {
 		JMenu menu = new JMenu(target);
 		
@@ -289,7 +300,7 @@ public class HistogramViewer extends JFrame {
 						updateDataset((DefaultXYDataset)datasetField.get(self),
 								target,
 								(Vector<Double>) dataField.get(self),
-								stepField.getInt(self), 0);
+								stepField.getInt(self));
 					}
 				} catch (NumberFormatException ex) {
 					GraphViewer.showErrorDialog("Error "+ex.getClass(), ex.getClass()+": "+s+
@@ -403,6 +414,8 @@ public class HistogramViewer extends JFrame {
 		return menu;
 	}
 	
+	/**Builds the toolbar of the frame.
+	 */
 	private void buildToolBar() {
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
@@ -439,6 +452,14 @@ public class HistogramViewer extends JFrame {
 		toolBar.add(lblInfos);
 	}
 	
+	/**Draws the graph with the given data.
+	 * @param throughputData The values for the throughput plot.
+	 * @param stepThroughput The step for the throughput plot.
+	 * @param sourceData The values for the source buffers plot.
+	 * @param stepSource The step for the source buffers plot.
+	 * @param transmitData The values for the transmit buffers plot.
+	 * @param stepTransmit The step for the transmit buffers plot.
+	 */
 	private void drawGraph(Vector<Double> throughputData, int stepThroughput,
 			Vector<Double> sourceData, int stepSource,
 			Vector<Double> transmitData, int stepTransmit) {
@@ -448,18 +469,18 @@ public class HistogramViewer extends JFrame {
 
 		/* Throughput data */
 		datasetThroughput = new DefaultXYDataset();
-		updateDataset(datasetThroughput, "Throughput", throughputData, stepThroughput, 20);
+		updateDataset(datasetThroughput, "Throughput", throughputData, stepThroughput);
 		
 		/* Source buffers data */
 		datasetSource = new DefaultXYDataset();
 		if(sourceData != null) {
-			updateDataset(datasetSource, "Source Traffic", sourceData, stepSource, 20);
+			updateDataset(datasetSource, "Source Traffic", sourceData, stepSource);
 		}
 		
 		/* Transmit buffers data */
 		datasetTransmit = new DefaultXYDataset();
 		if(transmitData != null) {
-			updateDataset(datasetTransmit, "Transmit Traffic", transmitData, stepTransmit, 20);
+			updateDataset(datasetTransmit, "Transmit Traffic", transmitData, stepTransmit);
 		}
 		
 		System.out.println("Finished, displaying...");
@@ -556,7 +577,14 @@ public class HistogramViewer extends JFrame {
 		this.repaint();
 	}
 	
-	private double[][] collectData(Vector<Double> data, int step, int progress) {
+	/**Collects the data from a single column vector, averaging the values with
+	 * the given <code>step</code>, and puts them into an XY 2-dimension array.
+	 * @param data The data vector to collect values from.
+	 * @param step The step for averaging.
+	 * @return A 2-dimension array where 1st dimension contains X values, and
+	 * 2nd dimension contains Y values.
+	 */
+	private double[][] collectData(Vector<Double> data, int step) {
 		int size = (int) Math.floor((double)data.size() / (double)step);
 		double[][] dataArray = new double[2][size];
 		int index = 0;
@@ -573,12 +601,24 @@ public class HistogramViewer extends JFrame {
 		return dataArray;
 	}
 	
+	/**Updates the given dataset with the given <code>data</code>,
+	 * averaging at the given <code>step</code>.
+	 * @param ds The dataset to update.
+	 * @param serieKey The name of the serie to update.
+	 * @param data The data to put into the serie.
+	 * @param step The averaging step for collecting the data.
+	 */
 	private void updateDataset(DefaultXYDataset ds, String serieKey,
-			Vector<Double> data, int step, int progress) {
+			Vector<Double> data, int step) {
 		ds.removeSeries(serieKey);
-		ds.addSeries(serieKey, collectData(data, step, progress));
+		ds.addSeries(serieKey, collectData(data, step));
 	}
 	
+	/**Changes the colors of the plot (given by its <code>index</code>) for
+	 * the given <code>color</code>.
+	 * @param index The index of the plot to change color.
+	 * @param color The color to change to.
+	 */
 	private void changeColor(int index, Color color) {
 		XYPlot plot = chart.getXYPlot();
 		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(index);

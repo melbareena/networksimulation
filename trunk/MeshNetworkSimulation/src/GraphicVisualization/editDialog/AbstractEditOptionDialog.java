@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
@@ -18,7 +17,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -30,7 +28,10 @@ import javax.swing.table.JTableHeader;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.StartOptionsDialog;
 
-@SuppressWarnings("unused")
+/**
+ * @author Benjamin
+ *
+ */
 public abstract class AbstractEditOptionDialog extends JDialog {
 	
 	private static final long serialVersionUID = -6656614289121355978L;

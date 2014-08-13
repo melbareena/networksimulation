@@ -32,7 +32,7 @@ public class ColorViewer extends JDialog {
 	
 	public static enum ColorType {Links, Channels};
 
-	/** Create the dialog.
+	/** Creates the dialog.
 	 */
 	public ColorViewer(GraphViewer frame, ColorType ct) {
 		super(frame, false);
@@ -119,9 +119,9 @@ public class ColorViewer extends JDialog {
 	}
 	
 	
-	/** Update the dialog content given the type of the coloring 
+	/** Updates the dialog content given the type of the coloring 
 	 * scheme currently used.
-	 * @param ct the type of the coloring scheme currently used
+	 * @param ct The type of the coloring scheme currently used.
 	 */
 	public void updateContent(ColorType ct) {
 		getContentPane().removeAll();
