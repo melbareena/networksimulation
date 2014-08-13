@@ -70,7 +70,7 @@ public class StartOptionsDialog extends JDialog {
 	private final JCheckBox chckbxAlternateOrder = new JCheckBox("Alternate order");
 	private final JCheckBox chckbxRepeatLinksTo = new JCheckBox("Repeat links to ensure ratio");
 	private final JCheckBox chckbxEnlargeByGateways = new JCheckBox("Enlarge by gateways");
-	private final JRadioButton rdbtnNewAlgorithm = new JRadioButton("New algorithm");
+	private final JRadioButton rdbtnNewAlgorithm = new JRadioButton("Pattern Based");
 	private final JLabel lblAlgorithm = new JLabel("TC Algorithms:");
 	private final JLabel lblEnvironment = new JLabel("Environment:");
 	private final JPanel environmentPanel = new JPanel();
@@ -476,7 +476,7 @@ public class StartOptionsDialog extends JDialog {
 			contentPanel.add(rdbtnPanel, "cell 1 5,alignx left,growy");
 			rdbtnPanel.setLayout(new GridLayout(2, 0, 0, 0));
 			
-			JRadioButton rdbtnOriginal = new JRadioButton("Original algorithm");
+			JRadioButton rdbtnOriginal = new JRadioButton("Original");
 			rdbtnPanel.add(rdbtnOriginal);
 	
 			rdbtnNewAlgorithm.addItemListener(new ItemListener() {
