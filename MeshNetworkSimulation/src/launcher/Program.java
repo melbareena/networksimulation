@@ -26,6 +26,10 @@ public class Program {
 
 	private static int numberOfExecution = 1;
 	
+	/**
+	 * @return A string containing the current available channels,
+	 * depending on the current instance index of the program.
+	 */
 	public static String getAvailableChannels() {
 		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
 			return ApplicationSettingFacade.Channel.getChannelMode().name();
@@ -46,6 +50,8 @@ public class Program {
 		return str;
 	}
 
+	/**Ends and restarts the application in the JVM.
+	 */
 	public static void restartApplication() {
 		try {
 			StringBuilder cmd = new StringBuilder();
@@ -66,6 +72,10 @@ public class Program {
 		}
 	}
 
+	/**Show the options dialog for the user to select the program parameters.
+	 * @param args -
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -76,6 +86,8 @@ public class Program {
 		startOptionDialog.setVisible(true);
 	}
 
+	/**Launch the program with the selected parameters.
+	 */
 	public static void launch() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());

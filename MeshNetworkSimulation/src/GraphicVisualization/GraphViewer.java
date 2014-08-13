@@ -163,7 +163,7 @@ public class GraphViewer extends JFrame {
 	
 	public static String _availableChannels; 
  
-	/** Initiate and show the Frame.
+	/** Initiates and show the Frame.
 	 * @param throughputData The data for the throughput plot.
 	 */
 	public GraphViewer(SchedulingResult results, String availableChannels, int instanceIndex) {
@@ -297,7 +297,7 @@ public class GraphViewer extends JFrame {
 				"Done!");
     }
 	
-	/** Build the bottom panel of the frame 
+	/** Builds the bottom panel of the frame 
 	 */
 	protected void buildBottomPanel() {
 		JScrollPane scrollPaneBottom = new JScrollPane();
@@ -596,7 +596,7 @@ public class GraphViewer extends JFrame {
 		bottomPanel.add(Box.createHorizontalGlue());
 	}
 
-	/** Build the menu of the frame 
+	/** Builds the menu of the frame 
 	 */
 	protected void buildMenu() {
 		
@@ -877,7 +877,7 @@ public class GraphViewer extends JFrame {
 		
 	}
 	
-	/** Get the data computed by the program and fill the graph object
+	/** Gets the data computed by the program and fill the graph object
 	 */
 	protected void getDataAndFillGraph() {
 		this.graph.getModel().beginUpdate();
@@ -894,7 +894,7 @@ public class GraphViewer extends JFrame {
 		}
 	}
 	
-	/** Hide all the links showing
+	/** Hides all the links showing
 	 */
 	protected void hideAllLinks() {
 		for(int id : GraphViewer.mapEdges.keySet()) {
@@ -902,7 +902,7 @@ public class GraphViewer extends JFrame {
 		}
 	}
 	
-	/** Show the links supposed to be shown and hide the others.
+	/** Shows the links supposed to be shown and hide the others.
 	 * (Based on the Checkboxes checked by the user)
 	 */
 	protected void updateShowingLinks() {
@@ -923,7 +923,7 @@ public class GraphViewer extends JFrame {
 		}
 	}
 
-	/** Update the label of each showing link on the graph.
+	/** Updates the label of each showing link on the graph.
 	 * (Based on the Checkboxes checked by the user)
 	 */
 	protected void updateLabels() {
@@ -953,7 +953,7 @@ public class GraphViewer extends JFrame {
 		}
 	}
 	
-	/** Update the style of the link and their label on the graph.
+	/** Updates the style of the link and their label on the graph.
 	 * (Based on the Checkboxes checked by the user)
 	 */
 	protected void updateStyle() {
@@ -995,7 +995,7 @@ public class GraphViewer extends JFrame {
 		}
 	}
 	
-	/** Fill the map containing the edges, and add them to the graph
+	/** Fills the map containing the edges, and add them to the graph
 	 * @see GraphViewer#mapVertices
 	 */
 	protected void fillMapNodes() {
@@ -1013,7 +1013,7 @@ public class GraphViewer extends JFrame {
 		}
 	}	
 	
-	/** Fill the map containing the transmission configurations and
+	/** Fills the map containing the transmission configurations and
 	 * the map containing the datarates
 	 * @see GraphViewer#mapConfigurations
 	 * @see GraphViewer#mapDatarates
@@ -1032,7 +1032,7 @@ public class GraphViewer extends JFrame {
 		}
 	}
 	
-	/** Fill the map containing the edges, and add them to the graph
+	/** Fills the map containing the edges, and add them to the graph
 	 * @see GraphViewer#mapEdges
 	 */
 	protected void fillMapEdges() {
@@ -1064,10 +1064,10 @@ public class GraphViewer extends JFrame {
 		}
 	}	
 	
-	/** Save the <code>component</code> as an Image : JPEG, PNG or BMP.
-	 * Show a save dialog, and handle the user request.
-	 * @param component the component to save
-	 * @param title the title for the save window (Save the ... as)
+	/** Saves the <code>component</code> as an Image : JPEG, PNG or BMP.
+	 * Shows a save dialog, and handle the user request.
+	 * @param component The component to save.
+	 * @param title The title for the save window (Save the ... as).
 	 */
 	public static void saveImage(Component component, String title) {
 		BufferedImage im = new BufferedImage(component.getWidth(), component.getHeight(),
@@ -1163,8 +1163,8 @@ public class GraphViewer extends JFrame {
 		}
 	}
 	
-	/** Save the graphComponent for all the configurations as an Image.
-	 * Show a save dialog, and handle the user request. 
+	/** Saves the graphComponent for all the configurations as an Image.
+	 * Shows a save dialog, and handle the user request. 
 	 */
 	protected void saveAllConfigurations() {
 		int result = JOptionPane.showConfirmDialog(this,
@@ -1246,9 +1246,9 @@ public class GraphViewer extends JFrame {
         }
 	}
 	
-	/** Display all the childs from the cell parent (console)
-	 * @param parent the parent cell
-	 * @param indent a String to indent from
+	/** Displays all the childs from the cell parent (console).
+	 * @param parent The parent cell.
+	 * @param indent A String to indent from.
 	 */
 	protected void displayModel(mxCell parent, String indent) {
 		System.out.println(indent+parent.getValue()+"("+parent.getClass().getName()+")");
@@ -1259,16 +1259,16 @@ public class GraphViewer extends JFrame {
 		}
 	}
  
-	/** Show an error panel with a default title and a given message
-	 * @param message the error message
+	/** Shows an error panel with a default title and a given message.
+	 * @param message The error message.
 	 */
 	public static void showErrorDialog(String message) {
 		showErrorDialog("Error", message);
 	}
 	
-	/** Show an error panel with the given title and message
-	 * @param title the title of the error panel
-	 * @param message the error message
+	/** Shows an error panel with the given title and message.
+	 * @param title The title of the error panel.
+	 * @param message The error message.
 	 */
 	public static void showErrorDialog(String title, String message) {
 		JOptionPane.showMessageDialog(null,

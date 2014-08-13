@@ -10,7 +10,6 @@ import java.util.Set;
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
 import common.FileGenerator;
-import common.PrintConsole;
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
