@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import com.google.common.collect.Maps;
-
 import launcher.Program;
 import common.FileGenerator;
 import trafficEstimating.TrafficEstimatingFacade;
