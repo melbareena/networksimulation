@@ -74,7 +74,6 @@ public class Buffer {
 		return "Packet size:" + packets.size() + ", Traffic:" + this.size();
 	}
 	
-	/*TODO*/
 	/**Return a map containing the list of packet for a given destination.
 	 * @return A map containing the list of packet for a given destination.
 	 */
@@ -97,7 +96,7 @@ public class Buffer {
 	public double getTrafficTowardDestination(Vertex destination) {
 		double totalTraffic = 0.0;
 		Map<Vertex, List<Packet>> map = getPacketDestinationMap();
-		if(!map.containsKey(destination)) {
+		if(!map.containsKey(destination)) { 
 			return 0.0;
 		} else {
 			for(Packet p : map.get(destination)) {

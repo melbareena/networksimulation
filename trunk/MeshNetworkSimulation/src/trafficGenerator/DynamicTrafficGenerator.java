@@ -19,7 +19,7 @@ import dataStructure.Traffic;
 import dataStructure.UplinkTraffic;
 import dataStructure.Vertex;
 
-/** Produce dynamic traffic for the network, with poisson arrival for the packets.
+/** Produces dynamic traffic for the network, with poisson arrival for the packets.
  * @author Benjamin
  * @version 1.1
  */
@@ -50,7 +50,7 @@ public class DynamicTrafficGenerator {
 	 * downlink traffic than uplink traffic. */
 	private int downOverUpRatio;
 	
-	/**Create a DynamicTrafficGenerator with the given <code>trafficRate</code>,
+	/**Creates a DynamicTrafficGenerator with the given <code>trafficRate</code>,
 	 * considering a given number of nodes at each time slot.<br/>
 	 * All links are considered fairly, with the given <code>downOverUpRatio</code>.
 	 * @param trafficRate The mean traffic rate of the network.
@@ -70,7 +70,7 @@ public class DynamicTrafficGenerator {
 		this.downOverUpRatio = downOverUpRatio;
 	}
 	
-	/**Create a DynamicTrafficGenerator with the parameter specified in the XML
+	/**Creates a DynamicTrafficGenerator with the parameter specified in the XML
 	 * config file.
 	 */
 	public DynamicTrafficGenerator() {
@@ -80,7 +80,7 @@ public class DynamicTrafficGenerator {
 				ApplicationSettingFacade.Traffic.getRatio());
 	}
 	
-	/**Generate some traffic in the network for {@link DynamicTrafficGenerator#nodesToConsider n}
+	/**Generates some traffic in the network for {@link DynamicTrafficGenerator#nodesToConsider n}
 	 * randomly selected nodes, and respecting the
 	 * {@link DynamicTrafficGenerator#downOverUpRatio given ratio}.
 	 * @param uplinks The uplinks to consider.
@@ -108,7 +108,7 @@ public class DynamicTrafficGenerator {
 		return new Traffic(uplinkTraffic, downlinkTraffic);
 	}
 	
-	/**Generate some traffic for the given <code>routers</code>.<br/>
+	/**Generates some traffic for the given <code>routers</code>.<br/>
 	 * The traffic is generated following a Poisson law, generating an amount
 	 * of traffic independently for each router.
 	 * @param routers The set of routers to generate uplink traffic for.
@@ -127,7 +127,7 @@ public class DynamicTrafficGenerator {
 		return uplinkTraffic;
 	}
 	
-	/**Generate some traffic for the given <code>gateways</code>, considering
+	/**Generates some traffic for the given <code>gateways</code>, considering
 	 * <code>n</code> of their links.<br/>
 	 * The traffic is generated following a Poisson law, generating an amount
 	 * of traffic independently for each router reachable by each gateway.
@@ -160,7 +160,7 @@ public class DynamicTrafficGenerator {
 		return downlinkTraffic;
 	}
 	
-	/**Pick up randomly <code>n</code> nodes from the set of all nodes,
+	/**Picks up randomly <code>n</code> nodes from the set of all nodes,
 	 * and return them.
 	 * @param n The number of nodes to pick up.
 	 * @return A list of <code>n</code> randomly chosen.
@@ -171,7 +171,7 @@ public class DynamicTrafficGenerator {
 		return Sets.newHashSet(shuffledList.subList(0, n));
 	}
 	
-	/**Generate randomly a number of Poisson arrivals, given the <code>lambda</code> parameter.
+	/**Generates randomly a number of Poisson arrivals, given the <code>lambda</code> parameter.
 	 * <br/>Note: Based on Knuth algorithm.
 	 * @param lambda The lambda parameter for the Poisson distribution used, corresponding to
 	 * the average number of arrivals in a given time interval.
