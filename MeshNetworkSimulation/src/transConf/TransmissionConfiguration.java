@@ -245,6 +245,7 @@ public class TransmissionConfiguration {
 		}
 		return minTriple;
 	}
+	
 	private TCUnit addIncomingLinks(TCUnit tConfUnit, Vertex g)
 	{
 		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Incoming))
@@ -259,6 +260,7 @@ public class TransmissionConfiguration {
 		}
 		return tConfUnit;
 	}
+	
 	private TCUnit addOutgoingLinks(TCUnit tConfUnit, Vertex g)
 	{
 		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing))

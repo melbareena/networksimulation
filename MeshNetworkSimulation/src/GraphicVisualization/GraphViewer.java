@@ -416,7 +416,7 @@ public class GraphViewer extends JFrame {
 				updateStyle();
 			}
 		});
-		rdbtnColorByLink.setSelected(true);
+		rdbtnColorByLink.setSelected(false);
 		colorPanel.add(rdbtnColorByLink);
 		
 		JButton buttonColorViewer = new JButton("Color viewer");
@@ -436,7 +436,7 @@ public class GraphViewer extends JFrame {
 				updateStyle();
 			}
 		});
-		rdbtnColorByChannel.setSelected(false);
+		rdbtnColorByChannel.setSelected(true);
 		colorPanel.add(rdbtnColorByChannel);	
 		
 		ButtonGroup groupColor = new ButtonGroup();
@@ -590,6 +590,12 @@ public class GraphViewer extends JFrame {
 		ButtonGroup groupConfig = new ButtonGroup();
 		groupConfig.add(rdbtnAllLinks);
 		groupConfig.add(rdbtnConfiguration);
+		
+		//configurationsPanel.add(Box.createVerticalGlue());
+		
+		JLabel nbConfigLabel = new JLabel(mapConfigurations.size()+" configs available");
+		nbConfigLabel.setFont(nbConfigLabel.getFont().deriveFont(Font.ITALIC, 9.0F));
+		configurationsPanel.add(nbConfigLabel);
 		
 		configurationsPanel.add(Box.createVerticalGlue());
 		
