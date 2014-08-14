@@ -2,6 +2,8 @@ package dataStructure;
 
 import java.util.Vector;
 
+import setting.ApplicationSettingFacade;
+
 public class SchedulingResult {
 	
 	private Vector<Double> throughputData;
@@ -72,6 +74,14 @@ public class SchedulingResult {
 
 	public void setAveragePacketDelay(double averagePacketsDelay) {
 		this.averagePacketDelay = averagePacketsDelay;
+	}
+	
+	public double getAverageThroughputInSteadyState() {
+		double sum = 0.0;
+        for(int i = 0; i < ApplicationSettingFacade.Traffic.getDuration(); i++) {
+        	sum += throughputData.get(i);
+        }
+        return sum / ApplicationSettingFacade.Traffic.getDuration();
 	}
 
 }

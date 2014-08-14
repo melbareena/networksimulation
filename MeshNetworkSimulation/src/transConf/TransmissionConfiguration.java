@@ -1,23 +1,27 @@
 package transConf;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 
 import setting.ApplicationSettingFacade;
-import topology.TopologyFacade;
 import topology2graph.TopologyGraphFacade;
 import trafficEstimating.TrafficEstimatingFacade;
+import cAssignment.ChannelAssignmentFacade;
 import common.FileGenerator;
+import dataStructure.Channel;
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
 import dataStructure.LinkType;
 import dataStructure.TCUnit;
-import dataStructure.TopologyGraph;
 import dataStructure.Triple;
 import dataStructure.Vertex;
 
@@ -296,15 +300,15 @@ public class TransmissionConfiguration {
 	 * @see TransmissionConfiguration#remainingLinksStep(List, HashSet, boolean, List, int)
 	 * @param downOverUpRatio the ratio for the number of downlinks, over the number
 	 * of uplinks by configuration
-	 * @param alternateOrder specify whether or not the order of selecting links by
-	 * the amount of traffic should be alterned
+	 * @param priorityToOrthogonal specify whether or not orhtognoal links should be considered
+	 * with priority over overlapping links
 	 * @param repeatLinksToRespectRatio specify whether or not links can be repeated in
 	 * more than one configuration to respect the ratio
 	 * @param enlargeByGateways specify whether or not the enlarge algortihm should focus
 	 * on gateways links
 	 * @return the list of transmission configurations created
 	 */
-	protected List<TCUnit> ConfiguringBenjamin(int downOverUpRatio, boolean alternateOrder,
+	protected List<TCUnit> ConfiguringBenjamin(int downOverUpRatio, boolean priorityToOrthogonal,
 			boolean repeatLinksToRespectRatio, boolean enlargeByGateways) 
 	{
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
@@ -313,7 +317,7 @@ public class TransmissionConfiguration {
 		
 		HashSet<Link> selectedLinksSet = new HashSet<Link>();
 		
-		List<TCUnit> patterns = gatewaysStep(gateways, downOverUpRatio, alternateOrder,
+		List<TCUnit> patterns = gatewaysStep(gateways, downOverUpRatio, priorityToOrthogonal,
 				selectedLinksSet, repeatLinksToRespectRatio);
 		
 		System.out.println("Number of patterns: "+patterns.size());
@@ -332,8 +336,8 @@ public class TransmissionConfiguration {
 	 * @param gateways the list of gateways
 	 * @param downOverUpRatio the ratio for the number of downlinks, over the number
 	 * of uplinks by configuration
-	 * @param alternateOrder specify whether or not the order of selecting links by
-	 * the amount of traffic should be alterned
+	 * @param priorityToOrthogonal specify whether or not orhtognoal links should be considered
+	 * with priority over overlapping links
 	 * @param selectedLinksSet the set of links selected, in other words the links
 	 * already in at least 1 configuration
 	 * @param repeatLinksToRespectRatio specify whether or not links can be repeated in
@@ -341,7 +345,7 @@ public class TransmissionConfiguration {
 	 * @return the list of transmission configurations created
 	 */
 	protected List<TCUnit> gatewaysStep(List<Vertex> gateways, int downOverUpRatio,
-			boolean alternateOrder, HashSet<Link> selectedLinksSet,
+			boolean priorityToOrthogonal, HashSet<Link> selectedLinksSet,
 			boolean repeatLinksToRespectRatio) {
 		List<TCUnit> listTCU = new ArrayList<TCUnit>();
 		int downlinksNumber = 0;
@@ -361,36 +365,26 @@ public class TransmissionConfiguration {
 				List<Link> downlinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Outgoing);
 				List<Link> uplinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Incoming);
 				
-				boolean reverseOrder = false; 
-				// Alternate the link sorting by traffic
-				Set<Link> downlinksKeySet;
-				if(reverseOrder) {
-					downlinksKeySet = LinksTraffic.Sort().descendingKeySet();
-					reverseOrder = false;
-				} else {
-					downlinksKeySet = LinksTraffic.Sort().keySet();
-					reverseOrder = true && alternateOrder;
-				}
+				Set<Link> downlinksKeySet = LinksTraffic.Sort().keySet();
 				// Retain only the concerned downlinks from the set
 				downlinksKeySet.retainAll(downlinks);
+				// Sort by orthogonal channels
+				if(priorityToOrthogonal) {
+					downlinksKeySet = sortByOrthogonalChannel(downlinksKeySet);
+				}
 				// For each downlink
 				int preSize = tcu.size();
 				tcu = tryAddingLinks(downlinksKeySet, tcu, 1, false, selectedLinksSet);
 				downlinksNumber += tcu.size() - preSize;
 				/* END downlink loop */
 				
-				reverseOrder = false; 
-				// Alternate the link sorting by traffic
-				Set<Link> uplinksKeySet;
-				if(reverseOrder) {
-					uplinksKeySet = LinksTraffic.Sort().descendingKeySet();
-					reverseOrder = false;
-				} else {
-					uplinksKeySet = LinksTraffic.Sort().keySet();
-					reverseOrder = true && alternateOrder;
-				}
+				Set<Link> uplinksKeySet = LinksTraffic.Sort().descendingKeySet();
 				// Retain only the concerned uplinks from the set
 				uplinksKeySet.retainAll(uplinks);
+				// Sort by orthogonal channels
+				if(priorityToOrthogonal) {
+					uplinksKeySet = sortByOrthogonalChannel(uplinksKeySet);
+				}				
 				preSize = tcu.size();
 				tcu = tryAddingLinks(uplinksKeySet, tcu, 1, false, selectedLinksSet);
 				uplinksNumber += tcu.size() - preSize;
@@ -830,6 +824,27 @@ public class TransmissionConfiguration {
 			return true;
 		}
 		return false;
+	}
+	
+	private LinkedHashSet<Link> sortByOrthogonalChannel(Set<Link> linkSet) {
+		Deque<Link> result = new ArrayDeque<Link>();
+		for(Link l : linkSet) {
+			Channel c = ChannelAssignmentFacade.getChannels().get(l);
+			if(c.getChannel() == 1 || c.getChannel() == 6 || c.getChannel() == 11) {
+				result.addFirst(l);
+			} else {
+				result.addLast(l);
+			}
+		}
+		return new LinkedHashSet<Link>(result);
+	}
+	
+	private void printLinkSetChannels(LinkedHashSet<Link> linkSet) {
+		/*TODO*/
+		int i = 0;
+		for(Link l : linkSet) {
+			System.out.println(i+": Ch"+ChannelAssignmentFacade.getChannels().get(l));
+		}
 	}
 	
 }

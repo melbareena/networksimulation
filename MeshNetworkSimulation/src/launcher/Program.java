@@ -2,6 +2,7 @@ package launcher;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingWorker;
@@ -107,6 +108,10 @@ public class Program {
 		
 		try {
 			SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
+				List<Integer> samplesList = new ArrayList<Integer>();
+				List<Double> throughputList = new ArrayList<Double>();
+				List<Integer> delaysList = new ArrayList<Integer>();
+				
 				@Override
 				protected Object doInBackground() throws Exception {
 					if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
@@ -130,6 +135,10 @@ public class Program {
 						histogramViewerFrame.showGraph();
 						histogramViewerFrame.setVisible(true);
 						Program.loadingDialog.setProgress(index-1, 100, "Done!");
+						
+						samplesList.add(result.getThroughputData().size());
+						throughputList.add(result.getAverageThroughputInSteadyState());
+						delaysList.add((int) Math.round(result.getAveragePacketDelay()));
 					}
 				}
 
