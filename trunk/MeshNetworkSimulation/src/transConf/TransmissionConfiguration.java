@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import setting.ApplicationSettingFacade;
+import topology.TopologyFacade;
+import topology2graph.TopologyGraphFacade;
 import trafficEstimating.TrafficEstimatingFacade;
 import common.FileGenerator;
 import dataStructure.DataRate;
@@ -15,6 +17,7 @@ import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
 import dataStructure.LinkType;
 import dataStructure.TCUnit;
+import dataStructure.TopologyGraph;
 import dataStructure.Triple;
 import dataStructure.Vertex;
 
@@ -71,7 +74,6 @@ public class TransmissionConfiguration {
 			//*****STEP TWO**************************************************************************
 			if(tConfUnit.size() > 0)
 			{
-				_added_links_step1.clear();
 				TCUnit original = tConfUnit.Clone(); // copy the links which are added in first step
 													 // these links are the originals ones which must be checked at least one of 
 													 // them are in the updated TC after the phase 2 is ran.
@@ -92,7 +94,7 @@ public class TransmissionConfiguration {
 					if(tConfUnit.getCounter_g(g, LinkType.Incoming) == 0 )
 						tConfUnit = exchangeIncoming(tConfUnit, original, g);
 					//if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0 )
-						//tConfUnit = exchangeOutgoing(tConfUnit, original, g);
+					//	tConfUnit = exchangeOutgoing(tConfUnit, original, g);
 					//---------------------------------------------------------------------------
 			} 
 		}	
@@ -115,27 +117,21 @@ public class TransmissionConfiguration {
 		return _TT;
 	}
 
-	private List<Link> _added_links_step1 =  new ArrayList<Link>();
 	
 	private TCUnit exchangeIncoming(TCUnit tConfUnit, TCUnit original, Vertex g)
 	{
-		System.out.println("SIZE:" + tConfUnit.size());
 		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
 		Triple<Link,Link, Double> triple; // add,remove, sinr
 		
-		boolean canRemoveOutgoinglink = false;
-		if(tConfUnit.getCounter_g(g, LinkType.Outgoing) > 1)
-			canRemoveOutgoinglink = true;
-		
 		TCUnit copyTC = tConfUnit.Clone();
 		
-		List<Link> outgoingLinks = TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing);
+
 		
 		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Incoming))
 		{
 			for(Link lprime : copyTC.getLinks())
 			{
-				if(!canRemoveOutgoinglink && outgoingLinks.contains(lprime)) continue;
+				if(TopologyGraphFacade.isGatewayLink(lprime)) continue;
 				List<Link> links = copyTC.getLinks();
 				links.remove(lprime);
 				links.add(link);
@@ -166,15 +162,63 @@ public class TransmissionConfiguration {
 		if(updatedLinks.size() > 0 ) // check at least one of the original links 
 									 //(original link is the link which is already added by first phase) remains in 
 									 // in transmission configuration.
-		{
-			System.out.println("EXCHANGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");		
+		{	
 			removeFromConsiderList(deletedLink);
 			return copyTC;
 		}
-		System.out.println("No");
 		return tConfUnit;
 	}
-
+	private TCUnit exchangeOutgoing(TCUnit tConfUnit, TCUnit original, Vertex g)
+	{
+		System.out.println("SIZE:" + tConfUnit.size());
+		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
+		Triple<Link,Link, Double> triple; // add,remove, sinr
+		
+		
+		TCUnit copyTC = tConfUnit.Clone();
+		
+		
+		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing))
+		{
+			for(Link lprime : copyTC.getLinks())
+			{
+				if(TopologyGraphFacade.isGatewayLink(lprime)) continue;
+				List<Link> links = copyTC.getLinks();
+				links.remove(lprime);
+				links.add(link);
+				double sinr = SINR.calc(link, links);
+					
+				if(sinr <= BETA)
+				{
+					triple = new Triple<>(link, lprime, sinr);
+					tripleLists.add(triple);
+				}
+			}
+		}
+		Link deletedLink = null;
+		if(tripleLists.size() > 0 )
+		{
+			Triple<Link, Link, Double> minTriple = minimizing(tripleLists);
+			copyTC.removeLink(minTriple.getB());
+			deletedLink = minTriple.getB();
+			copyTC.put(minTriple.getA(), computeRate(minTriple.getC()).getRate());
+									
+		
+		}
+		Set<Link> updatedLinks = new HashSet<Link>(copyTC.getLinks());
+		Set<Link> originalLinks = new HashSet<Link>(original.getLinks());
+		
+		updatedLinks.retainAll(originalLinks);
+		
+		if(updatedLinks.size() > 0 ) // check at least one of the original links 
+									 //(original link is the link which is already added by first phase) remains 
+									 // in transmission configuration.
+		{	
+			removeFromConsiderList(deletedLink);
+			return copyTC;
+		}
+		return tConfUnit;
+	}
 	private void removeFromConsiderList(Link deletedLink)
 	{
 		for (TCUnit unit : _TT)
@@ -543,10 +587,10 @@ public class TransmissionConfiguration {
 		boolean add = true;
 		double sinr = 0;
 		TCUnit tPrime = tConfig.Clone();
-
+		
 		if(this.checkRadio(newLink))
 		{
-			if(!checkBalanceOfGateway(newLink,tConfig)) return null;
+			if(!balanceGatewayLinks(newLink,tConfig)) return null;
 			tPrime.put(newLink, 0);
 			tPrime.setTCAPZero();
 			
@@ -567,15 +611,12 @@ public class TransmissionConfiguration {
 					break;
 				}
 			}
-		} else {
-			//System.out.println("\tRadio problem");
-		}
+		} 
 		if(add && tPrime.getTCAP() > tConfig.getTCAP())
 		{
 			ConsiderLinks.put(newLink,true);
 			setMark(newLink.getDestination());
 			setMark(newLink.getSource());
-			//this.tConfUnit.put(newLink, newConfUnit.getRate(newLink));
 			return tPrime;
 		} 	
 		return null;
@@ -591,7 +632,7 @@ public class TransmissionConfiguration {
  	 * @param a new link which wants to add the TC.
  	 * @return can be added or not
  	 */
-	private boolean checkBalanceOfGateway(Link newLink, TCUnit tConfig)
+	private boolean balanceGatewayLinks(Link newLink, TCUnit tConfig)
 	{
 	
 		for (Vertex gateway : 	ApplicationSettingFacade.Gateway.getGateway().values())

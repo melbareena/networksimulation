@@ -57,7 +57,7 @@ public class TopologyGraphFacade
 	{
 		return topology.incomingLinks;
 	}
-	public boolean isIncomingLinkToGateway(Link l)
+	public static boolean isIncomingLinkToGateway(Link l)
 	{
 		Vector<Link> links = new Vector<Link>();
 		
@@ -67,7 +67,7 @@ public class TopologyGraphFacade
 		}
 		return links.contains(l);
 	}
-	public boolean isOutgoingLinkToGateway(Link l)
+	public static boolean isOutgoingLinkToGateway(Link l)
 	{
 		Vector<Link> links = new Vector<Link>();
 		
@@ -76,5 +76,9 @@ public class TopologyGraphFacade
 			links.addAll(getOutcomingLinks().get(gateways.getValue()));
 		}
 		return links.contains(l);
+	}
+	public static boolean isGatewayLink(Link l)
+	{
+		return isOutgoingLinkToGateway(l) || isIncomingLinkToGateway(l) ;
 	}
 }
