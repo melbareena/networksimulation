@@ -127,12 +127,8 @@ public class HistogramViewer extends JFrame {
 		this.stepThroughput = step;
 		this.stepSource = step;
 		this.stepTransmit = step;
-		
-		double sum = 0.0;
-        for(int i = 0; i < ApplicationSettingFacade.Traffic.getDuration(); i++) {
-        	sum += dataThroughput.get(i);
-        }
-        meanThroughput = new ValueMarker(sum / ApplicationSettingFacade.Traffic.getDuration());
+
+        meanThroughput = new ValueMarker(results.getAverageThroughputInSteadyState());
 	}
 	
 	/**Shows the graph and build all the components in the frame.

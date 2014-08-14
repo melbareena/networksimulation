@@ -11,7 +11,7 @@ public class TCFacade
 {
 	public static boolean newAlgortihm;
 	public static int downOverUpRatio;
-	public static boolean alternateOrder;
+	public static boolean priotityToOrthogonal;
 	public static boolean repeatLinksToRespectRatio;
 	public static boolean enlargeByGateways;
 	
@@ -27,7 +27,7 @@ public class TCFacade
 			multiExecIndex = Program.multiExecIndex;
 			TransmissionConfiguration	tc = new TransmissionConfiguration();
 			if(newAlgortihm) 
-				configurations = tc.ConfiguringBenjamin(downOverUpRatio, alternateOrder,
+				configurations = tc.ConfiguringBenjamin(downOverUpRatio, priotityToOrthogonal,
 						repeatLinksToRespectRatio, enlargeByGateways);
 			else 
 				configurations = tc.Configuring();

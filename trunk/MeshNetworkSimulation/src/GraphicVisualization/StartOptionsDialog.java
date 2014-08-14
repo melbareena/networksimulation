@@ -67,7 +67,7 @@ public class StartOptionsDialog extends JDialog {
 	private final JPanel	contentPanel	= new JPanel();
 	private final JPanel chckbxPanel = new JPanel();
 	private final JSpinner spinnerRatio = new JSpinner();
-	private final JCheckBox chckbxAlternateOrder = new JCheckBox("Alternate order");
+	private final JCheckBox chckbxPriorityToOrthogonal = new JCheckBox("Priority to orthogonal");
 	private final JCheckBox chckbxRepeatLinksTo = new JCheckBox("Repeat links to ensure ratio");
 	private final JCheckBox chckbxEnlargeByGateways = new JCheckBox("Enlarge by gateways");
 	private final JRadioButton rdbtnNewAlgorithm = new JRadioButton("Pattern Based");
@@ -489,7 +489,7 @@ public class StartOptionsDialog extends JDialog {
 				public void itemStateChanged(ItemEvent e) {
 					chckbxPanel.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 					spinnerRatio.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-					chckbxAlternateOrder.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+					chckbxPriorityToOrthogonal.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 					chckbxRepeatLinksTo.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 					chckbxEnlargeByGateways.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 				}
@@ -502,7 +502,7 @@ public class StartOptionsDialog extends JDialog {
 			rdbtnNewAlgorithm.setSelected(true);
 			lblSinr.setHorizontalAlignment(SwingConstants.TRAILING);
 			
-			newAlgoPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "New algorithm parameters", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+			newAlgoPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Pattern based algorithm parameters", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 			
 			contentPanel.add(newAlgoPanel, "cell 0 6 2 1,alignx center,aligny center");
 			newAlgoPanel.setLayout(new MigLayout("insets 5 0 0 0", "[min!]10[157px]", "[83px][83px]"));
@@ -528,7 +528,7 @@ public class StartOptionsDialog extends JDialog {
 			newAlgoPanel.add(chckbxPanel, "cell 1 1,grow");
 			chckbxPanel.setLayout(new GridLayout(3, 0, 0, 0));
 	
-			chckbxPanel.add(chckbxAlternateOrder);
+			chckbxPanel.add(chckbxPriorityToOrthogonal);
 	
 			chckbxPanel.add(chckbxRepeatLinksTo);
 	
@@ -625,7 +625,7 @@ public class StartOptionsDialog extends JDialog {
 				public void actionPerformed(ActionEvent e) {
 					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
 					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
+					TCFacade.priotityToOrthogonal = chckbxPriorityToOrthogonal.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
@@ -649,7 +649,7 @@ public class StartOptionsDialog extends JDialog {
 				public void actionPerformed(ActionEvent e) {
 					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
 					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
+					TCFacade.priotityToOrthogonal = chckbxPriorityToOrthogonal.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
@@ -673,7 +673,7 @@ public class StartOptionsDialog extends JDialog {
 				public void actionPerformed(ActionEvent e) {
 					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
 					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-					TCFacade.alternateOrder = chckbxAlternateOrder.isSelected();
+					TCFacade.priotityToOrthogonal = chckbxPriorityToOrthogonal.isSelected();
 					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
 					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
