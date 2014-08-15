@@ -1,6 +1,7 @@
 package transConf;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
@@ -21,6 +23,7 @@ import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
 import dataStructure.LinkType;
+import dataStructure.LinksChannelMap;
 import dataStructure.TCUnit;
 import dataStructure.Triple;
 import dataStructure.Vertex;
@@ -309,8 +312,7 @@ public class TransmissionConfiguration {
 	 * @return the list of transmission configurations created
 	 */
 	protected List<TCUnit> ConfiguringBenjamin(int downOverUpRatio, boolean priorityToOrthogonal,
-			boolean repeatLinksToRespectRatio, boolean enlargeByGateways) 
-	{
+			boolean repeatLinksToRespectRatio, boolean enlargeByGateways) {
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
 		
 		List<Vertex> gateways = new ArrayList<Vertex>(ApplicationSettingFacade.Gateway.getGateway().values());
@@ -365,7 +367,7 @@ public class TransmissionConfiguration {
 				List<Link> downlinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Outgoing);
 				List<Link> uplinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Incoming);
 				
-				Set<Link> downlinksKeySet = LinksTraffic.Sort().keySet();
+				LinkedHashSet<Link> downlinksKeySet = new LinkedHashSet<Link>(LinksTraffic.Sort().keySet());
 				// Retain only the concerned downlinks from the set
 				downlinksKeySet.retainAll(downlinks);
 				// Sort by orthogonal channels
@@ -378,13 +380,13 @@ public class TransmissionConfiguration {
 				downlinksNumber += tcu.size() - preSize;
 				/* END downlink loop */
 				
-				Set<Link> uplinksKeySet = LinksTraffic.Sort().descendingKeySet();
+				LinkedHashSet<Link> uplinksKeySet = new LinkedHashSet<Link>(LinksTraffic.Sort().keySet());
 				// Retain only the concerned uplinks from the set
 				uplinksKeySet.retainAll(uplinks);
 				// Sort by orthogonal channels
 				if(priorityToOrthogonal) {
 					uplinksKeySet = sortByOrthogonalChannel(uplinksKeySet);
-				}				
+				}
 				preSize = tcu.size();
 				tcu = tryAddingLinks(uplinksKeySet, tcu, 1, false, selectedLinksSet);
 				uplinksNumber += tcu.size() - preSize;
@@ -410,7 +412,7 @@ public class TransmissionConfiguration {
 	 * <code>evenIfAlreadySelected</code> is false, meaning that a link is added to 
 	 * <code>tcu</code> only if it is not contained in <code>selectedLinksSet</code>.
 	 * Otherwise, if <code>evenIfAlreadySelected</code> is true, a link can be added 
-	 * unconditionnally (<i>except of course if the <code>checkAdd</i> function
+	 * unconditionnally (<em>except of course if the <code>checkAdd</code> function
 	 * prevent it</em>).
 	 * @see TransmissionConfiguration#checkAdd(Link, TCUnit)
 	 * @param linksSet the set of links to try to add to the configuration
@@ -422,8 +424,8 @@ public class TransmissionConfiguration {
 	 * another configuration
 	 * @return the transmission configuration tcu, modified or not
 	 */
-	private TCUnit tryAddingLinks(Set<Link> linksSet, TCUnit tcu, int numberOfLinksToAdd,
-			boolean evenIfAlreadySelected, HashSet<Link> selectedLinksSet) {
+	private TCUnit tryAddingLinks(LinkedHashSet<Link> linksSet, TCUnit tcu, int numberOfLinksToAdd,
+			boolean evenIfAlreadySelected, Set<Link> selectedLinksSet) {
 		int numberOfLinksAdded = 0;
 		boolean newLinkAdded = true;
 		while(newLinkAdded && (numberOfLinksAdded < numberOfLinksToAdd)) {
@@ -469,7 +471,7 @@ public class TransmissionConfiguration {
 	 * of uplinks by configuration
 	 * @return the list of transmission configurations created
 	 */
-	protected List<TCUnit> remainingLinksStep(List<TCUnit> patterns, HashSet<Link> selectedLinksSet,
+	protected List<TCUnit> remainingLinksStep(List<TCUnit> patterns, Set<Link> selectedLinksSet,
 			boolean enlargeByGateways, List<Vertex> gateways, int downOverUpRatio) {
 		List<TCUnit> listTCU = new ArrayList<TCUnit>(patterns);
 		// Try adding links using generated patterns
@@ -543,7 +545,7 @@ public class TransmissionConfiguration {
 	 * of uplinks for the configuration <code>tcu</code>
 	 * @return the extended configuration (or the same if extension what not successful)
 	 */
-	private TCUnit enlargeByGateways(TCUnit tcu, HashSet<Link> selectedLinksSet, 
+	private TCUnit enlargeByGateways(TCUnit tcu, Set<Link> selectedLinksSet, 
 			List<Vertex> gateways, int downOverUpRatio) {
 		int downlinksNumber = 0;
 		int uplinksNumber = 0;
@@ -551,14 +553,14 @@ public class TransmissionConfiguration {
 			List<Link> downlinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Outgoing);
 			List<Link> uplinks = TrafficEstimatingFacade.getOptimalLinks(g, LinkType.Incoming);
 			
-			Set<Link> downlinksKeySet = LinksTraffic.Sort().descendingKeySet();
+			LinkedHashSet<Link> downlinksKeySet = new LinkedHashSet<Link>(LinksTraffic.Sort().keySet());
 			// Retain only the concerned downlinks from the set
 			downlinksKeySet.retainAll(downlinks);
 			int preSize = tcu.size();
 			tcu = tryAddingLinks(downlinksKeySet, tcu, 1, true, selectedLinksSet);
 			downlinksNumber += tcu.size() - preSize;
 
-			Set<Link> uplinksKeySet = LinksTraffic.Sort().descendingKeySet();
+			LinkedHashSet<Link> uplinksKeySet = new LinkedHashSet<Link>(LinksTraffic.Sort().keySet());
 			// Retain only the concerned uplinks from the set
 			uplinksKeySet.retainAll(uplinks);
 			preSize = tcu.size();
@@ -763,8 +765,6 @@ public class TransmissionConfiguration {
 		return tConfUnit;
 	}
 
-	
-
 	private DataRate computeRate(double sinr)
 	{
 		List<DataRate> dataRates = ApplicationSettingFacade.DataRate.getDataRate();
@@ -827,24 +827,53 @@ public class TransmissionConfiguration {
 	}
 	
 	private LinkedHashSet<Link> sortByOrthogonalChannel(Set<Link> linkSet) {
-		Deque<Link> result = new ArrayDeque<Link>();
-		for(Link l : linkSet) {
-			Channel c = ChannelAssignmentFacade.getChannels().get(l);
-			if(c.getChannel() == 1 || c.getChannel() == 6 || c.getChannel() == 11) {
-				result.addFirst(l);
-			} else {
-				result.addLast(l);
+		TreeSet<Link> result = new TreeSet<Link>(new Comparator<Link>() {
+			@Override
+			public int compare(Link l1, Link l2) {
+				if(l1.compareTo(l2) == 0) {
+					return 0;
+				}
+				LinkTrafficMap trMap = TrafficEstimatingFacade.getLinksTraffic();
+				if(isOrthogonalChannel(l1)) {
+					if(isOrthogonalChannel(l2)) {
+						if(trMap.get(l1) > trMap.get(l2)) {
+							return -1;
+						} else {
+							return 1;
+						}
+					} else {
+						return -1;
+					}
+				} else {
+					if(isOrthogonalChannel(l2)) {
+						return 1;
+					} else {
+						if(trMap.get(l1) > trMap.get(l2)) {
+							return -1;
+						} else {
+							return 1;
+						}
+					}
+				}
 			}
-		}
+			
+			private boolean isOrthogonalChannel(Link l) {
+				int channel = ChannelAssignmentFacade.getChannels().get(l).getChannel();
+				return channel == 1 || channel == 6 || channel == 11;
+			}
+		});
+		result.addAll(linkSet);
+		printLinkSetChannels(result);
 		return new LinkedHashSet<Link>(result);
 	}
 	
-	private void printLinkSetChannels(LinkedHashSet<Link> linkSet) {
-		/*TODO*/
+	protected void printLinkSetChannels(Set<Link> linkSet) {
 		int i = 0;
 		for(Link l : linkSet) {
-			System.out.println(i+": Ch"+ChannelAssignmentFacade.getChannels().get(l));
+			System.out.println((i++)+": L"+l.getId()+"; "+ChannelAssignmentFacade.getChannels().get(l)+
+					"; T"+TrafficEstimatingFacade.getLinksTraffic().get(l));
 		}
+		System.out.println("");
 	}
 	
 }
