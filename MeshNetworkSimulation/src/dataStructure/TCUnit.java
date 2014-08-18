@@ -69,6 +69,7 @@ public class TCUnit
 		return rate;
 		
 	}
+	
 	public double getMatchingRate(Link l)
 	{
 		double rate = 0;		
@@ -95,8 +96,7 @@ public class TCUnit
 		
 		return is;
 	}
-	
-	
+		
 	public int getCounter_g(Vertex g , LinkType ty)
 	{
 		int counter = 0; 
@@ -119,16 +119,19 @@ public class TCUnit
 		return counter;
 		
 	}
+	
 	public void put(Link l, int rate)
 	{
 		collection.put(l, rate);
 	}	
+	
 	public List<Link> getLinks()
 	{
 		ArrayList<Link> links = new ArrayList<>();
 		links.addAll(collection.keySet());
 		return links;
 	}
+	
 	public int getRate(Link l)
 	{
 		return collection.get(l);
@@ -144,8 +147,7 @@ public class TCUnit
 	{
 		collection.remove(l);
 	}
-	
-	
+
 	/**
 	 * @return Integer value is data rate.
 	 */
@@ -153,10 +155,12 @@ public class TCUnit
 	{
 		return collection.entrySet();
 	}
+	
 	public boolean containsKey(Link key)
 	{
 		return collection.containsKey(key);
 	}
+	
 	public int size()
 	{
 		return collection.size();
@@ -195,6 +199,7 @@ public class TCUnit
 		}	
 		return copy;
 	}
+	
 	public void setTCAPZero()
 	{
 		Set<Link> links = collection.keySet();

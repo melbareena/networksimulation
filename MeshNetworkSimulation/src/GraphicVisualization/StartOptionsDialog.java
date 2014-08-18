@@ -261,7 +261,7 @@ public class StartOptionsDialog extends JDialog {
 			
 			schedulingComboBox.setMaximumRowCount(3);
 			schedulingComboBox.setModel(new DefaultComboBoxModel(new String[] {"Normal", "Round Robin", "Back Pressure"}));
-			schedulingComboBox.setSelectedIndex(1);
+			schedulingComboBox.setSelectedIndex(2);
 			
 			schedulingPanel.add(schedulingComboBox, "cell 0 0,growx,aligny center");
 			
@@ -348,6 +348,7 @@ public class StartOptionsDialog extends JDialog {
 			trafficLabelPanel.add(rdbtnStatic, "cell 0 1,alignx right,growy");
 			
 			groupTraffic.add(rdbtnDynamic);
+			rdbtnDynamic.setSelected(true);
 			
 			rdbtnDynamic.setFont(new Font("Tahoma", Font.ITALIC, 10));
 			rdbtnDynamic.addActionListener(new ActionListener() {
@@ -405,7 +406,7 @@ public class StartOptionsDialog extends JDialog {
 			lblSetDefaults.setForeground(new Color(0, 0, 255));
 			lblSetDefaults.setFont(new Font("Tahoma", Font.ITALIC, 11));
 			
-			durationSpinner.setModel(new SpinnerNumberModel(new Long(100000), new Long(1), null, new Long(100)));
+			durationSpinner.setModel(new SpinnerNumberModel(new Long(10000), new Long(1), null, new Long(100)));
 			rateSpinner.setModel(new SpinnerNumberModel(new Double(0.5), new Double(0.001), new Double(1.0), new Double(0.01)));
 			seedSpinner.setModel(new SpinnerNumberModel(Math.abs(new Random().nextLong()), new Long(1), null, new Long(1)));
 			nodesSpinner.setModel(new SpinnerNumberModel(new Integer(5), new Integer(1), null, new Integer(1)));
@@ -426,7 +427,7 @@ public class StartOptionsDialog extends JDialog {
 				}
 			});
 			
-			updateTrafficPanel(false, false);
+			updateTrafficPanel(rdbtnDynamic.isSelected(), trafficComboBox.getSelectedIndex() == 1);
 		}
 			
 		/*---------*/
@@ -517,7 +518,7 @@ public class StartOptionsDialog extends JDialog {
 			
 			ratioLabelsPanel.add(lblOverUplinks, "cell 0 1,alignx right,growy");
 			
-			spinnerRatio.setModel(new SpinnerNumberModel(1, 1, 4, 1));
+			spinnerRatio.setModel(new SpinnerNumberModel(2, 1, 4, 1));
 			JPanel spinnerPanel = new JPanel();
 			newAlgoPanel.add(spinnerPanel, "cell 1 0,growx,aligny center");
 			spinnerPanel.setAlignmentX(CENTER_ALIGNMENT);
@@ -571,7 +572,7 @@ public class StartOptionsDialog extends JDialog {
 				}
 			});
 			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Some channels", "All combinations", "Apart combinations"}));
-			channelModeComboBox.setSelectedIndex(0);
+			channelModeComboBox.setSelectedIndex(3);
 			
 			channelsPanel.add(channelModeComboBox, "cell 1 0,grow");
 			lblSelected.setHorizontalAlignment(SwingConstants.TRAILING);
