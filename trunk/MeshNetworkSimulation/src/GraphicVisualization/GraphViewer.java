@@ -154,6 +154,8 @@ public class GraphViewer extends JFrame {
 	private final JSlider sliderLabels = new JSlider();
 	private final JSlider sliderThickness = new JSlider();
 	private final JMenuItem mntmSaveAll = new JMenuItem("Save all configurations...");
+	private final JLabel tcapConfigLabel = new JLabel("");
+	private final JLabel sizeConfigLabel = new JLabel("");
 	
 	/* ColorViewer dialog */
 	private final ColorViewer colorViewerDialog = new ColorViewer(this, ColorViewer.ColorType.Links);
@@ -519,12 +521,13 @@ public class GraphViewer extends JFrame {
 		configurationsPanel.setLayout(new BoxLayout(configurationsPanel, BoxLayout.Y_AXIS));
 		configurationsPanel.setBorder(new TitledBorder(null, "Show links:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		bottomPanel.add(configurationsPanel);
-		
+
 		Integer[] intList = mapConfigurations.keySet().toArray(new Integer[mapConfigurations.size()]);
 		configList = new JComboBox<Integer>(intList);
 		configList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				updateConfigStats(configList.getSelectedIndex());
 				updateShowingLinks();
 				updateLabels();
 				updateStyle();
@@ -552,6 +555,7 @@ public class GraphViewer extends JFrame {
 				mntmSaveAll.setEnabled(false);
 				updateShowingLinks();
 				updateLabels();
+				updateConfigStats(-1);
 			}
 		});
 		rdbtnAllLinks.setSelected(true);
@@ -577,6 +581,7 @@ public class GraphViewer extends JFrame {
 				mntmSaveAll.setEnabled(true);
 				updateShowingLinks();
 				updateLabels();
+				updateConfigStats(configList.getSelectedIndex());
 			}
 		});
 		rdbtnConfiguration.setSelected(false);
@@ -593,12 +598,20 @@ public class GraphViewer extends JFrame {
 		
 		//configurationsPanel.add(Box.createVerticalGlue());
 		
+		tcapConfigLabel.setFont(tcapConfigLabel.getFont().deriveFont(Font.ITALIC, 10.0F));
+		configurationsPanel.add(tcapConfigLabel);
+		
+		sizeConfigLabel.setFont(sizeConfigLabel.getFont().deriveFont(Font.ITALIC, 10.0F));
+		configurationsPanel.add(sizeConfigLabel);
+		
+		configurationsPanel.add(Box.createVerticalGlue());
+		
 		JLabel nbConfigLabel = new JLabel(mapConfigurations.size()+" configs available");
 		nbConfigLabel.setFont(nbConfigLabel.getFont().deriveFont(Font.ITALIC, 9.0F));
 		configurationsPanel.add(nbConfigLabel);
 		
 		configurationsPanel.add(Box.createVerticalGlue());
-		
+
 		bottomPanel.add(Box.createHorizontalGlue());
 	}
 
@@ -1001,6 +1014,17 @@ public class GraphViewer extends JFrame {
 		}
 	}
 	
+	protected void updateConfigStats(int configIndex) {
+		if(configIndex < 0 || configIndex >= TCFacade.getConfigurations().size()) {
+			
+		} else {
+			TCUnit tcu = TCFacade.getConfigurations().get(configIndex);
+			tcapConfigLabel.setText("Config capacity: "+
+					tcu.getTCAP());
+			sizeConfigLabel.setText("Contains "+tcu.getLinks().size()+" links");
+		}
+	}
+	
 	/** Fills the map containing the edges, and add them to the graph
 	 * @see GraphViewer#mapVertices
 	 */
@@ -1282,6 +1306,5 @@ public class GraphViewer extends JFrame {
 			    title,
 			    JOptionPane.ERROR_MESSAGE);
 	}
-
 
 }
