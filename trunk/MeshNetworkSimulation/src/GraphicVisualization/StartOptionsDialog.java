@@ -848,10 +848,11 @@ public class StartOptionsDialog extends JDialog {
 		
 		XMLWriter.writeIFactor((double[]) ifactorDialog.getResults().get("ifactor"));
 		
-		XMLWriter.writeOutputFolder(outputFolderPathTextField.getToolTipText()+"", chckbxGenerateFiles.isSelected());
+		XMLWriter.writeOutputFolder(outputFolderPathTextField.getToolTipText()+File.separator, chckbxGenerateFiles.isSelected());
 		
 		HashMap<String, Object> routersResult = routersDialog.getResults();
 		String routersGenerator = routersResult.get("generation").toString();
+		
 		if(routersGenerator == "File") {
 			XMLWriter.writeRouters((int) routersResult.get("radio"), routersGenerator,
 					(int) routersResult.get("minDistance"), (int) routersResult.get("transmissionRate"),
