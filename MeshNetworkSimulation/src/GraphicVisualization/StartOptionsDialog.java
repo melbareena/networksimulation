@@ -47,7 +47,6 @@ import launcher.Program;
 import net.miginfocom.swing.MigLayout;
 import setting.XMLParser;
 import setting.XMLWriter;
-import transConf.TCFacade;
 import GraphicVisualization.editDialog.DatarateEditOptionDialog;
 import GraphicVisualization.editDialog.GatewaysEditOptionDialog;
 import GraphicVisualization.editDialog.IFactorEditOptionDialog;
@@ -624,11 +623,6 @@ public class StartOptionsDialog extends JDialog {
 			defaultButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
-					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-					TCFacade.priotityToOrthogonal = chckbxPriorityToOrthogonal.isSelected();
-					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
-					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					configFile = "/setting/input/config_default.xml";
@@ -648,11 +642,6 @@ public class StartOptionsDialog extends JDialog {
 			loadConfigButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
-					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-					TCFacade.priotityToOrthogonal = chckbxPriorityToOrthogonal.isSelected();
-					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
-					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					JTextField blank = new JTextField();
@@ -672,11 +661,6 @@ public class StartOptionsDialog extends JDialog {
 			saveAndRunButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					TCFacade.newAlgortihm = rdbtnNewAlgorithm.isSelected();
-					TCFacade.downOverUpRatio = (int) spinnerRatio.getValue();
-					TCFacade.priotityToOrthogonal = chckbxPriorityToOrthogonal.isSelected();
-					TCFacade.repeatLinksToRespectRatio = chckbxRepeatLinksTo.isSelected();
-					TCFacade.enlargeByGateways = chckbxEnlargeByGateways.isSelected();
 					//Program.schedulingStrategy = (String) schedulingComboBox.getSelectedItem();
 					/* Write config_auto.xml */
 					writeConfiguration();
@@ -811,6 +795,8 @@ public class StartOptionsDialog extends JDialog {
 	}
 	
 	private void writeConfiguration() {
+
+		
 		String mode = "Single";
 		if(channelModeComboBox.getSelectedIndex() == 2) mode = "AllCombination"; 
 		else if (channelModeComboBox.getSelectedIndex() == 3) mode = "ApartCombination"; 
@@ -901,6 +887,13 @@ public class StartOptionsDialog extends JDialog {
 				(int) ratioSpinner.getValue(),
 				(long) durationSpinner.getValue());
 
+		if(rdbtnNewAlgorithm.isSelected())
+			XMLWriter.writePatternBasedSterategy((int) spinnerRatio.getValue(), chckbxPriorityToOrthogonal.isSelected(),
+					chckbxRepeatLinksTo.isSelected(),  chckbxEnlargeByGateways.isSelected());
+		else
+			XMLWriter.writeOriginalTCSterategy();
+		
+		
 		File f = saveConfiguration();
 		if(f != null) {
 			configFile = f.getAbsolutePath();
@@ -962,6 +955,7 @@ public class StartOptionsDialog extends JDialog {
 				return file;
 			}
 		} catch (Exception e) {
+			System.err.println(e.getMessage());
 			GraphViewer.showErrorDialog(e.getMessage());
 		}
 		return null;

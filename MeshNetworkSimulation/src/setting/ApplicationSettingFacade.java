@@ -9,6 +9,7 @@ import java.util.Vector;
 import launcher.Program;
 import setting.BaseConfiguration.AppExecMode;
 import setting.BaseConfiguration.ChannelMode;
+import setting.BaseConfiguration.TCStrategy;
 import setting.BaseConfiguration.TypeOfGenerationEnum;
 import dataStructure.IFactorMap;
 import dataStructure.Vertex;
@@ -34,6 +35,7 @@ public class ApplicationSettingFacade
 	private static ChannelAssignmentConfig _chCong = ChannelAssignmentConfig.Initiating();
 	private static SchedulingConfig _schConf = SchedulingConfig.Initiating();
 	private static AppConfig _appConf = AppConfig.Initiating();
+	private static TCConfig _tcConfig = TCConfig.Initiating();
 	
 	public static AppExecMode getApplicationExecutionMode()
 	{
@@ -209,6 +211,33 @@ public class ApplicationSettingFacade
 	    }
 		
 	}
+	
+	public static class TranmissionConfiguration
+	{
+		public static TCStrategy getStertegy()
+		{
+			return _tcConfig.getSterategyName();
+		}
+		
+		public static int getDownOverUpRatio()
+		{
+			return _tcConfig.getDOUR();
+		}
+		public static boolean isPriotityToOrthogonal()
+		{
+			return _tcConfig.isPTO();
+		}
+		
+		public static boolean isRepeatLinksToRespectRatio()
+		{
+			return _tcConfig.isRLTRR();
+		}
+		public static boolean isEnlargeByGateways()
+		{
+			return _tcConfig.isEBG();
+		}
+	}
+	
 	
 	public static class Router
 	{
