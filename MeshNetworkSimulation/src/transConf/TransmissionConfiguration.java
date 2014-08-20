@@ -138,7 +138,7 @@ public class TransmissionConfiguration {
 		{
 			for(Link lprime : copyTC.getLinks())
 			{
-				if(TopologyGraphFacade.isGatewayLink(lprime)) continue;
+				//if(TopologyGraphFacade.isGatewayLink(lprime)) continue;
 				List<Link> links = copyTC.getLinks();
 				links.remove(lprime);
 				links.add(link);
@@ -175,57 +175,8 @@ public class TransmissionConfiguration {
 		}
 		return tConfUnit;
 	}
-	private TCUnit exchangeOutgoing(TCUnit tConfUnit, TCUnit original, Vertex g)
-	{
-		System.out.println("SIZE:" + tConfUnit.size());
-		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
-		Triple<Link,Link, Double> triple; // add,remove, sinr
-		
-		
-		TCUnit copyTC = tConfUnit.Clone();
-		
-		
-		for (Link link : TrafficEstimatingFacade.getOptimalLinks(g,LinkType.Outgoing))
-		{
-			for(Link lprime : copyTC.getLinks())
-			{
-				if(TopologyGraphFacade.isGatewayLink(lprime)) continue;
-				List<Link> links = copyTC.getLinks();
-				links.remove(lprime);
-				links.add(link);
-				double sinr = SINR.calc(link, links);
-					
-				if(sinr <= BETA)
-				{
-					triple = new Triple<>(link, lprime, sinr);
-					tripleLists.add(triple);
-				}
-			}
-		}
-		Link deletedLink = null;
-		if(tripleLists.size() > 0 )
-		{
-			Triple<Link, Link, Double> minTriple = minimizing(tripleLists);
-			copyTC.removeLink(minTriple.getB());
-			deletedLink = minTriple.getB();
-			copyTC.put(minTriple.getA(), computeRate(minTriple.getC()).getRate());
-									
-		
-		}
-		Set<Link> updatedLinks = new HashSet<Link>(copyTC.getLinks());
-		Set<Link> originalLinks = new HashSet<Link>(original.getLinks());
-		
-		updatedLinks.retainAll(originalLinks);
-		
-		if(updatedLinks.size() > 0 ) // check at least one of the original links 
-									 //(original link is the link which is already added by first phase) remains 
-									 // in transmission configuration.
-		{	
-			removeFromConsiderList(deletedLink);
-			return copyTC;
-		}
-		return tConfUnit;
-	}
+	
+	
 	private void removeFromConsiderList(Link deletedLink)
 	{
 		for (TCUnit unit : _TT)
