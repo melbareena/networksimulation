@@ -482,6 +482,7 @@ public class HistogramViewer extends JFrame {
 		System.out.println("Finished, displaying...");
 		
 		String titleString = "AC:"+Program.getAvailableChannels() + "\n"
+				+ "TC: " + ApplicationSettingFacade.TranmissionConfiguration.getStertegy().name() + "\n"
 				+ "Scheduling: " + results.getSchedulingStrategy() + " - "
 				+ ((ApplicationSettingFacade.Router.getTypeOfGeneration() == TypeOfGenerationEnum.RANDOM) ?
 						"Topolgy: Random " : "Topology: Static ") + "\n"

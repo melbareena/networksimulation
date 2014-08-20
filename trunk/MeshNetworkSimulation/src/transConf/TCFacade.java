@@ -2,18 +2,18 @@ package transConf;
 
 import java.util.List;
 
+import setting.ApplicationSettingFacade;
+import setting.BaseConfiguration.TCStrategy;
 import common.PrintConsole;
-
 import launcher.Program;
 import dataStructure.TCUnit;
 
 public class TCFacade
 {
-	public static boolean newAlgortihm;
-	public static int downOverUpRatio;
-	public static boolean priotityToOrthogonal;
-	public static boolean repeatLinksToRespectRatio;
-	public static boolean enlargeByGateways;
+	public static int downOverUpRatio = ApplicationSettingFacade.TranmissionConfiguration.getDownOverUpRatio();
+	public static boolean priotityToOrthogonal = ApplicationSettingFacade.TranmissionConfiguration.isPriotityToOrthogonal();
+	public static boolean repeatLinksToRespectRatio = ApplicationSettingFacade.TranmissionConfiguration.isRepeatLinksToRespectRatio();
+	public static boolean enlargeByGateways = ApplicationSettingFacade.TranmissionConfiguration.isEnlargeByGateways();
 	
 	
 	private static int multiExecIndex = 0;
@@ -26,11 +26,11 @@ public class TCFacade
 			PrintConsole.print("Tranmission Configuration Start.......");
 			multiExecIndex = Program.multiExecIndex;
 			TransmissionConfiguration	tc = new TransmissionConfiguration();
-			if(newAlgortihm) 
-				configurations = tc.ConfiguringBenjamin(downOverUpRatio, priotityToOrthogonal,
+			if(ApplicationSettingFacade.TranmissionConfiguration.getStertegy() == TCStrategy.PatternBased) 
+				configurations = tc.patternBasedConfiguration(downOverUpRatio, priotityToOrthogonal,
 						repeatLinksToRespectRatio, enlargeByGateways);
 			else 
-				configurations = tc.Configuring();
+				configurations = tc.originalConfiguring();
 
 		}
 		return configurations;

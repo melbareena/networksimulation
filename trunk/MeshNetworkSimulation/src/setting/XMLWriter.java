@@ -16,6 +16,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import setting.BaseConfiguration.TCStrategy;
 import GraphicVisualization.GraphViewer;
 
 public class XMLWriter {
@@ -80,6 +81,23 @@ public class XMLWriter {
 		rootElement.appendChild(e);
 		e.setAttribute("Strategy", schedulingStrategy);
 	}
+	public static void writeOriginalTCSterategy()
+	{
+		Element e = doc.createElement("TranmissionConfiguration");
+		rootElement.appendChild(e);
+		e.setAttribute("Strategy", TCStrategy.Original.name());
+	}
+	public static void writePatternBasedSterategy(int downOverUpRatio, 
+			boolean priotityToOrthogonal, boolean repeatLinksToRespectRatio, boolean enlargeByGateways)
+			{
+				Element e = doc.createElement("TranmissionConfiguration");
+				rootElement.appendChild(e);
+				e.setAttribute("Strategy", TCStrategy.PatternBased.name());
+				e.setAttribute("downOverUpRatio", downOverUpRatio + "");
+				e.setAttribute("priotityToOrthogonal", priotityToOrthogonal + "");
+				e.setAttribute("repeatLinksToRespectRatio", repeatLinksToRespectRatio + "");
+				e.setAttribute("enlargeByGateways", enlargeByGateways + "");
+			}
 	
 	public static void writeTraffic(boolean dynamic, String generator, String addrUp, String addrDown,
 			long upseed, long downseed, double rate, long seed, int nodes, int ratio, long duration) {

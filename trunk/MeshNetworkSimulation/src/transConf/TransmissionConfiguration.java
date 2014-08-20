@@ -1,8 +1,8 @@
 package transConf;
-import java.util.ArrayDeque;
+
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Deque;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -10,20 +10,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedSet;
+
 import java.util.TreeSet;
 
 import setting.ApplicationSettingFacade;
-import topology2graph.TopologyGraphFacade;
+
 import trafficEstimating.TrafficEstimatingFacade;
 import cAssignment.ChannelAssignmentFacade;
 import common.FileGenerator;
-import dataStructure.Channel;
+
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
 import dataStructure.LinkType;
-import dataStructure.LinksChannelMap;
+
 import dataStructure.TCUnit;
 import dataStructure.Triple;
 import dataStructure.Vertex;
@@ -42,7 +42,7 @@ public class TransmissionConfiguration {
 	}
 	
 	List<TCUnit> _TT = new ArrayList<>();
-	protected List<TCUnit> Configuring()
+	protected List<TCUnit> originalConfiguring()
 	{
 		
 		TCUnit tConfUnit;
@@ -262,7 +262,7 @@ public class TransmissionConfiguration {
 	 * on gateways links
 	 * @return the list of transmission configurations created
 	 */
-	protected List<TCUnit> ConfiguringBenjamin(int downOverUpRatio, boolean priorityToOrthogonal,
+	protected List<TCUnit> patternBasedConfiguration(int downOverUpRatio, boolean priorityToOrthogonal,
 			boolean repeatLinksToRespectRatio, boolean enlargeByGateways) {
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
 		
