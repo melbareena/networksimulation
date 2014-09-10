@@ -1,5 +1,7 @@
 package setting;
 
+import java.util.Random;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -93,19 +95,19 @@ class TrafficGenerator extends BaseConfiguration {
 	private long fetchSeed(Element eElement) {
 		if(eElement.hasAttribute(ATTSEED))
 			return Long.parseLong(eElement.getAttribute(ATTSEED));
-		return System.nanoTime();
+		return Math.abs(new Random().nextLong());
 	}
 	
 	private long fetchUpSeed(Element eElement) {
 		if(eElement.hasAttribute(ATTUPSEED))
 			return Long.valueOf(eElement.getAttribute(ATTUPSEED));
-		return System.nanoTime();
+		return Math.abs(new Random().nextLong());
 	}
 	
 	private long fetchDownSeed(Element eElement) {
 		if(eElement.hasAttribute(ATTDOWNSEED))
 			return Long.valueOf(eElement.getAttribute(ATTDOWNSEED));
-		return System.nanoTime();
+		return Math.abs(new Random().nextLong());
 	}
 	
 	private void FetchFromFile(Element eElement) {

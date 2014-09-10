@@ -144,7 +144,11 @@ public class Program {
 
 				private void singleMode() {
 					PrintConsole.print("********************** Application is in single execution mode ************************");
+					long startTime = System.currentTimeMillis();
 					SchedulingResult result = SchedulingFacade.getScheduling(0);
+					long stopTime = System.currentTimeMillis();
+				    long elapsedTime = stopTime - startTime;
+				    System.out.println("---------------------------Execution Time:" + elapsedTime);
 					Program.loadingDialog.setIndeterminate(0, true);
 					Program.loadingDialog.setLabel(0, "Building user interface...");
 					new GraphViewer(result, getAvailableChannels(), 0);
