@@ -144,7 +144,7 @@ public class TransmissionConfiguration {
 				links.add(link);
 				double sinr = SINR.calc(link, links);
 					
-				if(sinr <= BETA)
+				if(sinr >= BETA)
 				{
 					triple = new Triple<>(link, lprime, sinr);
 					tripleLists.add(triple);
@@ -154,10 +154,10 @@ public class TransmissionConfiguration {
 		Link deletedLink = null;
 		if(tripleLists.size() > 0 )
 		{
-			Triple<Link, Link, Double> minTriple = minimizing(tripleLists);
-			copyTC.removeLink(minTriple.getB());
-			deletedLink = minTriple.getB();
-			copyTC.put(minTriple.getA(), computeRate(minTriple.getC()).getRate());
+			Triple<Link, Link, Double> maxTriple = maxmizing(tripleLists);
+			copyTC.removeLink(maxTriple.getB());
+			deletedLink = maxTriple.getB();
+			copyTC.put(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
 									
 		
 		}
@@ -188,20 +188,20 @@ public class TransmissionConfiguration {
 		
 	}
 
-	private Triple<Link, Link, Double> minimizing(
+	private Triple<Link, Link, Double> maxmizing(
 			ArrayList<Triple<Link, Link, Double>> tripleLists)
 	{
-		double min = Double.MAX_VALUE;
-		Triple<Link, Link, Double> minTriple = null;
+		double max = Double.MIN_VALUE;
+		Triple<Link, Link, Double> maxTriple = null;
 		for (Triple<Link, Link, Double> currentTriple : tripleLists)
 		{
-			if(min > currentTriple.getC().doubleValue())
+			if(max < currentTriple.getC().doubleValue())
 			{
-				min = currentTriple.getC().doubleValue();
-				minTriple = currentTriple;
+				max = currentTriple.getC().doubleValue();
+				maxTriple = currentTriple;
 			}
 		}
-		return minTriple;
+		return maxTriple;
 	}
 	
 	private TCUnit addIncomingLinks(TCUnit tConfUnit, Vertex g)
