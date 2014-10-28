@@ -122,7 +122,7 @@ class UplinkEstimating
 		
 		if(trafficDistribute.size() < 2 )
 		{
-			trafficDistribute.get(0).setPathTraffic(trafficDistribute.get(0).getPathTraffic() + trafficUL_V);
+			trafficDistribute.get(0).setPathTraffic(trafficUL_V);
 			trafficDistribute.get(0).setPercentage(100);
 			return trafficDistribute;
 		}
@@ -265,139 +265,9 @@ class UplinkEstimating
 			}
 			
 		}
-			return trafficDistribute;
-			
-		/*	TrafficOfUplinkPath p_prime;		
-			float  preTraffic,newTraffic;
-			
-			
-			
-			
-			int ITER = 0, index = 0 ;
-			
-			
-			List<TrafficOfUplinkPath> pULx = new ArrayList<>();
-			while(consider.size() > 0 && trafficUL_V > 0)
-			{
-				p_prime = uplinkPathwithTraffic.get(index);
-				ITER++;
-				pULx.add(p_prime);
-				
-				
-				
-				// for p'' in pULp'' 
-				for (int pdp = 0 ; pdp < uplinkPathwithTraffic.size() ; pdp++)
-				{
-					TrafficOfUplinkPath p_double_prime = uplinkPathwithTraffic.get(pdp);
-					if(p_double_prime.getPath().equals(p_prime.getPath())) continue;
-					
-					
-					if(p_double_prime.getPathTraffic() < p_prime.getPathTraffic() && trafficUL_V != 0)
-					{
-						float delta =  p_prime.getPathTraffic() - p_double_prime.getPathTraffic();
-						if(ITER * delta < trafficUL_V)
-						{
-							preTraffic  = p_double_prime.getPathTraffic();
-							newTraffic  = preTraffic + delta;
-							p_double_prime.setPathTraffic(newTraffic);
-							trafficUL_V -= delta;
-							
-							double prcentagePart = (percentage * delta) / trafficUL_V;
-							
-							p_double_prime.setPercentage(p_double_prime.getPercentage() + prcentagePart);
-							
-							percentage -= prcentagePart;
-						}
-						else
-						{
-							for (TrafficOfUplinkPath tULx : pULx)
-							{
-								tULx.setPathTraffic(tULx.getPathTraffic() + trafficUL_V / ITER);
-								tULx.setPercentage(tULx.getPercentage() + (percentage / ITER) );
-							}
-							
-							trafficUL_V = 0;
-						}
-
-					}
-				}
-				consider.remove(p_prime);
-				index++;
-			}
-			
-			for (TrafficOfUplinkPath pu : pULx)
-			{
-				for (TrafficOfUplinkPath upt : uplinkPathwithTraffic)
-				{
-					if(pu.getPath().equals(upt.getPath()))
-					{
-						upt.setPercentage(pu.getPercentage());
-					}
-				}
-			}*/
-
-		
+			return trafficDistribute;		
 	}
 
-	/*private UplinkPathTraffic getTmaxV(List<UplinkPathTraffic> trafficMax)
-	{
-		UplinkPathTraffic maxTraffic = null;
-		int MaxValue = 0;
-		for (UplinkPathTraffic maxTrafficOfPath : trafficMax)
-		{
-			if(maxTrafficOfPath.getPathTraffic() >= MaxValue)
-				maxTraffic = maxTrafficOfPath;
-		}
-		return maxTraffic;
-	}
-
-	private UplinkPathTraffic getTmaxVG(Path ulPath)
-	{
-		Edge MaxEdge = null;
-		Float max = 0f;
-		Float trafficL = 0f;
-		TreeSet<Float> lt = new TreeSet<>();
-		
-		for(int i = 0 ; i < ulPath.getEdgePath().size()  ; i++)
-		{
-				
-				Link link = ulPath.getEdgePath().get(i);		
-				trafficL = linksTraffic.get(link);
-				lt.add(trafficL);
-				Link reverseLink = getReverseLink(link);
-				Float trafficLprim = linksTraffic.get(reverseLink);
-				if(trafficL + trafficLprim > max)
-				{
-					max = trafficL + trafficLprim ;
-					MaxEdge = new Edge(link, reverseLink);
-				}
-		}
-		
-		return new UplinkPathTraffic(ulPath, MaxEdge, max,lt);
-	}
-	
-	private Collection<? extends UplinkPathTraffic> getTmaxVG(List<Path> uplinkPathForRouter)
-	{
-		List<UplinkPathTraffic> output = new ArrayList<UplinkPathTraffic>();
-		
-		for (Path trafficOfPath : uplinkPathForRouter)
-		{
-			output.add(getTmaxVG(trafficOfPath));
-		}
-			
-		return output; 
-	}
-
-	private Link getReverseLink(Link edge)
-	{
-		for (Entry<Integer, Link> edgesMap : gtd.LinkMap.entrySet())
-		{
-			Link currentEdge = edgesMap.getValue();
-			if(edge.getSource() == currentEdge.getDestination() && edge.getDestination() == currentEdge.getSource())
-				return currentEdge;
-		}
-		return null;
-	}*/
 	
 	private void ModifyTarfficOfLink(List<UplinkPathTraffic> listOf_tULp)
 	{

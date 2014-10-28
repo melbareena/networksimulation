@@ -27,7 +27,7 @@ public class Vertex implements Comparable<Vertex>
 
 	public String toString()
 	{
-		return   "Vertex #" + id;
+		return   location.x + "," + location.y + " " + id;
 	}
 
 	@Override
