@@ -109,7 +109,7 @@ public class TransmissionConfiguration {
 			
 			//*******************************************SETP 3****************************************************
 			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.
-			tConfUnit = Enlarge(tConfUnit);			
+			//tConfUnit = Enlarge(tConfUnit);			
 			//*******************************************SETP 4****************************************************
 			tConfUnit = calcDataRate(tConfUnit);	
 			//*****************************************************************************************************		
@@ -560,14 +560,15 @@ public class TransmissionConfiguration {
 					break;
 				}
 			}
+		
+			if(add && tPrime.getTCAP() >= tConfig.getTCAP())
+			{
+				ConsiderLinks.put(newLink,true);
+				setMark(newLink.getDestination());
+				setMark(newLink.getSource());
+				return tPrime;
+			}
 		} 
-		if(add && tPrime.getTCAP() > tConfig.getTCAP())
-		{
-			ConsiderLinks.put(newLink,true);
-			setMark(newLink.getDestination());
-			setMark(newLink.getSource());
-			return tPrime;
-		} 	
 		return null;
 
 
