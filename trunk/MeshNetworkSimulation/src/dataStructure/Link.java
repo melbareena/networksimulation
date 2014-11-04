@@ -50,6 +50,21 @@ public class Link implements Comparable<Link>
 		return id +"[" + source + "-> " + destination + "]";
 	}
 
+	public double getDistance()
+	{
+		 return source.getDistance(destination);
+	}
+	
+	/**
+	 * 
+	 * @param l: link (i)
+	 * @return cross distance between current object (j) and other link (j)
+	 */
+	public double getCrossDistance(Link l)
+	{
+		 return source.getDistance(l.getDestination());
+	}
+	
 	@Override
 	public int compareTo(Link o)
 	{

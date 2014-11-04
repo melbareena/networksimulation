@@ -2,7 +2,6 @@ package transConf;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -10,20 +9,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import java.util.TreeSet;
 
-import setting.ApplicationSettingFacade;
+import org.jblas.ComplexDouble;
+import org.jblas.ComplexDoubleMatrix;
+import org.jblas.DoubleMatrix;
+import org.jblas.Eigen;
 
+import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
+import transConf.SINR;
 import cAssignment.ChannelAssignmentFacade;
 import common.FileGenerator;
-
+import common.PrintConsole;
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
 import dataStructure.LinkType;
-
 import dataStructure.TCUnit;
 import dataStructure.Triple;
 import dataStructure.Vertex;
@@ -64,7 +66,7 @@ public class TransmissionConfiguration {
 					{
 						setMark(l.getDestination());
 						setMark(l.getSource());
-						tConfUnit.put(l, setting.ApplicationSettingFacade.DataRate.getMax());
+						tConfUnit.putRate(l, setting.ApplicationSettingFacade.DataRate.getMax());
 								
 						ConsiderLinks.put(l,true);
 					}
@@ -100,31 +102,24 @@ public class TransmissionConfiguration {
 					//-------------------------PHASE 2----------------------------------------
 					if(tConfUnit.getCounter_g(g, LinkType.Incoming) == 0 )
 						tConfUnit = exchangeIncoming(tConfUnit, original, g);
-					//if(tConfUnit.getCounter_g(g, LinkType.Outgoing) == 0 )
-					//	tConfUnit = exchangeOutgoing(tConfUnit, original, g);
 					//---------------------------------------------------------------------------
-			} 
-		}	
+				} 
+			}	
 		
+			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.	
+			powerControl(tConfUnit);
 			
-			//*******************************************SETP 3****************************************************
-			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.
-			//tConfUnit = Enlarge(tConfUnit);			
-			//*******************************************SETP 4****************************************************
-			tConfUnit = calcDataRate(tConfUnit);	
-			//*****************************************************************************************************		
+			
 			_TT.add(tConfUnit);
-			resetMARK();
-			
-		}	
-		
-		
+			resetMARK();		
+		}
+		//*******************************************SETP 3****************************************************
+		Enlarge();		
 		FileGenerator.TransmissionConfige(_TT);
 		FileGenerator.DataRate(_TT);
 		return _TT;
 	}
 
-	
 	private TCUnit exchangeIncoming(TCUnit tConfUnit, TCUnit original, Vertex g)
 	{
 		ArrayList<Triple<Link, Link, Double>> tripleLists = new ArrayList<>();
@@ -138,7 +133,6 @@ public class TransmissionConfiguration {
 		{
 			for(Link lprime : copyTC.getLinks())
 			{
-				//if(TopologyGraphFacade.isGatewayLink(lprime)) continue;
 				List<Link> links = copyTC.getLinks();
 				links.remove(lprime);
 				links.add(link);
@@ -157,7 +151,7 @@ public class TransmissionConfiguration {
 			Triple<Link, Link, Double> maxTriple = maxmizing(tripleLists);
 			copyTC.removeLink(maxTriple.getB());
 			deletedLink = maxTriple.getB();
-			copyTC.put(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
+			copyTC.putRate(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
 									
 		
 		}
@@ -540,7 +534,7 @@ public class TransmissionConfiguration {
 		if(this.checkRadio(newLink))
 		{
 			if(!balanceGatewayLinks(newLink,tConfig)) return null;
-			tPrime.put(newLink, 0);
+			tPrime.putRate(newLink, 0);
 			tPrime.setTCAPZero();
 			
 		
@@ -552,7 +546,7 @@ public class TransmissionConfiguration {
  				sinr = SINR.calc(currentLink,linkSet );
 				
 				if(sinr >= BETA)
-					tPrime.put(currentLink, computeRate(sinr).getRate());
+					tPrime.putRate(currentLink, computeRate(sinr).getRate());
 				else
 				{
 					//System.out.println("\tSINR too low : "+sinr);
@@ -624,9 +618,49 @@ public class TransmissionConfiguration {
 			links.remove(l);
 			double  sinr = SINR.calc(l, links);
 			DataRate dr = computeRate(sinr);
-			tConfUnit.setDataRate(l, dr.getRate());
+			tConfUnit.setSinrRate(l, dr.getRate(),sinr);
 		}
 		return tConfUnit;
+	}
+		
+	private void calcDataRate()
+	{
+		List<TCUnit> updateTT = new ArrayList<TCUnit>();
+		TCUnit updateTUnit = null;
+		for (TCUnit tcUnit : _TT)
+		{
+			updateTUnit = this.calcDataRate(tcUnit);
+			updateTT.add(updateTUnit);
+		}
+		_TT = updateTT;
+		
+	}
+
+	private void Enlarge()
+	{
+		List<TCUnit> updateTT = new ArrayList<TCUnit>();
+		TCUnit updateTUnit = null;
+		for (TCUnit tcUnit : _TT)
+		{
+			tcUnit = calcDataRate(tcUnit);
+			calcOccupiedRadio(tcUnit);
+			updateTUnit = this.Enlarge(tcUnit);
+			updateTUnit = this.calcDataRate(updateTUnit);
+			updateTT.add(updateTUnit);
+			resetMARK();
+		}
+		_TT = updateTT;
+		calcDataRate();
+	}
+	
+	private void calcOccupiedRadio(TCUnit tcUnit)
+	{
+		for (Link l : tcUnit.getLinks())
+		{
+			setMark(l.getDestination());
+			setMark(l.getSource());
+		}
+		
 	}
 
 	private TCUnit Enlarge(TCUnit tConfUnit)
@@ -653,7 +687,7 @@ public class TransmissionConfiguration {
 				if(checkRadio(lprime))
 				{
 					TCUnit T_prime = tConfUnit.Clone(); // clone new TC and add the new link to it
-					T_prime.put(lprime, 0); // add new link which wants to add to the tc
+					T_prime.putRate(lprime, 0); // add new link which wants to add to the tc
 					T_prime = calcDataRate(T_prime); // calculate tc data rate
 					
 					
@@ -664,7 +698,7 @@ public class TransmissionConfiguration {
 						TCUnit T = tConfUnit.Clone();
 							
 						T.removeLink(l);
-						T.put(lprime, 0);
+						T.putRate(lprime, 0);
 						sinr = SINR.calc(l, T.getLinks());
 						T = calcDataRate(T);
 						if(sinr  <= BETA || T_prime.getTCAP() < tConfUnit.getTCAP() )
@@ -673,7 +707,7 @@ public class TransmissionConfiguration {
 					if(add)
 					{
 						sinr = SINR.calc(lprime, tConfUnit.getLinks());
-						tConfUnit.put(lprime, computeRate(sinr).getRate());
+						tConfUnit.putRate(lprime, computeRate(sinr).getRate());
 						setMark(u);
 						setMark(v);
 						break;
@@ -698,13 +732,13 @@ public class TransmissionConfiguration {
 					{
 						TCUnit T = tConfUnit.Clone();
 						T.removeLink(l);
-						T.put(lprime, 0);
+						T.putRate(lprime, 0);
 						sinr = SINR.calc(l, T.getLinks());
 						T = calcDataRate(T);
 						if(sinr  < BETA && T.getTCAP() > tConfUnit.getTCAP() )
 						{				
 							//System.err.println("TC #" + TCCounter + " add link " + lprime +" by Enlarg....");
-							tConfUnit.put(lprime, computeRate(sinr).getRate());
+							tConfUnit.putRate(lprime, computeRate(sinr).getRate());
 							setMark(u);
 							setMark(v);
 							break;
@@ -714,6 +748,7 @@ public class TransmissionConfiguration {
 				}
 			}
 		}
+	
 		return tConfUnit;
 	}
 
@@ -728,7 +763,7 @@ public class TransmissionConfiguration {
 		}
 		return result;
 	}
-
+	
 	private void setMark(Vertex v)
 	{
 		int pre = MARK.remove(v);
@@ -777,6 +812,47 @@ public class TransmissionConfiguration {
 		}
 		return false;
 	}
+	
+	
+	private TCUnit powerControl(TCUnit unit)
+	{
+		unit = calcDataRate(unit);
+		
+		List<Link> links = unit.getLinks();
+		
+		double[][] arr_D = new double[unit.size()][unit.size()];
+		double[][] arr_G = new double[unit.size()][unit.size()];
+		for(int i = 0 ; i < unit.size() ; i++)
+			for(int j=0; j < unit.size() ; j++)
+			{
+				if(i==j)
+					arr_D[i][j] = unit.getSinr(links.get(i)); // get gamma 
+				else
+					arr_G[i][j] = Math.pow(links.get(j).getCrossDistance(links.get(i)),2) /
+							Math.pow(links.get(i).getDistance(), 2);
+			}
+		
+		DoubleMatrix D=new DoubleMatrix(arr_D);
+		DoubleMatrix G=new DoubleMatrix(arr_G);		
+		
+		DoubleMatrix A = D.mmuli(G);	
+		ComplexDoubleMatrix cdm = Eigen.eigenvalues(A);
+		 ComplexDouble[] cd = new ComplexDouble[unit.size()];
+		  for (int i=0;i<unit.size();i++) cd[i]=cdm.get(i);
+		  double perron_eigenvalue=Double.MIN_VALUE;
+		  	  for (int i=0;i<unit.size();i++) {
+			    if (cd[i].isReal() && cd[i].real()>perron_eigenvalue) perron_eigenvalue=cd[i].real();
+		}
+		  	  
+		  	  if(perron_eigenvalue < 1)
+		  		  PrintConsole.print("Helllllooooooooooooooooooooooooooooooooooooooooooooooooooooo Power Control");
+		  	  else
+		  		  PrintConsole.print("Dead");
+		
+		
+		return null;
+	}
+	
 	
 	private LinkedHashSet<Link> sortByOrthogonalChannel(Set<Link> linkSet) {
 		TreeSet<Link> result = new TreeSet<Link>(new Comparator<Link>() {

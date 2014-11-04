@@ -49,7 +49,6 @@ public class AssigningSterategy {
 			linksChannel = new LinksChannelMap();
 
 			linksTraffics = new LinkTrafficMap(TrafficEstimatingFacade.getLinksTraffic().Sort());
-
 			for (Entry<Link, Float> tLink : linksTraffics.entrySet()) {
 				linksChannel.put(tLink.getKey(), new Channel(0));
 			}
