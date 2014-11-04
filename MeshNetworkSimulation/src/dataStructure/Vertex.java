@@ -65,6 +65,11 @@ public class Vertex implements Comparable<Vertex>
 
 	}
 	
+	public double getDistance(Vertex v)
+	{
+		 return Math.sqrt(Math.pow((location.x-v.location.x), 2) + Math.pow((location.y-v.location.y), 2)); 
+	}
+	
 	
 
 }
