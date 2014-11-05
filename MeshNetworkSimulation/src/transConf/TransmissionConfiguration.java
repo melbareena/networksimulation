@@ -1,5 +1,6 @@
 package transConf;
 
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.jblas.ComplexDouble;
 import org.jblas.ComplexDoubleMatrix;
 import org.jblas.DoubleMatrix;
 import org.jblas.Eigen;
+import org.jblas.Solve;
 
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
@@ -107,7 +109,7 @@ public class TransmissionConfiguration {
 			}	
 		
 			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.	
-			powerControl(tConfUnit);
+			tConfUnit = powerControl(tConfUnit);
 			
 			
 			_TT.add(tConfUnit);
@@ -813,9 +815,9 @@ public class TransmissionConfiguration {
 		return false;
 	}
 	
-	
 	private TCUnit powerControl(TCUnit unit)
 	{
+		
 		unit = calcDataRate(unit);
 		
 		List<Link> links = unit.getLinks();
@@ -825,17 +827,27 @@ public class TransmissionConfiguration {
 		for(int i = 0 ; i < unit.size() ; i++)
 			for(int j=0; j < unit.size() ; j++)
 			{
-				if(i==j)
-					arr_D[i][j] = unit.getSinr(links.get(i)); // get gamma 
+				Link ell_i = links.get(i);
+				Link ell_j = links.get(j);
+				if(i==j)	
+					arr_D[i][j] = unit.getSinr(ell_i); // get gamma
 				else
-					arr_G[i][j] = Math.pow(links.get(j).getCrossDistance(links.get(i)),2) /
-							Math.pow(links.get(i).getDistance(), 2);
+				{
+					double d =  (Math.pow(links.get(j).getCrossDistance(links.get(i)),-ApplicationSettingFacade.SINR.getAlpha()) /
+							Math.pow(links.get(i).getDistance(), -ApplicationSettingFacade.SINR.getAlpha()));
+					double IfactorValue = SINR.getIFactorValue(ell_i, ell_j);
+					d = d * IfactorValue;
+					double rounded = (double) Math.round(d * 10000) / 10000;
+					arr_G[i][j] = rounded;
+				}
 			}
 		
-		DoubleMatrix D=new DoubleMatrix(arr_D);
-		DoubleMatrix G=new DoubleMatrix(arr_G);		
 		
-		DoubleMatrix A = D.mmuli(G);	
+		DoubleMatrix A = new DoubleMatrix(unit.size(), unit.size());
+		DoubleMatrix D = new DoubleMatrix(arr_D);
+		DoubleMatrix G = new DoubleMatrix(arr_G);		
+		
+		 D.mmuli(G,A);	
 		ComplexDoubleMatrix cdm = Eigen.eigenvalues(A);
 		 ComplexDouble[] cd = new ComplexDouble[unit.size()];
 		  for (int i=0;i<unit.size();i++) cd[i]=cdm.get(i);
@@ -845,12 +857,44 @@ public class TransmissionConfiguration {
 		}
 		  	  
 		  	  if(perron_eigenvalue < 1)
-		  		  PrintConsole.print("Helllllooooooooooooooooooooooooooooooooooooooooooooooooooooo Power Control");
+		  	  {
+		  		  double[][] h = new double[unit.size()][unit.size()];
+		  		  for (int i=0;i<unit.size();i++)
+					  for (int j=0;j<unit.size();j++) 
+						  h[i][j]= i==j ? 1-A.get(i,j) : -1*A.get(i,j);
+						  
+				  DoubleMatrix H = new DoubleMatrix(h); //(I-A)	
+				  
+				  DoubleMatrix b = new DoubleMatrix(unit.size());
+				  for (int i=0;i<unit.size();i++) 
+					  b.put(i,0, ApplicationSettingFacade.SINR.getMue() /
+							  Math.pow(links.get(i).getDistance(),-ApplicationSettingFacade.SINR.getAlpha()));
+				  
+				  
+				  DoubleMatrix H_inv=Solve.solve(H,DoubleMatrix.eye(unit.size()));
+				  DoubleMatrix P = H_inv.mmul(b);
+				  double[] power = P.toArray();
+				  
+				  int i = 0;
+				for (double e : power)
+				{
+					
+					double power_watTOmWat = e * 1000;
+					if(power_watTOmWat < ApplicationSettingFacade.SINR.getPower())
+					{
+						unit.setPower(links.get(i), power_watTOmWat) ;
+						PrintConsole.print(links.get(i) + ": " +  power_watTOmWat + "mW");
+					}
+					else
+						PrintConsole.print("exteed the max power:"+ links.get(i) + ": " + power_watTOmWat);
+					i++;
+				}
+		  	  }
 		  	  else
 		  		  PrintConsole.print("Dead");
 		
 		
-		return null;
+		return unit;
 	}
 	
 	
