@@ -39,7 +39,7 @@ public class SINREditOptionDialog extends AbstractEditOptionDialog {
 		centerPanel.add(lblAlpha, "cell 0 0,grow");
 
 		alphaSpinner = new JSpinner();
-		alphaSpinner.setModel(new SpinnerNumberModel(new Integer(4), new Integer(0), null, new Integer(1)));
+		alphaSpinner.setModel(new SpinnerNumberModel(new Integer(2), new Integer(0), null, new Integer(1)));
 		centerPanel.add(alphaSpinner, "cell 1 0,grow");
 
 		JLabel lblW = new JLabel("W:");
@@ -106,7 +106,7 @@ public class SINREditOptionDialog extends AbstractEditOptionDialog {
 	
 	@Override
 	protected void setDefault() {
-		alphaSpinner.setValue(4);
+		alphaSpinner.setValue(2);
 		WSpinner.setValue(20);
 		powerSpinner.setValue(25);
 		betaSpinner.setValue(8.51);
