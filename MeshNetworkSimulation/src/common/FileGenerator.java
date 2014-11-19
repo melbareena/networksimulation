@@ -627,12 +627,12 @@ public class FileGenerator
 			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/AdjustmentTC/need" +counter + ".txt"));
 			for (Link l : unit.getLinks())
 			{
-				writer.write(l.getId() + ": " + unit.getPower(l));
+				writer.write(l.getId() + ": " + unit.getRate(l));
 				writer.newLine();
 			}
 
 			writer.close();
-			PrintConsole.printErr("Adjustment for power control inserted in file successfully.");
+			//PrintConsole.printErr("Adjustment for power control inserted in file successfully.");
 		} 
 		catch (Exception ex)
 		{
@@ -641,6 +641,30 @@ public class FileGenerator
 		
 		
 		
+	}
+
+	private static int counter = 0;
+	public static void deadTC(TCUnit unit)
+	{
+		counter++;
+		if(!ISFILEENABLE) return;
+		
+		try
+		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/DeadTC/dead"+ counter +".txt"));
+			for (Link l : unit.getLinks())
+			{
+				writer.write(l.getId() + ": " + unit.getRate(l));
+				writer.newLine();
+			}
+
+			writer.close();
+			//PrintConsole.printErr("Adjustment for power control inserted in file successfully.");
+		} 
+		catch (Exception ex)
+		{
+			System.err.println("DeadTC/FileGenerator/Message:" + ex.getMessage());
+		}
 	}
 
 

@@ -108,6 +108,7 @@ class PowerControlUnit
 			
 			if(powerAllocationIsOk)
 			{
+				FileGenerator.needToAdjust(counter, unit);
 				unit.setNeedAdjusmentpower(false);
 				unit.setDead(false);
 				unit.setLock(true);
@@ -117,7 +118,10 @@ class PowerControlUnit
 		  }
 		  // there is no feasible solution  
 		  else
-	  		  unit.setDead(true);	  
+		  {
+	  		  unit.setDead(true);
+	  		  FileGenerator.deadTC(unit);
+		  }
 		  
 		  if(unit.needAdjusmentPower() && !unit.isDead())		  
 			  unit = adjustmentPower(unit); 
@@ -136,7 +140,7 @@ class PowerControlUnit
 		if(unit.needAdjusmentPower())
 		{
 			
-			FileGenerator.needToAdjust(counter, unit);
+			
 			double maxRate = Double.MIN_VALUE;
 			Link maxLink = null;
 			for (Link ell_i : unit.getLinks())
