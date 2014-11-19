@@ -618,6 +618,32 @@ public class FileGenerator
 	}
 
 
+	public static void needToAdjust(int counter, TCUnit unit)
+	{
+		if(!ISFILEENABLE) return;
+		
+		try
+		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/AdjustmentTC/need" +counter + ".txt"));
+			for (Link l : unit.getLinks())
+			{
+				writer.write(l.getId() + ": " + unit.getPower(l));
+				writer.newLine();
+			}
+
+			writer.close();
+			PrintConsole.printErr("Adjustment for power control inserted in file successfully.");
+		} 
+		catch (Exception ex)
+		{
+			System.err.println("NeedToAdjustment/FileGenerator/Message:" + ex.getMessage());
+		}
+		
+		
+		
+	}
+
+
 	
 
 

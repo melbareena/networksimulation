@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
@@ -19,12 +20,70 @@ public class TCUnit
 	private Map<Link, Integer> _rateCollection = new HashMap<Link, Integer>();
 	private Map<Link, Double> _sinrCollection = new HashMap<Link, Double>();
 	private Map<Link, Double> _powerCollection = new HashMap<Link, Double>(); 
+	private Map<Link,Double> _linkWeight = new HashMap<Link, Double>();
 	
-	private Map<Link,Double> linkWeight = new HashMap<Link, Double>();
+	/**
+	 * show the power control assign for the current T and calculation data rate not be perform to this TC;
+	 */
+	private boolean isLock = false;
+	
+	public boolean isLock()
+	{
+		return isLock;
+	}
+
+	public void setLock(boolean isLock)
+	{
+		this.isLock = isLock;
+	}
+
+	private boolean needAdjusmentPower = false;
+	
+	/**
+	 * there is no feasible solution for the current TC
+	 */
+	private boolean isDead = false;
+	
+	
+	public boolean isDead()
+	{
+		return isDead;
+	}
+
+	public void setDead(boolean isDead)
+	{
+		this.isDead = isDead;
+		if(isDead)
+			this.isLock = false;
+	}
+
+	public boolean needAdjusmentPower()
+	{
+		return needAdjusmentPower;
+	}
+
+	public void setNeedAdjusmentpower(boolean canAdjusmentpower)
+	{
+		this.needAdjusmentPower = canAdjusmentpower;
+		if(canAdjusmentpower)
+			this.isLock = false;
+			
+	}
+	public Map<Link, Integer> getRateMap()
+	{
+		return _rateCollection;
+	}
+	
+	public Map<Link, Double> getSinrMap()
+	{
+		return _sinrCollection;
+	}
+	
+	
 	
 	public Map<Link,Double> getLinkWeight()
 	{
-		return linkWeight;
+		return _linkWeight;
 	}
 	
 	private double throughput = 0;
@@ -54,7 +113,7 @@ public class TCUnit
 			Link l = traffic.getKey();
 			double traff = traffic.getValue();
 			int r = this.getRate(l);
-			linkWeight.put(l, traff/r);
+			_linkWeight.put(l, traff/r);
 		}
 	}
 	
@@ -75,8 +134,8 @@ public class TCUnit
 	public double getMatchingRate(Link l)
 	{
 		double rate = 0;		
-			if(linkWeight.containsKey(l))
-				rate += linkWeight.get(l);
+			if(_linkWeight.containsKey(l))
+				rate += _linkWeight.get(l);
 				
 		return rate;
 		
@@ -177,6 +236,9 @@ public class TCUnit
 			_sinrCollection.remove(l);	
 		if(_powerCollection.containsKey(l))
 			_powerCollection.remove(l);
+		if(_linkWeight.containsKey(l))
+			_linkWeight.remove(l);
+			
 	}
 
 	/**
@@ -243,5 +305,14 @@ public class TCUnit
 			_rateCollection.put(link, 0);
 		}
 		
+	}
+
+	public Link removeLinkRandomly()
+	{	
+		int i = getLinks().size();
+		Random rand = new Random();
+		Link deleted = getLinks().get(rand.nextInt(i));
+		removeLink(deleted);
+		return deleted;
 	}
 }

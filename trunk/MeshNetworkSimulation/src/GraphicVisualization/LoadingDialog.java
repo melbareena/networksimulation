@@ -55,7 +55,7 @@ public class LoadingDialog extends JDialog {
 
 		addBar();
 		
-		setAlwaysOnTop(true);
+		//setAlwaysOnTop(true);
 		setLocationRelativeTo(null);
 		setCursor(new Cursor(Cursor.WAIT_CURSOR));
 	}

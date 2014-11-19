@@ -78,13 +78,19 @@ public class Program {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		try {
+		try
+		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			System.err.println("Unable to set the UI look and feel...");
+			StartOptionsDialog startOptionDialog = new StartOptionsDialog();
+			startOptionDialog.setVisible(true);
 		}
-		StartOptionsDialog startOptionDialog = new StartOptionsDialog();
-		startOptionDialog.setVisible(true);
+		catch (Exception e)
+		{
+			System.err.println("Unable to set the UI look and feel...");
+			System.err.println(e.getMessage());
+			System.err.println(e.getStackTrace());
+			System.exit(0);
+		}
 	}
 
 	/**Launch the program with the selected parameters.
@@ -163,10 +169,13 @@ public class Program {
 
 			};
 			worker.execute();
-		} catch (Exception e) {
+		}
+		catch (Exception e) 
+		{
 			GraphViewer.showErrorDialog(e.getClass().toString(), e.getClass()
 					.toString() + ": " + e.getMessage().toString());
 			e.printStackTrace(System.err);
+			System.exit(0);
 		}
 
 	}

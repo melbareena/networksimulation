@@ -18,7 +18,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -127,6 +129,7 @@ public class GraphViewer extends JFrame {
 	/** Map containing the Datarates for each Transmission Configuration
 	 * <code>key: configID (integer) -> value: datarate (List)</code>*/
 	private static HashMap<Integer, ArrayList<Integer>> mapDatarates;
+	private static HashMap<Integer,ArrayList<Double>> mapPowerRate;
 	
 	/* Swing stuff */
 	private final JCheckBox chckbxDownlinks = new JCheckBox("Downlinks");
@@ -139,6 +142,8 @@ public class GraphViewer extends JFrame {
 	private final JCheckBoxMenuItem menuChannel = new JCheckBoxMenuItem("Channel");
 	private final JCheckBox chckbxDatarate = new JCheckBox("Datarate");
 	private final JCheckBoxMenuItem menuDatarate = new JCheckBoxMenuItem("Datarate");
+	private final JCheckBox chkPower = new JCheckBox("Power");
+	private final JCheckBoxMenuItem menuPower = new JCheckBoxMenuItem("Power");
 	private final JRadioButton rdbtnColorByLink = new JRadioButton("Color by Link");
 	private final JRadioButtonMenuItem menuColorByLink = new JRadioButtonMenuItem("Color by Link");
 	private final JRadioButton rdbtnColorByChannel = new JRadioButton("Color by Channel");
@@ -164,6 +169,7 @@ public class GraphViewer extends JFrame {
 	private final HistogramViewer histogramViewerFrame;
 	
 	public static String _availableChannels; 
+	
  
 	/** Initiates and show the Frame.
 	 * @param throughputData The data for the throughput plot.
@@ -217,6 +223,7 @@ public class GraphViewer extends JFrame {
 		GraphViewer.mapEdges = new HashMap<Integer, Link>();
 		GraphViewer.mapConfigurations = new HashMap<Integer, ArrayList<Integer>>();
 		GraphViewer.mapDatarates = new HashMap<Integer, ArrayList<Integer>>();
+		GraphViewer.mapPowerRate = new HashMap<Integer, ArrayList<Double>>();
 
 		getDataAndFillGraph();
 		
@@ -393,7 +400,22 @@ public class GraphViewer extends JFrame {
 		
 		labelPanel.add(Box.createVerticalGlue());
 		
+		labelPanel.add(chkPower);
+		
 		bottomPanel.add(Box.createHorizontalGlue());
+		chkPower.setEnabled(false);
+		
+		chkPower.addItemListener(new ItemListener()
+		{
+			
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				menuPower.setSelected(e.getStateChange() == ItemEvent.SELECTED);
+				updateLabels();
+				
+			}
+		});
 		
 		/* displayPanel */
 		JPanel displayPanel = new JPanel();
@@ -523,6 +545,7 @@ public class GraphViewer extends JFrame {
 		bottomPanel.add(configurationsPanel);
 
 		Integer[] intList = mapConfigurations.keySet().toArray(new Integer[mapConfigurations.size()]);
+		Arrays.sort(intList);
 		configList = new JComboBox<Integer>(intList);
 		configList.addActionListener(new ActionListener() {
 			@Override
@@ -575,6 +598,7 @@ public class GraphViewer extends JFrame {
 				chckbxDatarate.setSelected(false);
 				menuDatarate.setSelected(false);
 				chckbxThickness.setEnabled(true);
+				chkPower.setEnabled(true);
 				menuThickness.setEnabled(true);
 				chckbxThickness.setSelected(false);
 				menuThickness.setSelected(false);
@@ -968,8 +992,20 @@ public class GraphViewer extends JFrame {
 					label += GraphViewer.mapDatarates.get(this.configList.getSelectedIndex()).get(TCindex);
 				}
 			}
+			if(chkPower.isSelected()){
+				label += (before) ? "\nP" : "P";
+				// If the current Link is in the currently showing TC
+				int TCindex = GraphViewer.mapConfigurations.get(this.configList.getSelectedIndex()).indexOf(id);
+				if(TCindex != -1) 
+					label += roundTwoDecimals(GraphViewer.mapPowerRate.get(this.configList.getSelectedIndex()).get(TCindex));
+			}
 			this.graph.getModel().setValue(edge, label);
 		}
+	}
+	
+	public double roundTwoDecimals(double d) {
+	    DecimalFormat twoDForm = new DecimalFormat("#.##");
+	    return Double.valueOf(twoDForm.format(d));
 	}
 	
 	/** Updates the style of the link and their label on the graph.
@@ -1053,12 +1089,16 @@ public class GraphViewer extends JFrame {
 		for(TCUnit tcu : TCFacade.getConfigurations()) {
 			ArrayList<Integer> tabConfig = new ArrayList<Integer>();
 			ArrayList<Integer> tabRates = new ArrayList<Integer>();
+			ArrayList<Double> tabPower = new ArrayList<Double>();
 			for(dataStructure.Link l : tcu.getLinks()) {
 				tabConfig.add(l.getId());
 				tabRates.add(tcu.getRate(l));
+				tabPower.add(tcu.getPower(l));
 			}
 			GraphViewer.mapConfigurations.put(tcuIndex, tabConfig);
-			GraphViewer.mapDatarates.put(tcuIndex++, tabRates);
+			GraphViewer.mapDatarates.put(tcuIndex, tabRates);
+			GraphViewer.mapPowerRate.put(tcuIndex, tabPower);
+			tcuIndex++;
 		}
 	}
 	
