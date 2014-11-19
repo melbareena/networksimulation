@@ -1,22 +1,16 @@
 package transConf;
 
 import java.util.List;
-import java.util.Map;
-
 import cAssignment.ChannelAssignmentFacade;
-
 import setting.ApplicationSettingFacade;
-import topology.TopologyFacade;
 import dataStructure.IFactorMap;
 import dataStructure.Link;
 import dataStructure.LinksChannelMap;
-import dataStructure.Vertex;
 
 public class SINR
 {
 	
 	private static SINR self;
-	private Map<Vertex,Map<Vertex,Double>> nodesDistances = TopologyFacade.getDistanceForEachNode();
 	private final float ALPHA = ApplicationSettingFacade.SINR.getAlpha();
 	private final double MUE = ApplicationSettingFacade.SINR.getMue();
 	private final float POWER = ApplicationSettingFacade.SINR.getPower();

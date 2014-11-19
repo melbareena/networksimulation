@@ -291,6 +291,10 @@ public abstract class SchedulingStrategy
 		return sourceBuffers.trafficSize() - currentTrafficAmount;
 	}
 	
+	/**
+	 * calculate the weight of link in each TC
+	 * @param isSourceBufferTraffic : {@value true} : calculate for source buffer
+	 */
 	protected void calcWeight(boolean isSourceBufferTraffic)
 	{
 		BufferMap targetMap;		

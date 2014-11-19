@@ -25,12 +25,19 @@ public class TCFacade
 		{
 			PrintConsole.print("Tranmission Configuration Start.......");
 			multiExecIndex = Program.multiExecIndex;
-			TransmissionConfiguration	tc = new TransmissionConfiguration();
+			
+			
 			if(ApplicationSettingFacade.TranmissionConfiguration.getStertegy() == TCStrategy.PatternBased) 
-				configurations = tc.patternBasedConfiguration(downOverUpRatio, priotityToOrthogonal,
+			{
+				PatternBasedTC pTC = new PatternBasedTC();
+				configurations = pTC.patternBasedConfiguration(downOverUpRatio, priotityToOrthogonal,
 						repeatLinksToRespectRatio, enlargeByGateways);
+			}
 			else 
-				configurations = tc.originalConfiguring();
+			{
+				GreedyTC gtc = new GreedyTC();
+				configurations = gtc.originalConfiguring();
+			}
 
 		}
 		return configurations;

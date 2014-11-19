@@ -81,6 +81,20 @@ public class ApplicationSettingFacade
 
 			return max;
 		}
+		
+		
+		public static int getMin()
+		{
+			int min = Integer.MAX_VALUE;
+			
+			List<dataStructure.DataRate> rates = getDataRate();
+			for (dataStructure.DataRate r : rates)
+			{
+				if(r.getRate() < min)
+					min = r.getRate();
+			}
+			return min;
+		}
 	}
 	
 	
