@@ -241,7 +241,8 @@ public class PatternBasedTC extends TCBasic
 				tcu = calcDataRate(tcu);
 				tcu = Enlarge(tcu);
 				tcu = calcDataRate(tcu);
-				tcu = _powerUnit.powerControl(tcu);
+				if(ApplicationSettingFacade.PowerControl.isEnable())
+					tcu = _powerUnit.powerControl(tcu);
 				if(listTCU.size() <= currentTCUIndex) {
 					listTCU.add(currentTCUIndex, tcu);
 				} else {
@@ -273,7 +274,8 @@ public class PatternBasedTC extends TCBasic
 					newTCU = Enlarge(newTCU);
 				}
 				newTCU = calcDataRate(newTCU);
-				newTCU = _powerUnit.powerControl(newTCU);
+				if(ApplicationSettingFacade.PowerControl.isEnable())
+					newTCU = _powerUnit.powerControl(newTCU);
 				listTCU.add(newTCU);
 			}
 			resetMARK();

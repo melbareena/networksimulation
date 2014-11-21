@@ -160,6 +160,7 @@ public class StartOptionsDialog extends JDialog {
 	private IFactorEditOptionDialog ifactorDialog;
 	private DatarateEditOptionDialog datarateDialog;
 	private SINREditOptionDialog sinrDialog;
+	private final JCheckBox chkPowerControl = new JCheckBox("Power Control");
 
 	/**
 	 * Create the dialog.
@@ -494,6 +495,9 @@ public class StartOptionsDialog extends JDialog {
 					chckbxEnlargeByGateways.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 				}
 			});
+			chkPowerControl.setSelected(true);
+			
+			rdbtnPanel.add(chkPowerControl);
 			rdbtnPanel.add(rdbtnNewAlgorithm);
 			
 			ButtonGroup groupAlgo = new ButtonGroup();
@@ -887,6 +891,8 @@ public class StartOptionsDialog extends JDialog {
 				(int) nodesSpinner.getValue(),
 				(int) ratioSpinner.getValue(),
 				(long) durationSpinner.getValue());
+		
+		XMLWriter.writePowerControl(chkPowerControl.isSelected());
 
 		if(rdbtnNewAlgorithm.isSelected())
 			XMLWriter.writePatternBasedSterategy((int) spinnerRatio.getValue(), chckbxPriorityToOrthogonal.isSelected(),

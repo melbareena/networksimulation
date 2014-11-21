@@ -170,6 +170,21 @@ public class GraphViewer extends JFrame {
 	
 	public static String _availableChannels; 
 	
+	private double calcAverageRate()
+	{
+		if(mapDatarates == null) return 0;
+		int sum = 0;
+		for (Entry<Integer, ArrayList<Integer>> items : mapDatarates.entrySet())
+		{
+			for (Integer rate : items.getValue())
+			{
+				sum += rate;
+			}
+		}
+		
+		double avarage = sum / mapDatarates.size();
+		return avarage;
+	}
  
 	/** Initiates and show the Frame.
 	 * @param throughputData The data for the throughput plot.
@@ -567,6 +582,8 @@ public class GraphViewer extends JFrame {
 				configList.setEnabled(false);
 				menuListConfig.setEnabled(false);
 				chckbxDatarate.setEnabled(false);
+				chkPower.setEnabled(false);
+				menuPower.setEnabled(false);
 				menuDatarate.setEnabled(false);
 				chckbxDatarate.setSelected(false);
 				menuDatarate.setSelected(false);
@@ -598,7 +615,11 @@ public class GraphViewer extends JFrame {
 				chckbxDatarate.setSelected(false);
 				menuDatarate.setSelected(false);
 				chckbxThickness.setEnabled(true);
-				chkPower.setEnabled(true);
+				if(ApplicationSettingFacade.PowerControl.isEnable())
+				{
+					chkPower.setEnabled(true);
+					menuPower.setEnabled(true);
+				}
 				menuThickness.setEnabled(true);
 				chckbxThickness.setSelected(false);
 				menuThickness.setSelected(false);
@@ -630,7 +651,7 @@ public class GraphViewer extends JFrame {
 		
 		configurationsPanel.add(Box.createVerticalGlue());
 		
-		JLabel nbConfigLabel = new JLabel(mapConfigurations.size()+" configs available");
+		JLabel nbConfigLabel = new JLabel(mapConfigurations.size()+" configs available \n avrage rates:" + this.calcAverageRate()  );
 		nbConfigLabel.setFont(nbConfigLabel.getFont().deriveFont(Font.ITALIC, 9.0F));
 		configurationsPanel.add(nbConfigLabel);
 		
@@ -1093,7 +1114,8 @@ public class GraphViewer extends JFrame {
 			for(dataStructure.Link l : tcu.getLinks()) {
 				tabConfig.add(l.getId());
 				tabRates.add(tcu.getRate(l));
-				tabPower.add(tcu.getPower(l));
+				if(ApplicationSettingFacade.PowerControl.isEnable())
+					tabPower.add(tcu.getPower(l));
 			}
 			GraphViewer.mapConfigurations.put(tcuIndex, tabConfig);
 			GraphViewer.mapDatarates.put(tcuIndex, tabRates);

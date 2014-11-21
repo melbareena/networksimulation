@@ -161,6 +161,8 @@ class PowerControlUnit
 			}
 			else
 			{
+				
+				System.err.println("remove linked");
 				_performer.removeFromConsiderList(unit.removeLinkRandomly());
 				unit.setNeedAdjusmentpower(false);	
 				unit.setDead(true);

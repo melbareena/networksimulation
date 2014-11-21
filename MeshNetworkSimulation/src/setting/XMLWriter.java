@@ -215,4 +215,12 @@ public class XMLWriter {
 		e.setAttribute("Strategy", strategy+"");
 	}
 
+	public static void writePowerControl(boolean selected)
+	{
+		Element e = doc.createElement("PowerControl");
+		rootElement.appendChild(e);
+		e.setAttribute("Enable", selected +"");
+		
+	}
+
 }

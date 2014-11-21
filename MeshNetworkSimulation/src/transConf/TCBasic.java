@@ -220,7 +220,8 @@ public abstract class TCBasic
 			calcOccupiedRadio(tcUnit);
 			updateTUnit = this.Enlarge(tcUnit);
 			updateTUnit = this.calcDataRate(updateTUnit);
-			updateTUnit = _powerUnit.powerControl(updateTUnit);
+			if(ApplicationSettingFacade.PowerControl.isEnable())
+				updateTUnit = _powerUnit.powerControl(updateTUnit);
 			updateTT.add(updateTUnit);
 			resetMARK();
 		}
