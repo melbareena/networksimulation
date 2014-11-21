@@ -36,13 +36,20 @@ public class ApplicationSettingFacade
 	private static SchedulingConfig _schConf = SchedulingConfig.Initiating();
 	private static AppConfig _appConf = AppConfig.Initiating();
 	private static TCConfig _tcConfig = TCConfig.Initiating();
+	private static PowerControlConfig _powerConfig = PowerControlConfig.Initiating();
 	
 	public static AppExecMode getApplicationExecutionMode()
 	{
 		return _appConf.getAppExceMode();
 	}
 	
-	
+	public static class PowerControl
+	{
+		public static boolean isEnable()
+		{
+			return _powerConfig.isEnbale();
+		}
+	}
 	public static class ChannelAssignment
 	{
 		public static String getSterategyClassName()

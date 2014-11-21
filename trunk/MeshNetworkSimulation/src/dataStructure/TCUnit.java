@@ -113,7 +113,7 @@ public class TCUnit
 			Link l = traffic.getKey();
 			double traff = traffic.getValue();
 			int r = this.getRate(l);
-			_linkWeight.put(l, traff/r);
+			_linkWeight.put(l, r/traff);
 		}
 	}
 	
