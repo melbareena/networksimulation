@@ -34,6 +34,8 @@ public class PatternBasedTC extends TCBasic
 		resetMARK();
 	}
 	
+	protected HashSet<Link> _selectedLinksSet = new HashSet<Link>();
+	protected List<TCUnit> _patterns;
 	/** Create a list of transmission configurations, as short as possible.
 	 * Based on 2 main steps :
 	 * <ul>
@@ -60,19 +62,16 @@ public class PatternBasedTC extends TCBasic
 		
 		List<Vertex> gateways = new ArrayList<Vertex>(ApplicationSettingFacade.Gateway.getGateway().values());
 		
-		HashSet<Link> selectedLinksSet = new HashSet<Link>();
+		_patterns = gatewaysStep(gateways, downOverUpRatio, priorityToOrthogonal,
+				_selectedLinksSet, repeatLinksToRespectRatio);
 		
-		List<TCUnit> patterns = gatewaysStep(gateways, downOverUpRatio, priorityToOrthogonal,
-				selectedLinksSet, repeatLinksToRespectRatio);
+		System.out.println("Number of patterns: "+_patterns.size());
 		
-		System.out.println("Number of patterns: "+patterns.size());
-		
-		List<TCUnit> finalList = remainingLinksStep(patterns, selectedLinksSet, enlargeByGateways,
+		List<TCUnit> finalList = remainingLinksStep(_patterns, _selectedLinksSet, enlargeByGateways,
 				gateways, downOverUpRatio);
-		
-		
-		FileGenerator.TransmissionConfige(finalList);
-		FileGenerator.DataRate(finalList);
+		_TT = finalList;
+		FileGenerator.TransmissionConfige(_TT);
+		FileGenerator.DataRate(_TT);
 		return finalList;
 	}
 
@@ -377,5 +376,31 @@ public class PatternBasedTC extends TCBasic
 					"; T"+TrafficEstimatingFacade.getLinksTraffic().get(l));
 		}
 		System.out.println("");
+	}
+
+
+
+	@Override
+	protected DeleteAction removeFromConsiderList(Link deletedLink)
+	{
+		int patternConter = 0;
+		for (TCUnit patt : _patterns)
+		{
+			if(patt.containsKey(deletedLink))
+				patternConter++;
+				//return false;
+		}
+		if(patternConter > 1)
+			return DeleteAction.Impossible;
+		if(_selectedLinksSet.contains(deletedLink))
+		{
+			_selectedLinksSet.remove(deletedLink);
+			return DeleteAction.True;
+		//	return true;
+		}
+		
+		return DeleteAction.NotNecessary;
+		//return true;
+		
 	}
 }

@@ -32,7 +32,8 @@ import dataStructure.TCUnit;
 import dataStructure.Triple;
 import dataStructure.Vertex;
 
-public class TransmissionConfiguration {
+public class TransmissionConfiguration 
+{
 	Map<Integer, Vertex> nodes = ApplicationSettingFacade.Nodes.getNodes();
 	private Map<Vertex, Integer> MARK;
 	LinkType forceGatewayLinks = LinkType.Outgoing;
@@ -41,6 +42,7 @@ public class TransmissionConfiguration {
 	private int numberOfLinks = TrafficEstimatingFacade.getOptimalLinks().size(); 
 	private Map<Link, Boolean> ConsiderLinks;
 	
+	private SINR _sinr = new SINR();
 	protected TransmissionConfiguration() {
 		InitiateVariable();
 	}
@@ -138,7 +140,7 @@ public class TransmissionConfiguration {
 				List<Link> links = copyTC.getLinks();
 				links.remove(lprime);
 				links.add(link);
-				double sinr = SINR.calc(link, links);
+				double sinr = _sinr.calc(link, links);
 					
 				if(sinr >= BETA)
 				{
@@ -545,7 +547,7 @@ public class TransmissionConfiguration {
 				List<Link> linkSet = tPrime.getLinks();
 				linkSet.remove(currentLink);
 				
- 				sinr = SINR.calc(currentLink,linkSet );
+ 				sinr = _sinr.calc(currentLink,linkSet );
 				
 				if(sinr >= BETA)
 					tPrime.putRate(currentLink, computeRate(sinr).getRate());
@@ -618,7 +620,7 @@ public class TransmissionConfiguration {
 		{
 			links = tConfUnit.getLinks();
 			links.remove(l);
-			double  sinr = SINR.calc(l, links);
+			double  sinr = _sinr.calc(l, links);
 			DataRate dr = computeRate(sinr);
 			tConfUnit.setSinrRate(l, dr.getRate(),sinr);
 		}
@@ -701,14 +703,14 @@ public class TransmissionConfiguration {
 							
 						T.removeLink(l);
 						T.putRate(lprime, 0);
-						sinr = SINR.calc(l, T.getLinks());
+						sinr = _sinr.calc(l, T.getLinks());
 						T = calcDataRate(T);
 						if(sinr  <= BETA || T_prime.getTCAP() < tConfUnit.getTCAP() )
 							add = false;
 					}
 					if(add)
 					{
-						sinr = SINR.calc(lprime, tConfUnit.getLinks());
+						sinr = _sinr.calc(lprime, tConfUnit.getLinks());
 						tConfUnit.putRate(lprime, computeRate(sinr).getRate());
 						setMark(u);
 						setMark(v);
@@ -735,7 +737,7 @@ public class TransmissionConfiguration {
 						TCUnit T = tConfUnit.Clone();
 						T.removeLink(l);
 						T.putRate(lprime, 0);
-						sinr = SINR.calc(l, T.getLinks());
+						sinr = _sinr.calc(l, T.getLinks());
 						T = calcDataRate(T);
 						if(sinr  < BETA && T.getTCAP() > tConfUnit.getTCAP() )
 						{				
@@ -835,7 +837,7 @@ public class TransmissionConfiguration {
 				{
 					double d =  (Math.pow(links.get(j).getCrossDistance(links.get(i)),-ApplicationSettingFacade.SINR.getAlpha()) /
 							Math.pow(links.get(i).getDistance(), -ApplicationSettingFacade.SINR.getAlpha()));
-					double IfactorValue = SINR.getIFactorValue(ell_i, ell_j);
+					double IfactorValue = _sinr.getIFactorValue(ell_i, ell_j);
 					d = d * IfactorValue;
 					double rounded = (double) Math.round(d * 10000) / 10000;
 					arr_G[i][j] = rounded;

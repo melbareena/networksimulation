@@ -17,6 +17,20 @@ import java.util.Vector;
  */
 public class TCUnit
 {	
+	private static int id = 0;
+	
+	private int ID;
+	
+	
+	public int getID()
+	{
+		return ID;
+	}
+	public TCUnit()
+	{
+		id++;
+		ID = id;
+	}
 	private Map<Link, Integer> _rateCollection = new HashMap<Link, Integer>();
 	private Map<Link, Double> _sinrCollection = new HashMap<Link, Double>();
 	private Map<Link, Double> _powerCollection = new HashMap<Link, Double>(); 
@@ -282,7 +296,10 @@ public class TCUnit
 		String out = "";
 		for (Entry<Link, Integer> linkDataRate : _rateCollection.entrySet())
 		{
-			out += "Link: " + linkDataRate + ", rate:" + linkDataRate.getValue() + "\n";
+			out += "Link: " + linkDataRate + ", rate:" + linkDataRate.getValue();
+			if(_powerCollection.containsKey(linkDataRate.getKey()))
+					out += " power: " + _powerCollection.get(linkDataRate);
+			out += "\n";
 		}
 		return out;
 	}
@@ -307,12 +324,11 @@ public class TCUnit
 		
 	}
 
-	public Link removeLinkRandomly()
+	public Link getLinkRandomly()
 	{	
 		int i = getLinks().size();
 		Random rand = new Random();
-		Link deleted = getLinks().get(rand.nextInt(i));
-		removeLink(deleted);
-		return deleted;
+		Link randLink = getLinks().get(rand.nextInt(i));
+		return randLink;
 	}
 }
