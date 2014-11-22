@@ -15,10 +15,10 @@ public class SINR
 	private final double MUE = ApplicationSettingFacade.SINR.getMue();
 	private final float POWER = ApplicationSettingFacade.SINR.getPower();
 	private static final IFactorMap iFactor = ApplicationSettingFacade.IFactor.getIFactorMap();
-	private static final LinksChannelMap channels = ChannelAssignmentFacade.getChannels();
+	private final LinksChannelMap channels = ChannelAssignmentFacade.getChannels();
 	
 	
-	public static double calc(Link l , List<Link> L )
+	public double calc(Link l , List<Link> L )
 	{
 		if(self == null)  self = new SINR();
 		double i_l_lprime = self.I_l_lprime(l, L);
@@ -41,7 +41,7 @@ public class SINR
 		double i_l_lprime = 0;
 		for (Link lprime : L)
 		{
-			double ifac = SINR.getIFactorValue(l, lprime);
+			double ifac = getIFactorValue(l, lprime);
 			double crossDis = this.getCrossDistance(lprime, l);
 			i_l_lprime += POWER * Math.pow(crossDis , (-ALPHA )) * ifac;
 		}
@@ -50,7 +50,7 @@ public class SINR
 	}
 	
 	
-	public static double getIFactorValue(Link l_i, Link l_j)
+	public  double getIFactorValue(Link l_i, Link l_j)
 	{
 		int diffCH = Math.abs(channels.get(l_i).getChannel() - channels.get(l_j).getChannel() );
 		double ifac = iFactor.get(diffCH);

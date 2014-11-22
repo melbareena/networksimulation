@@ -31,11 +31,14 @@ public class Program {
 	 * @return A string containing the current available channels,
 	 * depending on the current instance index of the program.
 	 */
-	public static String getAvailableChannels() {
-		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single) {
+	public static String getAvailableChannels()
+	{
+		if (ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
+		{
 			return ApplicationSettingFacade.Channel.getChannelMode().name();
 		}
-		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.AllCombination) {
+		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.AllCombination)
+		{
 			numberOfExecution = 12;
 			if(multiExecIndex != 12)
 				return "1.." + multiExecIndex;
@@ -95,15 +98,19 @@ public class Program {
 
 	/**Launch the program with the selected parameters.
 	 */
-	public static void launch() {
-		try {
+	public static void launch()
+	{
+		try 
+		{
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			System.err.println("Unable to set the UI look and feel...");
 		}
 		
 		getAvailableChannels();
-		
+		System.err.println("Power control is: " + ApplicationSettingFacade.PowerControl.isEnable());
 		loadingDialog = new LoadingDialog();
 		loadingDialog.setVisible(true);
 		int nbBars = numberOfExecution;

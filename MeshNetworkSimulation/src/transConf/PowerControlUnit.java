@@ -9,8 +9,8 @@ import org.jblas.Eigen;
 import org.jblas.Solve;
 
 import common.FileGenerator;
-
 import setting.ApplicationSettingFacade;
+import transConf.TCBasic.DeleteAction;
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.TCUnit;
@@ -23,6 +23,7 @@ import dataStructure.TCUnit;
 class PowerControlUnit
 {
 	private TCBasic _performer;
+	private SINR _sinr = new SINR();
 	
 	PowerControlUnit ( TCBasic performer)
 	{
@@ -49,7 +50,7 @@ class PowerControlUnit
 				{
 					double d =  (Math.pow(links.get(j).getCrossDistance(links.get(i)),-ApplicationSettingFacade.SINR.getAlpha()) /
 							Math.pow(links.get(i).getDistance(), -ApplicationSettingFacade.SINR.getAlpha()));
-					double IfactorValue = SINR.getIFactorValue(ell_i, ell_j);
+					double IfactorValue = _sinr.getIFactorValue(ell_i, ell_j);
 					d = d * IfactorValue;
 					double rounded = (double) Math.round(d * 10000) / 10000;
 					arr_G[i][j] = rounded;
@@ -151,7 +152,7 @@ class PowerControlUnit
 					maxLink = ell_i;
 				}
 			}
-			
+					
 			DataRate previousDataRate = preDataRate(maxRate);
 			
 			if(previousDataRate != null)
@@ -161,13 +162,29 @@ class PowerControlUnit
 			}
 			else
 			{
-				
-				System.err.println("remove linked");
-				_performer.removeFromConsiderList(unit.removeLinkRandomly());
+				Link l = unit.getLinkRandomly();
+				DeleteAction act = _performer.removeFromConsiderList(l);
+				int safty = 20;
+				int counter  = 0;
+				while (act == DeleteAction.Impossible && counter < safty)
+				{
+					l = unit.getLinkRandomly();
+					act = _performer.removeFromConsiderList(l);
+					counter++;
+				}
+				if(counter > safty )
+				{
+					System.err.println("can not reach to feasible soultion for a transmission configuration:" + unit.toString());
+					System.err.println("Exception in PowerControl Class Line 183");
+					System.exit(0);
+				}
+				if(act != DeleteAction.Impossible)
+					unit.removeLink(l);
+				System.err.print("Action: " + act.toString());
 				unit.setNeedAdjusmentpower(false);	
 				unit.setDead(true);
 				unit = _performer.calcDataRate(unit);
-				return unit;
+				return powerControl(unit);
 			}
 		}
 		return unit;
@@ -178,7 +195,7 @@ class PowerControlUnit
 		if(curValue == ApplicationSettingFacade.DataRate.getMin()) return null;
 		
 		List<DataRate> rates = ApplicationSettingFacade.DataRate.getDataRate();
-		for(int i =rates.size() -1  ; i > 0 ; i--)
+		for(int i =rates.size() -1  ; i >= 0 ; i--)
 		{
 			if(rates.get(i).getRate() < curValue)
 				return rates.get(i);

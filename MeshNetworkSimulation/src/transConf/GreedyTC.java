@@ -8,7 +8,6 @@ import java.util.Set;
 
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
-import transConf.SINR;
 import common.FileGenerator;
 import dataStructure.Link;
 import dataStructure.LinkType;
@@ -128,7 +127,7 @@ public class GreedyTC extends TCBasic {
 				List<Link> links = copyTC.getLinks();
 				links.remove(lprime);
 				links.add(link);
-				double sinr = SINR.calc(link, links);
+				double sinr = _sinr.calc(link, links);
 					
 				if(sinr >= BETA)
 				{
@@ -209,6 +208,22 @@ public class GreedyTC extends TCBasic {
 				
 		}
 		return tConfUnit;
+	}
+
+	@Override
+	protected DeleteAction removeFromConsiderList(Link deletedLink)
+	{		
+		for (TCUnit unit : _TT)
+		{
+			if(unit.containsKey(deletedLink))
+				//return false;
+				return DeleteAction.NotNecessary; // the link is in the others Transmission configuration, hence, it is not necessary to remove 
+			//form consider links
+		}
+		ConsiderLinks.remove(deletedLink);
+		//return true;
+		return DeleteAction.True;
+			
 	}
 
 	

@@ -20,8 +20,12 @@ import dataStructure.Vertex;
  * @author Mahdi
  * All veriables which is needed for different Transmission configuration algorithms
  */
+
+
 public abstract class TCBasic
 {
+
+	public static enum DeleteAction { True, NotNecessary, Impossible}; 
 	protected Map<Integer, Vertex> nodes = ApplicationSettingFacade.Nodes.getNodes();
 	protected Map<Vertex, Integer> MARK = new HashMap<Vertex, Integer>();
 	protected LinkType forceGatewayLinks = LinkType.Outgoing;
@@ -31,6 +35,10 @@ public abstract class TCBasic
 	protected Map<Link, Boolean> ConsiderLinks;
 	protected List<TCUnit> _TT = new ArrayList<>();
 	protected PowerControlUnit _powerUnit;
+	protected SINR _sinr = new SINR();
+	
+	
+	protected abstract DeleteAction removeFromConsiderList(Link deletedLink);
 	
 	protected TCUnit calcDataRate(TCUnit tConfUnit)
 	{
@@ -40,22 +48,15 @@ public abstract class TCBasic
 		{
 			links = tConfUnit.getLinks();
 			links.remove(l);
-			double  sinr = SINR.calc(l, links);
+			double  sinr = _sinr.calc(l, links);
 			DataRate dr = computeRate(sinr);
 			tConfUnit.setSinrRate(l, dr.getRate(),sinr);
 		}
 		return tConfUnit;
 	}
-	void removeFromConsiderList(Link deletedLink)
-	{
-		for (TCUnit unit : _TT)
-		{
-			if(unit.containsKey(deletedLink))
-				return;
-		}
-		ConsiderLinks.remove(deletedLink);
-		
-	}
+	
+	
+	
 	protected void calcOccupiedRadio(TCUnit tcUnit)
 	{
 		for (Link l : tcUnit.getLinks())
@@ -150,7 +151,7 @@ public abstract class TCBasic
 				List<Link> linkSet = tPrime.getLinks();
 				linkSet.remove(currentLink);
 				
- 				sinr = SINR.calc(currentLink,linkSet );
+ 				sinr = _sinr.calc(currentLink,linkSet );
 				
 				if(sinr >= BETA)
 					tPrime.putRate(currentLink, computeRate(sinr).getRate());
@@ -267,14 +268,14 @@ public abstract class TCBasic
 							
 						T.removeLink(l);
 						T.putRate(lprime, 0);
-						sinr = SINR.calc(l, T.getLinks());
+						sinr = _sinr.calc(l, T.getLinks());
 						T = calcDataRate(T);
 						if(sinr  <= BETA || T_prime.getTCAP() < tConfUnit.getTCAP() )
 							add = false;
 					}
 					if(add)
 					{
-						sinr = SINR.calc(lprime, tConfUnit.getLinks());
+						sinr = _sinr.calc(lprime, tConfUnit.getLinks());
 						tConfUnit.putRate(lprime, computeRate(sinr).getRate());
 						setMark(u);
 						setMark(v);
@@ -301,7 +302,7 @@ public abstract class TCBasic
 						TCUnit T = tConfUnit.Clone();
 						T.removeLink(l);
 						T.putRate(lprime, 0);
-						sinr = SINR.calc(l, T.getLinks());
+						sinr = _sinr.calc(l, T.getLinks());
 						T = calcDataRate(T);
 						if(sinr  < BETA && T.getTCAP() > tConfUnit.getTCAP() )
 						{				
