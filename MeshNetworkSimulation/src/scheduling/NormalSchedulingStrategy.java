@@ -44,8 +44,6 @@ public class NormalSchedulingStrategy extends SchedulingStrategy
 				break;
 
 		}
-		if(selectedLinks.size() < 1)
-			System.err.println("Byeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 		return selectedLinks;
 		
 		

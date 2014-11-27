@@ -92,7 +92,7 @@ public class GreedyTC extends TCBasic {
 				} 
 			}	
 		
-			tConfUnit = calcDataRate(tConfUnit); // make sure data rates are correct.	
+			tConfUnit = _sinr.calcDataRate(tConfUnit); // make sure data rates are correct.	
 
 			
 			
@@ -103,7 +103,7 @@ public class GreedyTC extends TCBasic {
 		Enlarge();	
 		
 		
-
+		System.out.println("Number of TC: " + _TT.size() + ", Summation of Capacity:" + getTotalCapacity() + "Average Capacity: " + getAverageCapacity());
 		FileGenerator.TransmissionConfige(_TT);
 		FileGenerator.DataRate(_TT);
 		return _TT;
@@ -142,7 +142,7 @@ public class GreedyTC extends TCBasic {
 			Triple<Link, Link, Double> maxTriple = maxmizing(tripleLists);
 			copyTC.removeLink(maxTriple.getB());
 			deletedLink = maxTriple.getB();
-			copyTC.putRate(maxTriple.getA(), computeRate(maxTriple.getC()).getRate());
+			copyTC.putRate(maxTriple.getA(), _sinr.calcDataRate(maxTriple.getC()).getRate());
 									
 		
 		}

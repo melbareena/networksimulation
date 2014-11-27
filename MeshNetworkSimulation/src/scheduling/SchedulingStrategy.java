@@ -347,7 +347,6 @@ public abstract class SchedulingStrategy
 		}
 		if(allInOneTC.size() >= k)
 		{
-			System.err.println("Heloooooooooooooooooooooooooooooo");
 			TreeSet<Double> weights = new TreeSet<>(Collections.reverseOrder());
 			for (TCUnit tcUnit : allInOneTC)
 			{

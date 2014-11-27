@@ -1,19 +1,18 @@
 package trafficEstimating;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import common.FileGenerator;
 import common.IntermediateOutput;
 import common.PrintConsole;
+import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
+import trafficGenerator.DynamicTraffic;
 import trafficGenerator.StaticTraffic;
 import dataStructure.Link;
-import dataStructure.TopologyGraph;
 import dataStructure.LinkTrafficMap;
 import dataStructure.Path;
 import dataStructure.PathMap;
@@ -37,19 +36,13 @@ class DownlinkEstimating
 	}
 
 	private LinkTrafficMap dl_Traffic_l;
-	protected PathMap getDownlinkPaths()
-	{
-		return DownlinkPaths;
-	}
-
 	
-	protected LinkTrafficMap estimating(TopologyGraph gtd)
+	
+	protected LinkTrafficMap estimating()
 	{
-		DownlinkPaths = TopologyGraphFacade.downlinkShortestPath(gtd);
-
-		//Map<Vertex, TreeMap<Vertex, Float>> staticTraffic = StaticTraffic.getDownlinkTraffic().getTraffic();
+		if(ApplicationSettingFacade.Traffic.isDynamicType()) return dynamicEstimating();
 		
-		OptimizeDownlinkPaths();
+		DownlinkPaths = TopologyGraphFacade.getOptimalDownLinkPath();
 	
 		Map<Vertex, TreeMap<Vertex, Float>> staticTraffic = StaticTraffic.getDownlinkTraffic(DownlinkPaths).getTraffic();
 		
@@ -71,46 +64,26 @@ class DownlinkEstimating
 	}
 
 
-	private void OptimizeDownlinkPaths()
+	private LinkTrafficMap dynamicEstimating()
 	{
-		
-		PathMap optimalsPathMap = new PathMap();
-		
-		Path optimal = null;
-		for (Entry<Vertex, List<Path>> vp : DownlinkPaths.entrySet())
+		DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
+		DownlinkPaths = TopologyGraphFacade.getOptimalDownLinkPath();
+	
+		Map<Vertex, TreeMap<Vertex, Float>> dynamicTraffic = dyTraffic.getDownlink(DownlinkPaths).getTraffic();
+		for (Entry<Vertex, List<Path>> dlPaths : DownlinkPaths.entrySet())
 		{
-			List<Path> optimalPaths = new ArrayList<>();
-			for (Path path : vp.getValue())
-			{
-				Vertex destination = path.getDestination();
-				optimal = path;
-				
-				for (Entry<Vertex, List<Path>> vps : DownlinkPaths.entrySet())
+			for (Path path : dlPaths.getValue())
+			{	
+				float traffic  = dynamicTraffic.get(path.getSource()).get(path.getDestination());
+				for (Link edge : path.getEdgePath())	
 				{
-					if(vp.getKey() != vps.getKey())
-					{
-						for (Path path2 : vps.getValue())
-						{
-							if(path2.getDestination() == destination)
-							{
-								if(path2.getEdgePath().size() < optimal.getEdgePath().size())
-									optimal = path2;
-							}
-						}
-					}
-				}
-				
-				optimalPaths.add(optimal);
-				
-				
+					dl_Traffic_l.put(edge, traffic);
+				}		
 			}
 			
-			optimalsPathMap.put(vp.getKey(), optimalPaths);
-			
 		}
-		DownlinkPaths = optimalsPathMap;
-		
-		FileGenerator.optimalDownlink(DownlinkPaths);
-		
+		IntermediateOutput.downLinkTrafficEstimationResult(dl_Traffic_l);
+		PrintConsole.print("Estimating downlink traffic is done successfully.");
+		return dl_Traffic_l;
 	}
 }

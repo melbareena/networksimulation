@@ -67,20 +67,24 @@ class TrafficGenerator extends BaseConfiguration {
 			try {
 				if(ValidateXMLDocument(eElement)) {
 					dynamicType = (eElement.getAttribute(ATTTYPE).compareToIgnoreCase("Dynamic") == 0);
-					if(dynamicType) {
+					if(dynamicType) 
+					{
 						trafficRate = Double.parseDouble(eElement.getAttribute(ATTRATE));
 						duration = Long.parseLong(eElement.getAttribute(ATTDURATION));
 						seed = fetchSeed(eElement);
 						ratio = Integer.parseInt(eElement.getAttribute(ATTRATIO));
 						numberOfNewEmittingNodes = Integer.parseInt(eElement.getAttribute(ATTNODES));
 					}
-					typeOfgeneration = TypeOfGenerationEnum.valueOf(eElement.getAttribute(ATTGEN).toUpperCase());
-					if(typeOfgeneration == TypeOfGenerationEnum.FILE  && ValidateXMLDocument(eElement, typeOfgeneration)) {
-						FetchFromFile(eElement);
-					}
-					if(typeOfgeneration == TypeOfGenerationEnum.RANDOM) {
-						upSeed =  fetchUpSeed(eElement);
-						downSeed = fetchDownSeed(eElement);
+					else
+					{
+						typeOfgeneration = TypeOfGenerationEnum.valueOf(eElement.getAttribute(ATTGEN).toUpperCase());
+						if(typeOfgeneration == TypeOfGenerationEnum.FILE  && ValidateXMLDocument(eElement, typeOfgeneration)) {
+							FetchFromFile(eElement);
+						}
+						if(typeOfgeneration == TypeOfGenerationEnum.RANDOM) {
+							upSeed =  fetchUpSeed(eElement);
+							downSeed = fetchDownSeed(eElement);
+						}
 					}
 				}
 			} 
@@ -119,9 +123,6 @@ class TrafficGenerator extends BaseConfiguration {
 	protected boolean ValidateXMLDocument(Element eElement) throws Exception {
 		if(!eElement.hasAttribute(ATTTYPE))
 			throw new Exception(ATTTYPE + " attribute in " + TAG + " tag is missing. the following template may help you." +
-						"\n <Traffic Type =\"Static\" Generator=\"File\" AddressUp=\"src/setting/input/trafficUp.txt\" AddressDown=\"src/setting/input/traffic.txt\" /> \n  or \n <Traffic Generator=\"Random\" />" );
-		if(!eElement.hasAttribute(ATTGEN))
-			throw new Exception(ATTGEN + " attribute in " + TAG + " tag is missing. the following template may help you." +
 						"\n <Traffic Type =\"Static\" Generator=\"File\" AddressUp=\"src/setting/input/trafficUp.txt\" AddressDown=\"src/setting/input/traffic.txt\" /> \n  or \n <Traffic Generator=\"Random\" />" );
 		return true;
 	}

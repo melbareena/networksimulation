@@ -70,12 +70,14 @@ public class PatternBasedTC extends TCBasic
 		List<TCUnit> finalList = remainingLinksStep(_patterns, _selectedLinksSet, enlargeByGateways,
 				gateways, downOverUpRatio);
 		_TT = finalList;
+		System.out.println("Number of TC: " + _TT.size() + ", Summation of Capacity:" + getTotalCapacity() + "Average Capacity: " + getAverageCapacity());
 		FileGenerator.TransmissionConfige(_TT);
 		FileGenerator.DataRate(_TT);
 		return finalList;
 	}
 
-	
+
+
 
 	/** Create a list of transmission configurations containing every link of every
 	 * gateway in the <code>gateways</code> list, trying to respect the ratio
@@ -144,7 +146,7 @@ public class PatternBasedTC extends TCBasic
 			}
 			/* END for each gateway */
 			if(tcu.size() > 0) {
-				tcu = calcDataRate(tcu);
+				tcu = _sinr.calcDataRate(tcu);
 				listTCU.add(tcu);
 			}
 			resetMARK();
@@ -237,9 +239,9 @@ public class PatternBasedTC extends TCBasic
 						}
 					}
 				}
-				tcu = calcDataRate(tcu);
+				tcu = _sinr.calcDataRate(tcu);
 				tcu = Enlarge(tcu);
-				tcu = calcDataRate(tcu);
+				tcu = _sinr.calcDataRate(tcu);
 				if(ApplicationSettingFacade.PowerControl.isEnable())
 					tcu = _powerUnit.powerControl(tcu);
 				if(listTCU.size() <= currentTCUIndex) {
@@ -265,14 +267,14 @@ public class PatternBasedTC extends TCBasic
 				}
 			}
 			if(newTCU.size() > 0) {
-				newTCU = calcDataRate(newTCU);
+				newTCU = _sinr.calcDataRate(newTCU);
 				
-				if(enlargeByGateways) {
+				if(enlargeByGateways)
 					newTCU = enlargeByGateways(newTCU, selectedLinksSet, gateways, downOverUpRatio);
-				} else {
+				else 
 					newTCU = Enlarge(newTCU);
-				}
-				newTCU = calcDataRate(newTCU);
+				
+				newTCU = _sinr.calcDataRate(newTCU);
 				if(ApplicationSettingFacade.PowerControl.isEnable())
 					newTCU = _powerUnit.powerControl(newTCU);
 				listTCU.add(newTCU);

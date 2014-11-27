@@ -25,13 +25,13 @@ public class StaticTraffic
 	
 	private static long upSeed = ApplicationSettingFacade.Traffic.getUpSeed();
 	private static long downSeed = ApplicationSettingFacade.Traffic.getDownSeed();
-	private static UplinkTraffic  uplinkTraffic;
+	private static UplinkTraffic  _uplinkTraffic;
 	
-	private static DownlinkTraffic downlinkTraffic;
+	private static DownlinkTraffic _downlinkTraffic;
 	
 	public static UplinkTraffic getUplinkTraffic()
 	{
-		if(uplinkTraffic != null) return uplinkTraffic;
+		if(_uplinkTraffic != null) return _uplinkTraffic;
 		
 		if(ApplicationSettingFacade.Traffic.getTypeOfGenerator() == TypeOfGenerationEnum.RANDOM)
 			return randomUpLink();
@@ -40,7 +40,7 @@ public class StaticTraffic
 	
 	public static UplinkTraffic getUplinkTraffic(PathMap uplinks)
 	{
-		if(uplinkTraffic != null) return uplinkTraffic;
+		if(_uplinkTraffic != null) return _uplinkTraffic;
 		
 		if(ApplicationSettingFacade.Traffic.getTypeOfGenerator() == TypeOfGenerationEnum.RANDOM)
 			return randomUpLink(uplinks);
@@ -49,7 +49,7 @@ public class StaticTraffic
 	
 	private static UplinkTraffic fileUplink()
 	{
-		uplinkTraffic = new UplinkTraffic();
+		_uplinkTraffic = new UplinkTraffic();
 		Map<Integer, Vertex> routers =  ApplicationSettingFacade.Nodes.getNodes();
 		String var = null; 
 		String[] tokens = null;
@@ -62,7 +62,7 @@ public class StaticTraffic
 			{
 				tokens = var.split("[ ]");
 				int nodeId = Integer.parseInt(tokens[0]);
-				uplinkTraffic.add(routers.get(nodeId) , Integer.parseInt(tokens[1]));
+				_uplinkTraffic.add(routers.get(nodeId) , Integer.parseInt(tokens[1]));
 			}
 			reader.close();
 		}
@@ -70,31 +70,31 @@ public class StaticTraffic
 		{
 			PrintConsole.printErr("StaticTraffic/fileUplink: message: " + ex.getMessage());
 		}
-		FileGenerator.UplinkTrafficInFile(uplinkTraffic);
-		return uplinkTraffic;
+		FileGenerator.UplinkTrafficInFile(_uplinkTraffic);
+		return _uplinkTraffic;
 	}
 	
 	private static UplinkTraffic randomUpLink(PathMap uplinks)
 	{
-		uplinkTraffic = new UplinkTraffic();
+		_uplinkTraffic = new UplinkTraffic();
 		Random rand = new Random(upSeed);
 		PrintConsole.print("Seed for uplink traffic is: " + upSeed);
 		for (Entry<Vertex, List<Path>> routerMap : uplinks.entrySet())
 		{
 			int trf = rand.nextInt(20) + 30;
-			uplinkTraffic.add(routerMap.getKey(), trf*100);
+			_uplinkTraffic.add(routerMap.getKey(), trf*100);
 		}
 		PrintConsole.print("Generating static traffic for uplinks is done.");
 		
-		FileGenerator.UplinkTrafficInFile(uplinkTraffic);
+		FileGenerator.UplinkTrafficInFile(_uplinkTraffic);
 		
-		return uplinkTraffic;
+		return _uplinkTraffic;
 
 	}
 	
 	private static UplinkTraffic randomUpLink()
 	{
-		uplinkTraffic = new UplinkTraffic();
+		_uplinkTraffic = new UplinkTraffic();
 		Map<Integer,Vertex> routerSet = ApplicationSettingFacade.Router.getRouter();
 		PrintConsole.print("Seed for uplink traffic is: " + upSeed);
 		Random rand = new Random(upSeed);
@@ -102,19 +102,19 @@ public class StaticTraffic
 		{
 			
 			int trf = rand.nextInt(20) + 30;
-			uplinkTraffic.add(routerMap.getValue(), trf*100);
+			_uplinkTraffic.add(routerMap.getValue(), trf*100);
 		}
 
 		PrintConsole.print("Generating static traffic for uplinks is done.");
 		
-		FileGenerator.UplinkTrafficInFile(uplinkTraffic);
+		FileGenerator.UplinkTrafficInFile(_uplinkTraffic);
 		
-		return uplinkTraffic;
+		return _uplinkTraffic;
 	}
 	
 	public static DownlinkTraffic getDownlinkTraffic()
 	{
-		if(downlinkTraffic != null) return downlinkTraffic;
+		if(_downlinkTraffic != null) return _downlinkTraffic;
 		
 		if(ApplicationSettingFacade.Traffic.getTypeOfGenerator() == TypeOfGenerationEnum.RANDOM)
 			return downlinkRandom();
@@ -123,7 +123,7 @@ public class StaticTraffic
 	
 	public static DownlinkTraffic getDownlinkTraffic(PathMap downlinkPaths)
 	{
-		if(downlinkTraffic != null) return downlinkTraffic;
+		if(_downlinkTraffic != null) return _downlinkTraffic;
 		if(ApplicationSettingFacade.Traffic.getTypeOfGenerator() == TypeOfGenerationEnum.RANDOM)
 			return downlinkRandom(downlinkPaths);
 		return  downlinkFile();
@@ -132,7 +132,7 @@ public class StaticTraffic
 	private static DownlinkTraffic downlinkRandom(PathMap downlinkPaths)
 	{
 		Random rand = new Random(downSeed);
-		downlinkTraffic = new DownlinkTraffic();
+		_downlinkTraffic = new DownlinkTraffic();
 		PrintConsole.print("Seed for downlink traffic is: " + downSeed);
 		
 		for (Entry<Vertex, List<Path>> ver_path : downlinkPaths.entrySet())
@@ -147,9 +147,9 @@ public class StaticTraffic
 				
 				
 			}
-			downlinkTraffic.add(gateway, grMap);
+			_downlinkTraffic.add(gateway, grMap);
 		}
-		return downlinkTraffic;
+		return _downlinkTraffic;
 	}
 
 	 static DownlinkTraffic downlinkRandom()
@@ -158,7 +158,7 @@ public class StaticTraffic
 		//int gatewayNumbers = ApplicationSettingFacade.Gateway.getSize();
 		Random rand = new Random(downSeed);
 		PrintConsole.print("Seed for downlink traffic is: " + downSeed);
-		downlinkTraffic = new DownlinkTraffic();
+		_downlinkTraffic = new DownlinkTraffic();
 		for (Entry<Integer, Vertex> getway : ApplicationSettingFacade.Gateway.getGateway().entrySet())
 		{
 			TreeMap<Vertex,Float> grMap = new TreeMap<>();
@@ -169,18 +169,18 @@ public class StaticTraffic
 				
 				grMap.put(routerMap.getValue(), trf*100);
 			}
-			downlinkTraffic.add(getway.getValue(), grMap);
+			_downlinkTraffic.add(getway.getValue(), grMap);
 		}
 		PrintConsole.print("Generating static traffic for downlinks is done.");
-		FileGenerator.dowlinkTrafficInFile(downlinkTraffic.getTraffic());
-		return downlinkTraffic;
+		FileGenerator.dowlinkTrafficInFile(_downlinkTraffic.getTraffic());
+		return _downlinkTraffic;
 	}
 	
 	private static DownlinkTraffic downlinkFile()
 	{
 		Map<Integer,Vertex> routerSet = ApplicationSettingFacade.Router.getRouter();
 		int routerSize = routerSet.size();
-		downlinkTraffic = new DownlinkTraffic();
+		_downlinkTraffic = new DownlinkTraffic();
 		String var = null; 
 		int gatwayIndex = 0;
 		int RouterIndex = 0;
@@ -198,7 +198,7 @@ public class StaticTraffic
 				if(RouterIndex == routerSize)
 				{
 					RouterIndex = 0;
-					downlinkTraffic.add(gateway, grMap);
+					_downlinkTraffic.add(gateway, grMap);
 					gatwayIndex++;
 					gateway = ApplicationSettingFacade.Gateway.getGateway().get(gatwayIndex);
 					grMap = new TreeMap<>();
@@ -210,15 +210,15 @@ public class StaticTraffic
 				RouterIndex++;
 			}
 			
-			downlinkTraffic.add(gateway, grMap);
+			_downlinkTraffic.add(gateway, grMap);
 			reader.close();
 		}
 		catch(Exception ex)
 		{
 			PrintConsole.printErr("StaticTraffic/DownlinkTraffic : message: " + ex.getMessage());
 		}
-		FileGenerator.dowlinkTrafficInFile(downlinkTraffic.getTraffic());
-		return downlinkTraffic;
+		FileGenerator.dowlinkTrafficInFile(_downlinkTraffic.getTraffic());
+		return _downlinkTraffic;
 	}
 
 	

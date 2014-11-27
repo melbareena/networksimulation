@@ -26,5 +26,18 @@ public class Traffic {
 	public void setDownlinkTraffic(DownlinkTraffic downlinkTraffic) {
 		this.downlinkTraffic = downlinkTraffic;
 	}
+	
+	public int size()
+	{
+		return uplinkTraffic.size() + downlinkTraffic.size();
+	}
+	
+	public String toString()
+	{
+		String str =   "Total Size: " + size()  + "\n";
+		str += uplinkTraffic + "\n";
+		str += downlinkTraffic +"\n";
+		return str;
+	}
 
 }

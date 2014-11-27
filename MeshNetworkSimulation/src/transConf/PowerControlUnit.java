@@ -8,7 +8,6 @@ import org.jblas.DoubleMatrix;
 import org.jblas.Eigen;
 import org.jblas.Solve;
 
-import common.FileGenerator;
 import setting.ApplicationSettingFacade;
 import transConf.TCBasic.DeleteAction;
 import dataStructure.DataRate;
@@ -49,10 +48,10 @@ class PowerControlUnit
 				else
 				{
 					double d =  (Math.pow(links.get(j).getCrossDistance(links.get(i)),-ApplicationSettingFacade.SINR.getAlpha()) /
-							Math.pow(links.get(i).getDistance(), -ApplicationSettingFacade.SINR.getAlpha()));
+							Math.pow(ell_i.getDistance(), -ApplicationSettingFacade.SINR.getAlpha()));
 					double IfactorValue = _sinr.getIFactorValue(ell_i, ell_j);
 					d = d * IfactorValue;
-					double rounded = (double) Math.round(d * 10000) / 10000;
+					double rounded = (double) Math.round(d * 10000000) / 10000000;
 					arr_G[i][j] = rounded;
 				}
 			}
@@ -62,7 +61,7 @@ class PowerControlUnit
 		DoubleMatrix D = new DoubleMatrix(arr_D);
 		DoubleMatrix G = new DoubleMatrix(arr_G);		
 		
-		D.mmuli(G,A);	
+		A = D.mmuli(G);	
 		ComplexDoubleMatrix cdm = Eigen.eigenvalues(A);
 		ComplexDouble[] cd = new ComplexDouble[unit.size()];
 		for (int i=0;i<unit.size();i++) cd[i]=cdm.get(i);
@@ -82,11 +81,11 @@ class PowerControlUnit
 		  			h[i][j]= i==j ? 1-A.get(i,j) : -1*A.get(i,j);
 						  
 		  	DoubleMatrix H = new DoubleMatrix(h); //(I-A)	
-			DoubleMatrix b = new DoubleMatrix(unit.size());
+			DoubleMatrix q = new DoubleMatrix(unit.size());
 			for (int i=0;i<unit.size();i++) 
-				  b.put(i,0, ApplicationSettingFacade.SINR.getMue() /
+				  q.put(i,0,  ApplicationSettingFacade.SINR.getMue() /
 					  Math.pow(links.get(i).getDistance(),-ApplicationSettingFacade.SINR.getAlpha()));
-				  
+			DoubleMatrix b = D.mmul(q);  
 			DoubleMatrix H_inv=Solve.solve(H,DoubleMatrix.eye(unit.size()));
 			DoubleMatrix P = H_inv.mmul(b);
 			double[] power = P.toArray();
@@ -95,7 +94,7 @@ class PowerControlUnit
 
 			for (double e : power)
 			{
-				double power_watTOmWat = e * 1000;
+				double power_watTOmWat = e*1000 ;
 				if(power_watTOmWat < ApplicationSettingFacade.SINR.getPower())
 					unit.setPower(links.get(i), power_watTOmWat) ;		// the power is ok	
 				else
@@ -109,10 +108,7 @@ class PowerControlUnit
 			
 			if(powerAllocationIsOk)
 			{
-				FileGenerator.needToAdjust(counter, unit);
-				unit.setNeedAdjusmentpower(false);
-				unit.setDead(false);
-				unit.setLock(true);
+				unit.setLocked();
 				return unit;
 			}
 			
@@ -120,8 +116,8 @@ class PowerControlUnit
 		  // there is no feasible solution  
 		  else
 		  {
+			  System.err.println("Dead TC............................");
 	  		  unit.setDead(true);
-	  		  FileGenerator.deadTC(unit);
 		  }
 		  
 		  if(unit.needAdjusmentPower() && !unit.isDead())		  
@@ -134,10 +130,8 @@ class PowerControlUnit
 		  return unit;
 	}
 
-	private static int counter = 0;
     TCUnit adjustmentPower(TCUnit unit)
 	{
-    	counter++;
 		if(unit.needAdjusmentPower())
 		{
 			
@@ -180,10 +174,10 @@ class PowerControlUnit
 				}
 				if(act != DeleteAction.Impossible)
 					unit.removeLink(l);
-				System.err.print("Action: " + act.toString());
+				System.err.println("Action: " + act.toString());
 				unit.setNeedAdjusmentpower(false);	
 				unit.setDead(true);
-				unit = _performer.calcDataRate(unit);
+				unit = _sinr.calcDataRate(unit);
 				return powerControl(unit);
 			}
 		}

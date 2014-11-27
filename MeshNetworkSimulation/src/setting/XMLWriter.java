@@ -85,7 +85,7 @@ public class XMLWriter {
 	{
 		Element e = doc.createElement("TranmissionConfiguration");
 		rootElement.appendChild(e);
-		e.setAttribute("Strategy", TCStrategy.Original.name());
+		e.setAttribute("Strategy", TCStrategy.Greedy.name());
 	}
 	public static void writePatternBasedSterategy(int downOverUpRatio, 
 			boolean priotityToOrthogonal, boolean repeatLinksToRespectRatio, boolean enlargeByGateways)
@@ -104,15 +104,23 @@ public class XMLWriter {
 		Element e = doc.createElement("Traffic");
 		rootElement.appendChild(e);
 		e.setAttribute("Type", (dynamic ? "Dynamic" : "Static"));
-		e.setAttribute("Generator", generator);
-		if(generator == "File") {
-			e.setAttribute("AddressUp", addrUp);
-			e.setAttribute("AddressDown", addrDown);
-		} else {
-			e.setAttribute("UpSeed", upseed+"");
-			e.setAttribute("DownSeed", downseed+"");
+		
+		if(!dynamic)
+		{
+			if(generator == "File")
+			{
+				e.setAttribute("Generator", "File");
+				e.setAttribute("AddressUp", addrUp);
+				e.setAttribute("AddressDown", addrDown);
+			} 
+			else if (generator == "Random")
+			{
+				e.setAttribute("Generator", generator);
+				e.setAttribute("UpSeed", upseed+"");
+				e.setAttribute("DownSeed", downseed+"");
+			}
 		}
-		if(dynamic) {
+		else {
 			e.setAttribute("Rate", rate+"");
 			e.setAttribute("Seed", seed+"");
 			e.setAttribute("NbOfNewEmittingNodes", nodes+"");

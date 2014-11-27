@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
-import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
 import dataStructure.LinkType;
@@ -40,20 +39,7 @@ public abstract class TCBasic
 	
 	protected abstract DeleteAction removeFromConsiderList(Link deletedLink);
 	
-	protected TCUnit calcDataRate(TCUnit tConfUnit)
-	{
-		
-		List<Link>  links;
-		for (Link l : tConfUnit.getLinks())
-		{
-			links = tConfUnit.getLinks();
-			links.remove(l);
-			double  sinr = _sinr.calc(l, links);
-			DataRate dr = computeRate(sinr);
-			tConfUnit.setSinrRate(l, dr.getRate(),sinr);
-		}
-		return tConfUnit;
-	}
+	
 	
 	
 	
@@ -66,17 +52,7 @@ public abstract class TCBasic
 		}
 		
 	}
-	protected  DataRate computeRate(double sinr)
-	{
-		List<DataRate> dataRates = ApplicationSettingFacade.DataRate.getDataRate();
-		DataRate result = dataRates.get(0);
-		for (DataRate dataRate : dataRates)
-		{
-			if(sinr > dataRate.getSINR())
-				result = dataRate;
-		}
-		return result;
-	}
+
 	
 	protected void setMark(Vertex v)
 	{
@@ -121,18 +97,19 @@ public abstract class TCBasic
 		return false;
 	}
 	
-	protected void calcDataRate()
+	protected void computeDataRate()
 	{
 		List<TCUnit> updateTT = new ArrayList<TCUnit>();
 		TCUnit updateTUnit = null;
 		for (TCUnit tcUnit : _TT)
 		{
-			updateTUnit = this.calcDataRate(tcUnit);
+			updateTUnit = _sinr.calcDataRate(tcUnit);
 			updateTT.add(updateTUnit);
 		}
 		_TT = updateTT;
 		
 	}
+	
 	TCUnit checkAdd(Link newLink, TCUnit tConfig)
 	{
 		boolean add = true;
@@ -154,7 +131,7 @@ public abstract class TCBasic
  				sinr = _sinr.calc(currentLink,linkSet );
 				
 				if(sinr >= BETA)
-					tPrime.putRate(currentLink, computeRate(sinr).getRate());
+					tPrime.putRate(currentLink, _sinr.calcDataRate(sinr).getRate());
 				else
 				{
 					//System.out.println("\tSINR too low : "+sinr);
@@ -217,10 +194,10 @@ public abstract class TCBasic
 		TCUnit updateTUnit = null;
 		for (TCUnit tcUnit : _TT)
 		{
-			tcUnit = calcDataRate(tcUnit);
+			tcUnit = _sinr.calcDataRate(tcUnit);
 			calcOccupiedRadio(tcUnit);
 			updateTUnit = this.Enlarge(tcUnit);
-			updateTUnit = this.calcDataRate(updateTUnit);
+			updateTUnit = _sinr.calcDataRate(updateTUnit);
 			if(ApplicationSettingFacade.PowerControl.isEnable())
 				updateTUnit = _powerUnit.powerControl(updateTUnit);
 			updateTT.add(updateTUnit);
@@ -257,7 +234,7 @@ public abstract class TCBasic
 				{
 					TCUnit T_prime = tConfUnit.Clone(); // clone new TC and add the new link to it
 					T_prime.putRate(lprime, 0); // add new link which wants to add to the tc
-					T_prime = calcDataRate(T_prime); // calculate tc data rate
+					T_prime = _sinr.calcDataRate(T_prime); // calculate tc data rate
 					
 					
 					
@@ -269,14 +246,14 @@ public abstract class TCBasic
 						T.removeLink(l);
 						T.putRate(lprime, 0);
 						sinr = _sinr.calc(l, T.getLinks());
-						T = calcDataRate(T);
+						T =  _sinr.calcDataRate(T);
 						if(sinr  <= BETA || T_prime.getTCAP() < tConfUnit.getTCAP() )
 							add = false;
 					}
 					if(add)
 					{
 						sinr = _sinr.calc(lprime, tConfUnit.getLinks());
-						tConfUnit.putRate(lprime, computeRate(sinr).getRate());
+						tConfUnit.putRate(lprime, _sinr.calcDataRate(sinr).getRate());
 						setMark(u);
 						setMark(v);
 						break;
@@ -303,11 +280,11 @@ public abstract class TCBasic
 						T.removeLink(l);
 						T.putRate(lprime, 0);
 						sinr = _sinr.calc(l, T.getLinks());
-						T = calcDataRate(T);
+						T =  _sinr.calcDataRate(T);
 						if(sinr  < BETA && T.getTCAP() > tConfUnit.getTCAP() )
 						{				
 							//System.err.println("TC #" + TCCounter + " add link " + lprime +" by Enlarg....");
-							tConfUnit.putRate(lprime, computeRate(sinr).getRate());
+							tConfUnit.putRate(lprime, _sinr.calcDataRate(sinr).getRate());
 							setMark(u);
 							setMark(v);
 							break;
@@ -320,4 +297,27 @@ public abstract class TCBasic
 	
 		return tConfUnit;
 	}
+	protected float getAverageCapacity()
+	{
+		int sum = 0;
+		
+		for (TCUnit tcUnit : _TT)
+		{
+			sum += tcUnit.getTCAP();
+		}
+		
+		return (float) sum/_TT.size();
+	}
+	protected float getTotalCapacity()
+	{
+		int sum = 0;
+		
+		for (TCUnit tcUnit : _TT)
+		{
+			sum += tcUnit.getTCAP();
+		}
+		
+		return sum;
+	}
+
 }

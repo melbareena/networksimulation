@@ -22,10 +22,10 @@ public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 
 	@Override
 	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) {
-		if (sourcePositionIndex > super.sourceBuffers.size()) {
+		if (sourcePositionIndex >= super.sourceBuffers.size()) {
 			sourcePositionIndex = 0;
 		}
-		if (tranmissionPositionIndex > super.transmitBuffers.size()) {
+		if (tranmissionPositionIndex >= super.transmitBuffers.size()) {
 			tranmissionPositionIndex = 0;
 		}
 
