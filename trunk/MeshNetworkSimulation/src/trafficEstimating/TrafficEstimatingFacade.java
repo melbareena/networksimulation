@@ -10,6 +10,7 @@ import common.FileGenerator;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
 import trafficGenerator.DynamicTrafficGenerator;
+import trafficGenerator.DynamicTraffic;
 import dataStructure.BufferMap;
 import dataStructure.DownlinkTraffic;
 import dataStructure.LinkType;
@@ -27,30 +28,8 @@ public class TrafficEstimatingFacade
 {
 	private static TrafficEstimatingFacade self;
 	
-	
-	private static PathMap optimalUplinkPath;
-	private static PathMap downlinkPath;
 	private static List<Link> optimalLinks; 
 	
-	
-	public static PathMap getOptimalUplinkPath()
-	{
-		if(self == null)
-		{
-			self = new TrafficEstimatingFacade();
-			LinksTraffic = self.Estimating();
-		}
-		return optimalUplinkPath;
-	}
-	public static PathMap getDownlinkPath()
-	{
-		if(self == null)
-		{
-			self = new TrafficEstimatingFacade();
-			LinksTraffic = self.Estimating();
-		}
-		return downlinkPath;
-	}
 	
 	
 	
@@ -72,9 +51,9 @@ public class TrafficEstimatingFacade
 		BufferMap bfMap = new BufferMap();
 		
 		
-		PathMap uplinks = getOptimalUplinkPath();
+		PathMap uplinks =   TopologyGraphFacade.getOptimalUplinkPaths();
 		UplinkTraffic uplinkTraffic = trafficGenerator.StaticTraffic.getUplinkTraffic(uplinks);
-		PathMap downlinkPaths = getDownlinkPath();
+		PathMap downlinkPaths = TopologyGraphFacade.getOptimalDownLinkPath();
 		DownlinkTraffic downlinkTraffic = trafficGenerator.StaticTraffic.getDownlinkTraffic(downlinkPaths);
 		for (Entry<Integer, Vertex> vertexList : ApplicationSettingFacade.Nodes.getNodes().entrySet())
 		{
@@ -115,9 +94,15 @@ public class TrafficEstimatingFacade
 	 * @param trafficGenerator The traffic generator used to add new traffic.
 	 * @return The updated <code>BufferMap</code>.
 	 */
-	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, 
-			DynamicTrafficGenerator trafficGenerator,
-			int currentTimeslot) {
+	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, DynamicTrafficGenerator trafficGenerator, int currentTimeslot) 
+	{
+		
+		
+		PathMap uplinks = TopologyGraphFacade.getOptimalUplinkPaths();
+		PathMap downlinks = TopologyGraphFacade.getOptimalDownLinkPath();
+		
+		DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
+		
 		BufferMap bfMap = null;
 		//Creating a new BufferMap if the current one is null
 		if(currentBufferMap == null) {
@@ -127,9 +112,7 @@ public class TrafficEstimatingFacade
 		}
 
 		//Initializing
-		PathMap uplinks = getOptimalUplinkPath();
-		PathMap downlinks = getDownlinkPath();
-		Traffic globalTraffic = trafficGenerator.generateTraffic(uplinks, downlinks);
+		Traffic globalTraffic = dyTraffic.getDynamicTraffic(currentTimeslot);
 		UplinkTraffic uplinkTraffic = globalTraffic.getUplinkTraffic();
 		DownlinkTraffic downlinkTraffic = globalTraffic.getDownlinkTraffic();
 		Map<Integer, Vertex> nodesMap = ApplicationSettingFacade.Nodes.getNodes();
@@ -224,23 +207,22 @@ public class TrafficEstimatingFacade
 	
 	private LinkTrafficMap Estimating()
 	{
-		TopologyGraph gtd = TopologyGraphFacade.buildGraphFromTopology();
-		
+			
+		TopologyGraph gtd = TopologyGraphFacade.buildGraphFromTopology();		
 		LinkTrafficMap trafficOfLink = Initialization(gtd);
 		
 		
 		DownlinkEstimating downlinkEstimatingTraffic = DownlinkEstimating.Initiate(trafficOfLink);
+		LinkTrafficMap downlink_taffic_l  = downlinkEstimatingTraffic.estimating();
 		
-		LinkTrafficMap downlink_taffic_l  = downlinkEstimatingTraffic.estimating(gtd);
 		
 		
-		downlinkPath = downlinkEstimatingTraffic.getDownlinkPaths(); 
 		
-		UplinkEstimating uplinkEstimating = new UplinkEstimating(downlink_taffic_l, gtd);
+		UplinkEstimating uplinkEstimating = new UplinkEstimating(downlink_taffic_l);
 		
 		LinkTrafficMap tarrfic_l = uplinkEstimating.estimating();
 		
-		optimalUplinkPath = uplinkEstimating.getOptimalUplinkPaths();
+		
 		
 
 		

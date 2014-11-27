@@ -57,6 +57,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import launcher.Program;
 import setting.ApplicationSettingFacade;
+import topology2graph.TopologyGraphFacade;
 import trafficEstimating.TrafficEstimatingFacade;
 import transConf.TCFacade;
 import cAssignment.ChannelAssignmentFacade;
@@ -1129,7 +1130,7 @@ public class GraphViewer extends JFrame {
 	 */
 	protected void fillMapEdges() {
 		HashSet<Integer> downlinkSet = new HashSet<Integer>();
-		for(Entry<Vertex,List<Path>> allPath : TrafficEstimatingFacade.getDownlinkPath().entrySet()) {
+		for(Entry<Vertex,List<Path>> allPath : TopologyGraphFacade.getOptimalDownLinkPath().entrySet()) {
 			for(Path p : allPath.getValue()) {
 				for (dataStructure.Link edge : p.getEdgePath()) {
 					downlinkSet.add(edge.getId());

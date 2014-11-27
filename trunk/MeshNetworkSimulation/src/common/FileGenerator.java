@@ -203,7 +203,7 @@ public class FileGenerator
 		try
 		{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "uplink_traffic.txt"));
-			for(Entry<Vertex, Integer> traffic : uplink.getUplinkTraffic().entrySet())
+			for(Entry<Vertex, Integer> traffic : uplink.getTraffic().entrySet())
 			{
 				writer.write(traffic.getKey().getId() + " " + traffic.getValue());
 				writer.newLine();

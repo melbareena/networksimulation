@@ -9,6 +9,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
+import setting.ApplicationSettingFacade;
+import transConf.SINR;
+
 
 
 /**
@@ -296,9 +299,9 @@ public class TCUnit
 		String out = "";
 		for (Entry<Link, Integer> linkDataRate : _rateCollection.entrySet())
 		{
-			out += "Link: " + linkDataRate + ", rate:" + linkDataRate.getValue();
+			out += "Link: " + linkDataRate.getKey() + ", rate:" + linkDataRate.getValue();
 			if(_powerCollection.containsKey(linkDataRate.getKey()))
-					out += " power: " + _powerCollection.get(linkDataRate);
+					out += " power: " + _powerCollection.get(linkDataRate.getKey());
 			out += "\n";
 		}
 		return out;
@@ -330,5 +333,21 @@ public class TCUnit
 		Random rand = new Random();
 		Link randLink = getLinks().get(rand.nextInt(i));
 		return randLink;
+	}
+	
+
+	public void setLocked()
+	{
+		
+		this.isLock = true;
+		this.setNeedAdjusmentpower(false);
+		this.setDead(false);
+		//calculate data rate with the powers
+		if(ApplicationSettingFacade.PowerControl.isEnable())
+		{
+			SINR sinr = new SINR();
+			Map<Link, Integer> newRates = sinr.calcDataRate(this,_powerCollection);
+			_rateCollection = newRates;
+		}
 	}
 }

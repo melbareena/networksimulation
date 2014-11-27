@@ -9,16 +9,16 @@ import java.util.Map.Entry;
 import java.util.TreeSet;
 
 import common.IntermediateOutput;
+import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
+import trafficGenerator.DynamicTraffic;
 import trafficGenerator.StaticTraffic;
 import dataStructure.Link;
-import dataStructure.TopologyGraph;
 import dataStructure.LinkTrafficMap;
 import dataStructure.UplinkPathTraffic;
 import dataStructure.Path;
 import dataStructure.UplinkTraffic;
 import dataStructure.Vertex;
-
 import dataStructure.PathMap;
 
 
@@ -26,31 +26,26 @@ class UplinkEstimating
 {
 	private LinkTrafficMap linksTraffic;
 	private PathMap UplinkPaths;
-	private TopologyGraph gtd;
+
 	
 	
-	protected PathMap getOptimalUplinkPaths()
-	{
-		return UplinkPaths;
-	}
-	
-	
-	
-	protected UplinkEstimating(LinkTrafficMap downlinkTraffic,TopologyGraph graph)
+	protected UplinkEstimating(LinkTrafficMap downlinkTraffic)
 	{
 		this.linksTraffic = downlinkTraffic;
-		this.gtd = graph;
 	}
 	
 
 	protected LinkTrafficMap estimating()
 	{
-		PathMap allPaths = TopologyGraphFacade.uplinkShortestPath(gtd); // extract uplink paths
-		this.UplinkPaths = ExtractOptimalUplinkPaths.getOptimal(allPaths); // get optimal of them
+		if(ApplicationSettingFacade.Traffic.isDynamicType()) return dynamicEstimating();
+			
+		
+		UplinkPaths = TopologyGraphFacade.getOptimalUplinkPaths();
+		
 		List<UplinkPathTraffic> tMAXvg = new ArrayList<UplinkPathTraffic>();
 		UplinkTraffic uplinkTraffic = StaticTraffic.getUplinkTraffic();
 		// the uplink traffic  tULv
-		for (Entry<Vertex, Integer> tULv : uplinkTraffic.getUplinkTraffic().entrySet())
+		for (Entry<Vertex, Integer> tULv : uplinkTraffic.getTraffic().entrySet())
 		{
 			tMAXvg.clear();
 					
@@ -79,6 +74,45 @@ class UplinkEstimating
 
 
 	
+
+
+	private LinkTrafficMap dynamicEstimating()
+	{
+		DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
+		UplinkPaths = TopologyGraphFacade.getOptimalUplinkPaths();
+		
+		
+		
+		List<UplinkPathTraffic> tMAXvg = new ArrayList<UplinkPathTraffic>();
+		UplinkTraffic uplinkTraffic = dyTraffic.getUplinkTraffic();
+		
+		for (Entry<Vertex, Integer> tULv : uplinkTraffic.getTraffic().entrySet())
+		{
+			tMAXvg.clear();
+					
+			Vertex router = tULv.getKey();
+			
+			int trafficV = tULv.getValue();
+				
+ 			List<Path> paths = this.UplinkPaths.get(router);
+	
+			List<UplinkPathTraffic> pathsTraffic = getTrafficOfPath(paths);
+			
+			
+			//tMAXvg.addAll(getTmaxVG(paths));
+			
+			List<UplinkPathTraffic> tULp = waterFilling(pathsTraffic, trafficV, router);		
+			
+			ModifyTarfficOfLink(tULp);
+			
+		
+		}
+		
+		IntermediateOutput.uplinkTrafficEstimationResult(linksTraffic);
+		
+		return linksTraffic;
+	}
+
 
 
 	private List<UplinkPathTraffic> getTrafficOfPath(List<Path> paths)

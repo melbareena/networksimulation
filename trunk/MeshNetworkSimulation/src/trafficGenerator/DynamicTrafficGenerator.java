@@ -62,7 +62,7 @@ public class DynamicTrafficGenerator {
 	 * This generator will generate '<code>downOverUpRatio</code>' times more
 	 * downlink traffic than uplink traffic.
 	 */
-	public DynamicTrafficGenerator(double trafficRate, long seed,
+	private DynamicTrafficGenerator(double trafficRate, long seed,
 			int nodesToConsider, int downOverUpRatio) {
 		this.lambda = trafficRate;
 		this.randomGenerator = new Random(seed);
@@ -90,7 +90,7 @@ public class DynamicTrafficGenerator {
 	 * @see DynamicTrafficGenerator#generateTimeSlotUplinkTraffic(Set)
 	 * @see DynamicTrafficGenerator#generateTimeSlotDownlinkTraffic(Set, PathMap, int)
 	 */
-	public Traffic generateTraffic(PathMap uplinks, PathMap downlinks) {
+	Traffic generateTraffic(PathMap uplinks, PathMap downlinks) {
 		Set<Vertex> selectedNodes = pickUpRandomNodes(nodesToConsider);
 		
 		// Clone the original set of nodes in the uplink PathMap
