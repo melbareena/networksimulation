@@ -9,6 +9,7 @@ import org.jblas.Eigen;
 import org.jblas.Solve;
 
 import setting.ApplicationSettingFacade;
+import sinr.SINR;
 import transConf.TCBasic.DeleteAction;
 import dataStructure.DataRate;
 import dataStructure.Link;

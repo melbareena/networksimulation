@@ -103,7 +103,7 @@ public class GreedyTC extends TCBasic {
 		Enlarge();	
 		
 		
-		System.out.println("Number of TC: " + _TT.size() + ", Summation of Capacity:" + getTotalCapacity() + "Average Capacity: " + getAverageCapacity());
+		System.out.println("Number of TC: " + _TT.size() + ", Summation of Capacity:" + getTotalCapacity() + ", Average Capacity: " + getAverageCapacity());
 		FileGenerator.TransmissionConfige(_TT);
 		FileGenerator.DataRate(_TT);
 		return _TT;

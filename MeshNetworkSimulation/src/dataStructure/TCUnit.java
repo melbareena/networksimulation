@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import setting.ApplicationSettingFacade;
-import transConf.SINR;
+import sinr.SINR;
 
 
 
@@ -47,11 +47,6 @@ public class TCUnit
 	public boolean isLock()
 	{
 		return isLock;
-	}
-
-	public void setLock(boolean isLock)
-	{
-		this.isLock = isLock;
 	}
 
 	private boolean needAdjusmentPower = false;
@@ -339,9 +334,7 @@ public class TCUnit
 	public void setLocked()
 	{
 		
-		this.isLock = true;
-		this.setNeedAdjusmentpower(false);
-		this.setDead(false);
+	
 		//calculate data rate with the powers
 		if(ApplicationSettingFacade.PowerControl.isEnable())
 		{
@@ -349,5 +342,8 @@ public class TCUnit
 			Map<Link, Integer> newRates = sinr.calcDataRate(this,_powerCollection);
 			_rateCollection = newRates;
 		}
+		this.isLock = true;
+		this.setNeedAdjusmentpower(false);
+		this.setDead(false);
 	}
 }

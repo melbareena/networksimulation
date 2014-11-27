@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import setting.ApplicationSettingFacade;
+import sinr.SINR;
 import trafficEstimating.TrafficEstimatingFacade;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;

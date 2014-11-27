@@ -19,8 +19,8 @@ import org.jblas.Eigen;
 import org.jblas.Solve;
 
 import setting.ApplicationSettingFacade;
+import sinr.SINR;
 import trafficEstimating.TrafficEstimatingFacade;
-import transConf.SINR;
 import cAssignment.ChannelAssignmentFacade;
 import common.FileGenerator;
 import common.PrintConsole;
