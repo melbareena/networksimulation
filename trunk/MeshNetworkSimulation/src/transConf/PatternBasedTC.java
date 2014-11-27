@@ -70,7 +70,7 @@ public class PatternBasedTC extends TCBasic
 		List<TCUnit> finalList = remainingLinksStep(_patterns, _selectedLinksSet, enlargeByGateways,
 				gateways, downOverUpRatio);
 		_TT = finalList;
-		System.out.println("Number of TC: " + _TT.size() + ", Summation of Capacity:" + getTotalCapacity() + "Average Capacity: " + getAverageCapacity());
+		System.out.println("Number of TC: " + _TT.size() + ", Summation of Capacity:" + getTotalCapacity() + ", Average Capacity: " + getAverageCapacity());
 		FileGenerator.TransmissionConfige(_TT);
 		FileGenerator.DataRate(_TT);
 		return finalList;

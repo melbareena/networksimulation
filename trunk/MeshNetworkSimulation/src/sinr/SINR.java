@@ -1,4 +1,4 @@
-package transConf;
+package sinr;
 
 import java.util.HashMap;
 import java.util.List;
@@ -106,6 +106,8 @@ public class SINR
 	}
 	public TCUnit calcDataRate(TCUnit tConfUnit)
 	{
+		// when a TC is locked means the power control set data rate; hence, the data rate should not be changed 
+		if(tConfUnit.isLock()) return tConfUnit;
 		
 		List<Link>  links;
 		for (Link l : tConfUnit.getLinks())
