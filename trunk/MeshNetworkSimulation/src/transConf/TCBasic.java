@@ -132,7 +132,7 @@ public abstract class TCBasic
  				sinr = _sinr.calc(currentLink,linkSet );
 				
 				if(sinr >= BETA)
-					tPrime.putRate(currentLink, _sinr.calcDataRate(sinr).getRate());
+					tPrime.setSinrRate(currentLink,  _sinr.calcDataRate(sinr).getRate(), sinr);
 				else
 				{
 					//System.out.println("\tSINR too low : "+sinr);
@@ -219,11 +219,9 @@ public abstract class TCBasic
 		//List<Link> links = TrafficEstimatingFacade.getOptimalLinks();
 		double sinr = 0;
 		int numLinks = links.length;
-		//Random rand = new Random();
-		//int randNum = rand.nextInt(numLinks);
-		int randNum = 0;
+
 		
-		for (int index = randNum; index <numLinks ; index++)
+		for (int index = 0; index <numLinks ; index++)
 		{
 			Link lprime = links[index];
 			if(!tConfUnit.containsKey(lprime))
@@ -254,7 +252,7 @@ public abstract class TCBasic
 					if(add)
 					{
 						sinr = _sinr.calc(lprime, tConfUnit.getLinks());
-						tConfUnit.putRate(lprime, _sinr.calcDataRate(sinr).getRate());
+						tConfUnit.setSinrRate(lprime, _sinr.calcDataRate(sinr).getRate(), sinr);
 						setMark(u);
 						setMark(v);
 						break;
@@ -263,38 +261,7 @@ public abstract class TCBasic
 			}
 		}
 		
-		for(int index = 0 ; index < randNum; index++ )
-		{
-			Link lprime = links[index];
-			if(!tConfUnit.containsKey(lprime))
-			{
-				Vertex u = lprime.getDestination();
-				Vertex v = lprime.getSource();
-				setMark(u);
-				setMark(v);
-				
-				if(checkRadio(lprime))
-				{
-					for(Link l : tConfUnit.getLinks())
-					{
-						TCUnit T = tConfUnit.Clone();
-						T.removeLink(l);
-						T.putRate(lprime, 0);
-						sinr = _sinr.calc(l, T.getLinks());
-						T =  _sinr.calcDataRate(T);
-						if(sinr  < BETA && T.getTCAP() > tConfUnit.getTCAP() )
-						{				
-							//System.err.println("TC #" + TCCounter + " add link " + lprime +" by Enlarg....");
-							tConfUnit.putRate(lprime, _sinr.calcDataRate(sinr).getRate());
-							setMark(u);
-							setMark(v);
-							break;
-							
-						}				
-					}
-				}
-			}
-		}
+		
 	
 		return tConfUnit;
 	}

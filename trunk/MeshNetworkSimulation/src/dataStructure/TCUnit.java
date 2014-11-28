@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import setting.ApplicationSettingFacade;
-import sinr.SINR;
 
 
 
@@ -20,20 +19,7 @@ import sinr.SINR;
  */
 public class TCUnit
 {	
-	private static int id = 0;
 	
-	private int ID;
-	
-	
-	public int getID()
-	{
-		return ID;
-	}
-	public TCUnit()
-	{
-		id++;
-		ID = id;
-	}
 	private Map<Link, Integer> _rateCollection = new HashMap<Link, Integer>();
 	private Map<Link, Double> _sinrCollection = new HashMap<Link, Double>();
 	private Map<Link, Double> _powerCollection = new HashMap<Link, Double>(); 
@@ -197,6 +183,18 @@ public class TCUnit
 	{
 		_rateCollection.put(l, rate);
 	}	
+	public void putSinr(Link l, double sinr)
+	{
+		_sinrCollection.put(l, sinr);
+	}	
+	public void putPower(Link l, double power)
+	{
+		_powerCollection.put(l, power);
+	}	
+	public void putLinkWeight(Link l, double weight)
+	{
+		_linkWeight.put(l, weight);
+	}	
 	
 	public List<Link> getLinks()
 	{
@@ -209,23 +207,30 @@ public class TCUnit
 	{
 		return _rateCollection.get(l);
 	}	
-	
 	public double getSinr(Link l)
-	{
+	{	
 		return _sinrCollection.get(l);
+	}
+	public double getSinrThreshold(Link l)
+	{
+		int DataRate = _rateCollection.get(l);
+		return ApplicationSettingFacade.DataRate.getSINRthreshold(DataRate);
+	}
+	public Map<Link,Double> getPower()
+	{
+		return _powerCollection;
 	}
 	public double getPower(Link l)
 	{
+		if(!_powerCollection.containsKey(l)) return -1;
 		return _powerCollection.get(l);
 	}
 	private void setDataRate(Link l , int dataRate)
 	{
-		//_rateCollection.remove(l);
 		_rateCollection.put(l, dataRate);
 	}
-	private void setSinr(Link l , double sinr)
+	public void setSinr(Link l , double sinr)
 	{
-		//_rateCollection.remove(l);
 		_sinrCollection.put(l, sinr);
 	}
 	
@@ -296,7 +301,9 @@ public class TCUnit
 		{
 			out += "Link: " + linkDataRate.getKey() + ", rate:" + linkDataRate.getValue();
 			if(_powerCollection.containsKey(linkDataRate.getKey()))
-					out += " power: " + _powerCollection.get(linkDataRate.getKey());
+					out += " ,power: " + String.format("%2f", _powerCollection.get(linkDataRate.getKey()));
+			if(_powerCollection.containsKey(linkDataRate.getKey()))
+					out += " ,sinr: " + String.format("%2f", _sinrCollection.get(linkDataRate.getKey()));
 			out += "\n";
 		}
 		return out;
@@ -307,7 +314,15 @@ public class TCUnit
 		TCUnit copy = new TCUnit();
 		for (Entry<Link, Integer> currentLink : this.entrySetRate())
 		{
-			copy.putRate(currentLink.getKey(), currentLink.getValue());
+			Link l = currentLink.getKey();
+			copy.putRate(l, currentLink.getValue());
+			
+			if(_sinrCollection.containsKey(l))
+				copy.putSinr(l, _sinrCollection.get(l));
+			if(_powerCollection.containsKey(l))
+				copy.putPower(l, _powerCollection.get(l));
+			if(_linkWeight.containsKey(l))
+				copy.putLinkWeight(l, _linkWeight.get(l));
 		}	
 		return copy;
 	}
@@ -333,17 +348,13 @@ public class TCUnit
 
 	public void setLocked()
 	{
-		
-	
-		//calculate data rate with the powers
-		if(ApplicationSettingFacade.PowerControl.isEnable())
-		{
-			SINR sinr = new SINR();
-			Map<Link, Integer> newRates = sinr.calcDataRate(this,_powerCollection);
-			_rateCollection = newRates;
-		}
 		this.isLock = true;
 		this.setNeedAdjusmentpower(false);
 		this.setDead(false);
+	}
+	public void setRates(Map<Link, Integer> newRates)
+	{
+		_rateCollection = newRates;
+		
 	}
 }

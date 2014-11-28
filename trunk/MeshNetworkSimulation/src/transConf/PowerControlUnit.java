@@ -1,6 +1,7 @@
 package transConf;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jblas.ComplexDouble;
 import org.jblas.ComplexDoubleMatrix;
@@ -8,13 +9,14 @@ import org.jblas.DoubleMatrix;
 import org.jblas.Eigen;
 import org.jblas.Solve;
 
+import common.FileGenerator;
+
 import setting.ApplicationSettingFacade;
 import sinr.SINR;
 import transConf.TCBasic.DeleteAction;
 import dataStructure.DataRate;
 import dataStructure.Link;
 import dataStructure.TCUnit;
-
 /**
  * 
  * @author Mahdi
@@ -45,7 +47,7 @@ class PowerControlUnit
 				Link ell_i = links.get(i);
 				Link ell_j = links.get(j);
 				if(i==j)	
-					arr_D[i][j] = unit.getSinr(ell_i); // get gamma
+					arr_D[i][j] = unit.getSinrThreshold(ell_i); // get gamma
 				else
 				{
 					double d =  (Math.pow(links.get(j).getCrossDistance(links.get(i)),-ApplicationSettingFacade.SINR.getAlpha()) /
@@ -95,11 +97,12 @@ class PowerControlUnit
 
 			for (double e : power)
 			{
-				double power_watTOmWat = e*1000 ;
+				double power_watTOmWat = e * 1000;
 				if(power_watTOmWat < ApplicationSettingFacade.SINR.getPower())
 					unit.setPower(links.get(i), power_watTOmWat) ;		// the power is ok	
 				else
 				{
+					 System.err.println(".....................................................................");
 					unit.setPower(links.get(i), power_watTOmWat) ;
 					unit.setNeedAdjusmentpower(true);
 					powerAllocationIsOk = false;
@@ -109,6 +112,13 @@ class PowerControlUnit
 			
 			if(powerAllocationIsOk)
 			{
+				//calculate data rate with the powers------------------------------------------
+				
+				FileGenerator.TransmissionConfige(unit);
+				Map<Link, Integer> newRates = _sinr.calcDataRate(unit,unit.getPower());
+				unit.setRates(newRates);
+				FileGenerator.TransmissionConfige(unit);
+				
 				unit.setLocked();
 				return unit;
 			}
@@ -131,7 +141,9 @@ class PowerControlUnit
 		  return unit;
 	}
 
-    TCUnit adjustmentPower(TCUnit unit)
+   
+
+	TCUnit adjustmentPower(TCUnit unit)
 	{
 		if(unit.needAdjusmentPower())
 		{

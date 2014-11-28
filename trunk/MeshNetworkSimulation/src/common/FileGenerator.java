@@ -667,6 +667,45 @@ public class FileGenerator
 		}
 	}
 
+	static int TCcounter = 0; 
+	public static void TransmissionConfige(TCUnit unit)
+	{
+		try
+		{
+			String str = TCcounter + "TC_";
+			if(TCcounter % 2 == 0)
+				str += "_before_" + counter;
+			else
+			{
+				str += "_after_" + counter;
+				counter++;
+			}
+			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/PowerControl/"+ str +".txt"));
+			
+			for (Link l : unit.getLinks())
+			{
+				writer.write(l.getId() + "-> rate: " + unit.getRate(l) + ", power: " + unit.getPower(l) + ", sinrThreshold:" + unit.getSinrThreshold(l)+ ", sinr actual:"+ unit.getSinr(l));
+				writer.newLine();
+			}
+			
+			writer.write("Total cpacity: "+ unit.getTCAP());
+
+			
+
+			writer.close();
+			TCcounter++;
+			//PrintConsole.printErr("Adjustment for power control inserted in file successfully.");
+		} 
+		catch (Exception ex)
+		{
+			System.err.println("TransmissionConfige/FileGenerator/Message:" + ex.getMessage());
+		}
+		
+	}
+
+
+	
+
 
 	
 

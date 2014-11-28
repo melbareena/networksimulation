@@ -15,7 +15,7 @@ import dataStructure.TCUnit;
 public class SINR
 {
 	
-	private static SINR self;
+
 	private final float ALPHA = ApplicationSettingFacade.SINR.getAlpha();
 	private final double MUE = ApplicationSettingFacade.SINR.getMue();
 	private final float POWER = ApplicationSettingFacade.SINR.getPower();
@@ -30,10 +30,10 @@ public class SINR
 	 */
 	public double calc(Link l , List<Link> L )
 	{
-		if(self == null)  self = new SINR();
-		double i_l_lprime = self.I_l_lprime(l, L);
+
+		double i_l_lprime = I_l_lprime(l, L);
 		double dis = l.getDistance();
-		double Sinr  = (POWER * Math.pow(dis, - (self.ALPHA) )) / (self.MUE + i_l_lprime) ;	
+		double Sinr  = (POWER * Math.pow(dis, - (ALPHA) )) / (MUE + i_l_lprime) ;	
 		return Sinr;
 		
 	}
@@ -47,10 +47,9 @@ public class SINR
 	 */
 	public double calc(Link l , List<Link> L, double power )
 	{
-		if(self == null)  self = new SINR();
-		double i_l_lprime = self.I_l_lprime(l, L,power);
+		double i_l_lprime = I_l_lprime(l, L,power);
 		double dis = l.getDistance();
-		double Sinr  = (power * Math.pow(dis, - (self.ALPHA) )) / (self.MUE + i_l_lprime) ;	
+		double Sinr  = (power * Math.pow(dis, - (ALPHA) )) / (MUE + i_l_lprime) ;	
 		return Sinr;
 		
 	}
@@ -129,9 +128,14 @@ public class SINR
 		{
 			links = tConfUnit.getLinks();
 			links.remove(l);
-			double  sinr = calc(l, links,powerCollection.get(l));
-			DataRate dr = calcDataRate(sinr);
-			rateMap.put(l, dr.getRate());
+			double  sinr = 0;
+			if(powerCollection.containsKey(l))
+				 sinr = calc(l, links,powerCollection.get(l));
+			else
+				sinr = calc(l, links);
+			
+			tConfUnit.setSinrRate(l, calcDataRate(sinr).getRate(), sinr);
+			rateMap.put(l, calcDataRate(sinr).getRate());
 		}
 		return rateMap;
 	}

@@ -69,14 +69,14 @@ public class DatarateEditOptionDialog extends AbstractEditOptionDialog {
 		while(model.getRowCount() > 0) {
 			model.removeRow(0);
 		}
-		model.addRow(new Object[] {0, 8.15, 6});
+		model.addRow(new Object[] {0, 8.51, 6});
 		model.addRow(new Object[] {0, 10.71, 9});
 		model.addRow(new Object[] {0, 13.48, 12});
 		model.addRow(new Object[] {0, 21.37, 18});
-		model.addRow(new Object[] {0, 50.70, 24});
+		model.addRow(new Object[] {0, 53.70, 24});
 		model.addRow(new Object[] {0, 134.89, 36});
 		model.addRow(new Object[] {0, 269.15, 48});
-		model.addRow(new Object[] {0, 429.57, 54});
+		model.addRow(new Object[] {0, 426.57, 54});
 	}
 
 	@Override
