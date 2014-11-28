@@ -102,6 +102,18 @@ public class ApplicationSettingFacade
 			}
 			return min;
 		}
+		
+		public static double getSINRthreshold(int DataRate)
+		{
+			List<dataStructure.DataRate> rates = getDataRate();
+			
+			for (dataStructure.DataRate r : rates)
+			{
+				if(r.getRate() == DataRate)
+					return r.getSINR();
+			}
+			return -1;
+		}
 	}
 	
 	
