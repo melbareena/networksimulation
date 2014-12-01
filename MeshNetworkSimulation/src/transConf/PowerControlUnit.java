@@ -47,7 +47,7 @@ class PowerControlUnit
 				Link ell_i = links.get(i);
 				Link ell_j = links.get(j);
 				if(i==j)	
-					arr_D[i][j] = unit.getSinrThreshold(ell_i); // get gamma
+					arr_D[i][j] = unit.getSinr(ell_i); // get gamma
 				else
 				{
 					double d =  (Math.pow(links.get(j).getCrossDistance(links.get(i)),-ApplicationSettingFacade.SINR.getAlpha()) /
@@ -65,33 +65,11 @@ class PowerControlUnit
 		DoubleMatrix G = new DoubleMatrix(arr_G);		
 		
 		A = D.mmuli(G);	
-		ComplexDoubleMatrix cdm = Eigen.eigenvalues(A);
-		ComplexDouble[] cd = new ComplexDouble[unit.size()];
-		for (int i=0;i<unit.size();i++) cd[i]=cdm.get(i);
-		double perron_eigenvalue=Double.MIN_VALUE;
-		for (int i=0;i<unit.size();i++) 
-		{
-			if (cd[i].isReal() && cd[i].real()>perron_eigenvalue) 
-				perron_eigenvalue=cd[i].real();
-		}
-		// there is a feasible solution  	  
+		double perron_eigenvalue = getEigenValue(unit, A);
 		if(perron_eigenvalue < 1)
 		{
 			
-			double[][] h = new double[unit.size()][unit.size()];
-		  	for (int i=0;i<unit.size();i++)
-		  		for (int j=0;j<unit.size();j++) 
-		  			h[i][j]= i==j ? 1-A.get(i,j) : -1*A.get(i,j);
-						  
-		  	DoubleMatrix H = new DoubleMatrix(h); //(I-A)	
-			DoubleMatrix q = new DoubleMatrix(unit.size());
-			for (int i=0;i<unit.size();i++) 
-				  q.put(i,0,  ApplicationSettingFacade.SINR.getMue() /
-					  Math.pow(links.get(i).getDistance(),-ApplicationSettingFacade.SINR.getAlpha()));
-			DoubleMatrix b = D.mmul(q);  
-			DoubleMatrix H_inv=Solve.solve(H,DoubleMatrix.eye(unit.size()));
-			DoubleMatrix P = H_inv.mmul(b);
-			double[] power = P.toArray();
+			double[] power = getPowerValues(unit, links, A, D);
 			
 			int i = 0;
 
@@ -141,14 +119,58 @@ class PowerControlUnit
 		  return unit;
 	}
 
+	/**
+	 * @param unit
+	 * @param links
+	 * @param A
+	 * @param D
+	 * @return
+	 */
+	private double[] getPowerValues(TCUnit unit, List<Link> c ,
+			DoubleMatrix A, DoubleMatrix D) 
+	{
+		double[][] h = new double[unit.size()][unit.size()];
+		for (int i=0;i<unit.size();i++)
+			for (int j=0;j<unit.size();j++) 
+				h[i][j]= i==j ? 1-A.get(i,j) : -1*A.get(i,j);
+					  
+		DoubleMatrix H = new DoubleMatrix(h); //(I-A)	
+		DoubleMatrix q = new DoubleMatrix(unit.size());
+		for (int i=0;i<unit.size();i++) 
+			  q.put(i,0,  ApplicationSettingFacade.SINR.getMue() /
+				  Math.pow(links.get(i).getDistance(),-ApplicationSettingFacade.SINR.getAlpha()));
+		DoubleMatrix b = D.mmul(q);  
+		DoubleMatrix H_inv=Solve.solve(H,DoubleMatrix.eye(unit.size()));
+		DoubleMatrix P = H_inv.mmul(b);
+		double[] power = P.toArray();
+		return power;
+	}
+
+	/**
+	 * @param unit
+	 * @param A
+	 * @return
+	 */
+	private double getEigenValue(TCUnit unit, DoubleMatrix A) {
+		ComplexDoubleMatrix cdm = Eigen.eigenvalues(A);
+		ComplexDouble[] cd = new ComplexDouble[unit.size()];
+		for (int i=0;i<unit.size();i++) cd[i]=cdm.get(i);
+		double perron_eigenvalue=Double.MIN_VALUE;
+		for (int i=0;i<unit.size();i++) 
+		{
+			if (cd[i].isReal() && cd[i].real()>perron_eigenvalue) 
+				perron_eigenvalue=cd[i].real();
+		}
+		// there is a feasible solution  	  
+		return perron_eigenvalue;
+	}
+
    
 
 	TCUnit adjustmentPower(TCUnit unit)
 	{
 		if(unit.needAdjusmentPower())
-		{
-			
-			
+		{		
 			double maxRate = Double.MIN_VALUE;
 			Link maxLink = null;
 			for (Link ell_i : unit.getLinks())
