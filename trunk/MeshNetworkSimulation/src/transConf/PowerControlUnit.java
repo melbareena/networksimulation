@@ -126,7 +126,7 @@ class PowerControlUnit
 	 * @param D
 	 * @return
 	 */
-	private double[] getPowerValues(TCUnit unit, List<Link> c ,
+	private double[] getPowerValues(TCUnit unit, List<Link> links,
 			DoubleMatrix A, DoubleMatrix D) 
 	{
 		double[][] h = new double[unit.size()][unit.size()];
