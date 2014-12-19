@@ -44,6 +44,8 @@ public class TrafficEstimatingFacade
 		}
 	}*/
 	
+	private static DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
+	
 	
 	public static BufferMap getSourceBuffers(int currentTimeslot)
 	{
@@ -52,9 +54,22 @@ public class TrafficEstimatingFacade
 		
 		
 		PathMap uplinks =   TopologyGraphFacade.getOptimalUplinkPaths();
-		UplinkTraffic uplinkTraffic = trafficGenerator.StaticTraffic.getUplinkTraffic(uplinks);
+		
+		UplinkTraffic uplinkTraffic = null;
+		if(!ApplicationSettingFacade.Traffic.isDynamicType())
+			uplinkTraffic = trafficGenerator.StaticTraffic.getUplinkTraffic(uplinks);
+		else
+			uplinkTraffic = dyTraffic.getUplinkTraffic(); 
+
+		
 		PathMap downlinkPaths = TopologyGraphFacade.getOptimalDownLinkPath();
-		DownlinkTraffic downlinkTraffic = trafficGenerator.StaticTraffic.getDownlinkTraffic(downlinkPaths);
+		DownlinkTraffic downlinkTraffic = null;
+		if(!ApplicationSettingFacade.Traffic.isDynamicType())
+			downlinkTraffic = trafficGenerator.StaticTraffic.getDownlinkTraffic(downlinkPaths);
+		else
+			downlinkTraffic = dyTraffic.getDownlink(downlinkPaths); 
+		
+		
 		for (Entry<Integer, Vertex> vertexList : ApplicationSettingFacade.Nodes.getNodes().entrySet())
 		{
 			
@@ -82,7 +97,6 @@ public class TrafficEstimatingFacade
 
 			}
 		}
-		//summation(bfMap);
 		return bfMap;
 	
 		
@@ -100,8 +114,7 @@ public class TrafficEstimatingFacade
 		
 		PathMap uplinks = TopologyGraphFacade.getOptimalUplinkPaths();
 		PathMap downlinks = TopologyGraphFacade.getOptimalDownLinkPath();
-		
-		DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
+
 		
 		BufferMap bfMap = null;
 		//Creating a new BufferMap if the current one is null

@@ -8,9 +8,6 @@ import org.jblas.ComplexDoubleMatrix;
 import org.jblas.DoubleMatrix;
 import org.jblas.Eigen;
 import org.jblas.Solve;
-
-import common.FileGenerator;
-
 import setting.ApplicationSettingFacade;
 import sinr.SINR;
 import transConf.TCBasic.DeleteAction;
@@ -32,23 +29,32 @@ class PowerControlUnit
 		_performer = performer;
 	}
 	
-	TCUnit powerControl(TCUnit unit)
+	
+	protected DoubleMatrix getD(TCUnit unit)
 	{
-		
-		//unit = calcDataRate(unit);
-		boolean powerAllocationIsOk = true;
+		List<Link> links = unit.getLinks();
+		double[][] arr_D = new double[unit.size()][unit.size()];
+		for(int i = 0 ; i < unit.size() ; i++)
+			for(int j=0; j < unit.size() ; j++)
+			{
+				Link ell_i = links.get(i);
+				if(i==j)	
+					arr_D[i][j] = unit.getSinrThreshold(ell_i); // get gamma
+			}
+		DoubleMatrix D = new DoubleMatrix(arr_D);
+		return D;
+	}
+	protected DoubleMatrix getG(TCUnit unit)
+	{
 		List<Link> links = unit.getLinks();
 		
-		double[][] arr_D = new double[unit.size()][unit.size()];
 		double[][] arr_G = new double[unit.size()][unit.size()];
 		for(int i = 0 ; i < unit.size() ; i++)
 			for(int j=0; j < unit.size() ; j++)
 			{
 				Link ell_i = links.get(i);
 				Link ell_j = links.get(j);
-				if(i==j)	
-					arr_D[i][j] = unit.getSinr(ell_i); // get gamma
-				else
+				if(i!=j)	
 				{
 					double d =  (Math.pow(links.get(j).getCrossDistance(links.get(i)),-ApplicationSettingFacade.SINR.getAlpha()) /
 							Math.pow(ell_i.getDistance(), -ApplicationSettingFacade.SINR.getAlpha()));
@@ -59,43 +65,48 @@ class PowerControlUnit
 				}
 			}
 		
+		return new DoubleMatrix(arr_G); 
 		
+	}
+	TCUnit powerControl(TCUnit unit)
+	{
+		
+		//unit = calcDataRate(unit);
+		boolean powerAllocationIsOk = true;
+		List<Link> links = unit.getLinks();
 		DoubleMatrix A = new DoubleMatrix(unit.size(), unit.size());
-		DoubleMatrix D = new DoubleMatrix(arr_D);
-		DoubleMatrix G = new DoubleMatrix(arr_G);		
+		DoubleMatrix D = getD(unit);
+		DoubleMatrix G = getG(unit);		
 		
-		A = D.mmuli(G);	
+		D.mmuli(G, A );	
 		double perron_eigenvalue = getEigenValue(unit, A);
 		if(perron_eigenvalue < 1)
 		{
 			
-			double[] power = getPowerValues(unit, links, A, D);
+			double[] powers = getPowerValues(unit, links, A, D);
 			
-			int i = 0;
-
-			for (double e : power)
+			if(isPowerFeasible(powers))
 			{
-				double power_watTOmWat = e * 1000;
-				if(power_watTOmWat < ApplicationSettingFacade.SINR.getPower())
-					unit.setPower(links.get(i), power_watTOmWat) ;		// the power is ok	
-				else
+				int i = 0;
+				for (double e : powers)
 				{
-					 System.err.println(".....................................................................");
-					unit.setPower(links.get(i), power_watTOmWat) ;
-					unit.setNeedAdjusmentpower(true);
-					powerAllocationIsOk = false;
+					double power_watTOmWat = e * 1000;
+					if(power_watTOmWat < ApplicationSettingFacade.SINR.getPower())
+						unit.setPower(links.get(i), power_watTOmWat) ;		// the power is ok	
+					i++;
 				}
-				i++;
 			}
-			
+			else
+			{
+				unit.setNeedAdjusmentpower(true);
+				powerAllocationIsOk = false;
+			}
 			if(powerAllocationIsOk)
 			{
 				//calculate data rate with the powers------------------------------------------
-				
-				FileGenerator.TransmissionConfige(unit);
 				Map<Link, Integer> newRates = _sinr.calcDataRate(unit,unit.getPower());
 				unit.setRates(newRates);
-				FileGenerator.TransmissionConfige(unit);
+				
 				
 				unit.setLocked();
 				return unit;
@@ -126,7 +137,7 @@ class PowerControlUnit
 	 * @param D
 	 * @return
 	 */
-	private double[] getPowerValues(TCUnit unit, List<Link> links,
+	protected double[] getPowerValues(TCUnit unit, List<Link> links,
 			DoubleMatrix A, DoubleMatrix D) 
 	{
 		double[][] h = new double[unit.size()][unit.size()];
@@ -151,7 +162,7 @@ class PowerControlUnit
 	 * @param A
 	 * @return
 	 */
-	private double getEigenValue(TCUnit unit, DoubleMatrix A) {
+	protected double getEigenValue(TCUnit unit, DoubleMatrix A) {
 		ComplexDoubleMatrix cdm = Eigen.eigenvalues(A);
 		ComplexDouble[] cd = new ComplexDouble[unit.size()];
 		for (int i=0;i<unit.size();i++) cd[i]=cdm.get(i);
@@ -239,5 +250,14 @@ class PowerControlUnit
 			//unit = calcDataRate(unit);
 		unit.setNeedAdjusmentpower(true);
 		return adjustmentPower(unit);
+	}
+	private boolean isPowerFeasible(double[] powers)
+	{
+		for (double p : powers)
+		{
+			if((p*1000) >= ApplicationSettingFacade.SINR.getPower())
+				return false;
+		}
+		return true;
 	}
 }

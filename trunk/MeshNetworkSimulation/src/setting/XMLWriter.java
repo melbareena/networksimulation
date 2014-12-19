@@ -71,6 +71,7 @@ public class XMLWriter {
 	public static void writeOutputFolder(String path, boolean generateFileAsOutput) {
 		Element e = doc.createElement("OutputFolder");
 		rootElement.appendChild(e);
+		if(path == null || path.length() < 1 || path.compareToIgnoreCase("null\\") == 0) path = "bin\\output";
 		e.setAttribute("Path", path);
 		e.setAttribute("GenerateFileAsOutput", generateFileAsOutput+"");
 		e.setAttribute("IntermidiateConsoleOutput", "false");

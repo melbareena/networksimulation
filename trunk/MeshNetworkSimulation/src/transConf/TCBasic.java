@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import common.FileGenerator;
+
 import setting.ApplicationSettingFacade;
 import sinr.SINR;
 import trafficEstimating.TrafficEstimatingFacade;
@@ -135,7 +137,6 @@ public abstract class TCBasic
 					tPrime.setSinrRate(currentLink,  _sinr.calcDataRate(sinr).getRate(), sinr);
 				else
 				{
-					//System.out.println("\tSINR too low : "+sinr);
 					add = false;
 					break;
 				}
@@ -190,7 +191,7 @@ public abstract class TCBasic
 	
 	protected void Enlarge()
 	{
-		
+		IncreaseDatarate increaser = new IncreaseDatarate(this);
 		List<TCUnit> updateTT = new ArrayList<TCUnit>();
 		TCUnit updateTUnit = null;
 		for (TCUnit tcUnit : _TT)
@@ -200,7 +201,15 @@ public abstract class TCBasic
 			updateTUnit = this.Enlarge(tcUnit);
 			updateTUnit = _sinr.calcDataRate(updateTUnit);
 			if(ApplicationSettingFacade.PowerControl.isEnable())
-				updateTUnit = _powerUnit.powerControl(updateTUnit);
+			{
+				
+				updateTUnit = _powerUnit.powerControl(updateTUnit);	
+				FileGenerator.TransmissionConfige(updateTUnit);
+				TCUnit improve = increaser.increaser(updateTUnit);
+				if(improve != null)
+					updateTUnit = improve;
+				FileGenerator.TransmissionConfige(updateTUnit);
+			}
 			updateTT.add(updateTUnit);
 			resetMARK();
 		}
@@ -212,52 +221,62 @@ public abstract class TCBasic
 
 	protected TCUnit Enlarge(TCUnit tConfUnit)
 	{
-	
+
 		Link[] links = TrafficEstimatingFacade.getSourceBuffers(0).sortByTraffic().keySet().toArray(new Link[0]);
 
 		
 		//List<Link> links = TrafficEstimatingFacade.getOptimalLinks();
-		double sinr = 0;
+		//double sinr = 0;
 		int numLinks = links.length;
 
 		
 		for (int index = 0; index <numLinks ; index++)
 		{
 			Link lprime = links[index];
+		
 			if(!tConfUnit.containsKey(lprime))
 			{
+				
+				TCUnit unit = checkAdd(lprime, tConfUnit);
+				if(unit != null)
+					tConfUnit = unit;
+				
+				/*
+				
 				Vertex u = lprime.getDestination();
 				Vertex v = lprime.getSource();
 
 				if(checkRadio(lprime))
 				{
-					TCUnit T_prime = tConfUnit.Clone(); // clone new TC and add the new link to it
-					T_prime.putRate(lprime, 0); // add new link which wants to add to the tc
-					T_prime = _sinr.calcDataRate(T_prime); // calculate tc data rate
+					TCUnit tPrime = tConfUnit.Clone(); // clone new TC and add the new link to it
+					tPrime.putRate(lprime, 0); // add new link which wants to add to the tc
+					tPrime.setTCAPZero();
 					
 					
 					
 					boolean add = true;
 					for(Link l : tConfUnit.getLinks())
 					{
-						TCUnit T = tConfUnit.Clone();
+						List<Link> linkSet = tPrime.getLinks();
+
+
 							
-						T.removeLink(l);
-						T.putRate(lprime, 0);
-						sinr = _sinr.calc(l, T.getLinks());
-						T =  _sinr.calcDataRate(T);
-						if(sinr  <= BETA || T_prime.getTCAP() < tConfUnit.getTCAP() )
+						linkSet.remove(l);
+					
+						sinr = _sinr.calc(l, linkSet);
+					
+						if(sinr  >= BETA )
+							tPrime.setSinrRate(l, _sinr.calcDataRate(sinr).getRate(), sinr);
+						else
 							add = false;
 					}
-					if(add)
+					if(add && tPrime.getTCAP() >= tConfUnit.getTCAP())
 					{
-						sinr = _sinr.calc(lprime, tConfUnit.getLinks());
-						tConfUnit.setSinrRate(lprime, _sinr.calcDataRate(sinr).getRate(), sinr);
+						tConfUnit = tPrime.Clone();
 						setMark(u);
 						setMark(v);
-						break;
 					}
-				}
+				}*/
 			}
 		}
 		
