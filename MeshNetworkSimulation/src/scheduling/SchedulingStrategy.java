@@ -51,7 +51,8 @@ public abstract class SchedulingStrategy
 	 */
 	public SchedulingStrategy(int instanceIndex) {
 		PrintConsole.printErr("Intiate Scheduling..........");
-		this.sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
+		if(!ApplicationSettingFacade.Traffic.isDynamicType())
+			this.sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);
 		this.configurations = TCFacade.getConfigurations();
 		this.transmitBuffers = new BufferMap();
 		this.throughput = new Vector<Double>();

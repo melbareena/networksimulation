@@ -29,7 +29,6 @@ public class GreedyTC extends TCBasic {
 		super._powerUnit = new PowerControlUnit(this);
 		resetMARK();
 	}
-	
 	protected List<TCUnit> originalConfiguring()
 	{
 		
@@ -46,10 +45,12 @@ public class GreedyTC extends TCBasic {
 			{
 			
 				Link l = links.getKey();
+				
 				if(!ConsiderLinks.containsKey(l))
 				{
 					if(tConfUnit.size() == 0 )
 					{
+					
 						setMark(l.getDestination());
 						setMark(l.getSource());
 						tConfUnit.putRate(l, setting.ApplicationSettingFacade.DataRate.getMax());

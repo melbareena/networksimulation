@@ -44,6 +44,7 @@ public class StaticTraffic
 		
 		if(ApplicationSettingFacade.Traffic.getTypeOfGenerator() == TypeOfGenerationEnum.RANDOM)
 			return randomUpLink(uplinks);
+		
 		return fileUplink();
 	}
 	
@@ -68,7 +69,7 @@ public class StaticTraffic
 		}
 		catch(Exception ex)
 		{
-			PrintConsole.printErr("StaticTraffic/fileUplink: message: " + ex.getMessage());
+			ex.printStackTrace();
 		}
 		FileGenerator.UplinkTrafficInFile(_uplinkTraffic);
 		return _uplinkTraffic;

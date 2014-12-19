@@ -51,7 +51,6 @@ public class SINR
 		double dis = l.getDistance();
 		double Sinr  = (power * Math.pow(dis, - (ALPHA) )) / (MUE + i_l_lprime) ;	
 		return Sinr;
-		
 	}
 	private double getCrossDistance(Link l, Link currentLink)
 	{

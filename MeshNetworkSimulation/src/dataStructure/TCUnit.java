@@ -357,4 +357,9 @@ public class TCUnit
 		_rateCollection = newRates;
 		
 	}
+
+	public void removePower(Link l)
+	{
+		_powerCollection.remove(l);	
+	}
 }

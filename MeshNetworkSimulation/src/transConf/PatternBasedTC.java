@@ -218,20 +218,28 @@ public class PatternBasedTC extends TCBasic
 	 * of uplinks by configuration
 	 * @return the list of transmission configurations created
 	 */
-	protected List<TCUnit> remainingLinksStep(List<TCUnit> patterns, Set<Link> selectedLinksSet,
-			boolean enlargeByGateways, List<Vertex> gateways, int downOverUpRatio) {
+	protected List<TCUnit> remainingLinksStep(List<TCUnit> patterns, Set<Link> selectedLinksSet, boolean enlargeByGateways, List<Vertex> gateways, int downOverUpRatio)
+			
+	{
+		
+		IncreaseDatarate increaser = new IncreaseDatarate(this);
 		List<TCUnit> listTCU = new ArrayList<TCUnit>(patterns);
 		// Try adding links using generated patterns
 		boolean newLinkAdded = true;
-		while((selectedLinksSet.size() < numberOfLinks) && newLinkAdded) {
+		while((selectedLinksSet.size() < numberOfLinks) && newLinkAdded)
+		{
 			newLinkAdded = false;
-			for(TCUnit tcu : listTCU) {
+			for(TCUnit tcu : listTCU) 
+			{
 				int currentTCUIndex = listTCU.indexOf(tcu);
-				for(Link l : LinksTraffic.Sort().keySet()) {
-					if(!selectedLinksSet.contains(l)) {
+				for(Link l : LinksTraffic.Sort().keySet()) 
+				{
+					if(!selectedLinksSet.contains(l)) 
+					{
 						TCUnit modifiedTC = checkAdd(l, tcu.Clone());
 						// Check if the link can be added to the current TCU
-						if(modifiedTC != null) {
+						if(modifiedTC != null) 
+						{
 							// Then add it
 							tcu = modifiedTC;
 							selectedLinksSet.add(l);
@@ -241,21 +249,21 @@ public class PatternBasedTC extends TCBasic
 				}
 				tcu = _sinr.calcDataRate(tcu);
 				tcu = Enlarge(tcu);
-				tcu = _sinr.calcDataRate(tcu);
-				if(ApplicationSettingFacade.PowerControl.isEnable())
-					tcu = _powerUnit.powerControl(tcu);
-				if(listTCU.size() <= currentTCUIndex) {
+				tcu = _sinr.calcDataRate(tcu);		
+				if(listTCU.size() <= currentTCUIndex)
 					listTCU.add(currentTCUIndex, tcu);
-				} else {
+				else 
 					listTCU.set(currentTCUIndex, tcu);
-				}
+				
 				resetMARK();
 			}
 		}
 		// Create other TCU if necessary, to add remaining links
-		while(selectedLinksSet.size() < numberOfLinks) {
+		while(selectedLinksSet.size() < numberOfLinks) 
+		{
 			TCUnit newTCU = new TCUnit();
-			for(Link l : LinksTraffic.Sort().keySet()) {
+			for(Link l : LinksTraffic.Sort().keySet()) 
+			{
 				if(!selectedLinksSet.contains(l)) {
 					TCUnit modifiedTC = checkAdd(l, newTCU.Clone());
 					// Check if the link can be added to the current TCU
@@ -268,20 +276,29 @@ public class PatternBasedTC extends TCBasic
 			}
 			if(newTCU.size() > 0) {
 				newTCU = _sinr.calcDataRate(newTCU);
-				
 				if(enlargeByGateways)
 					newTCU = enlargeByGateways(newTCU, selectedLinksSet, gateways, downOverUpRatio);
 				else 
 					newTCU = Enlarge(newTCU);
-				
 				newTCU = _sinr.calcDataRate(newTCU);
-				if(ApplicationSettingFacade.PowerControl.isEnable())
-					newTCU = _powerUnit.powerControl(newTCU);
 				listTCU.add(newTCU);
 			}
 			resetMARK();
 		}
-		
+		if(ApplicationSettingFacade.PowerControl.isEnable())
+		{
+			List<TCUnit> pTCs = new ArrayList<TCUnit>();
+			for (TCUnit tcUnit : listTCU)
+			{
+				TCUnit poweredTC = _powerUnit.powerControl(tcUnit);
+				TCUnit improve = increaser.increaser(poweredTC);
+				if(improve != null)
+					poweredTC = improve;
+				pTCs.add(poweredTC);
+			}
+			
+			listTCU = pTCs;
+		}
 		return listTCU;
 	}
 	

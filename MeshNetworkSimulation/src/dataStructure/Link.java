@@ -4,9 +4,9 @@ package dataStructure;
 public class Link implements Comparable<Link>
 {
 	private final Integer id;
-	private final Vertex source;
-	private final Vertex destination;
-	private final int weight;
+	private  Vertex source;
+	private  Vertex destination;
+	private  int weight;
 
 	public Link(int id, Vertex source, Vertex destination, int weight)
 	{
@@ -14,6 +14,10 @@ public class Link implements Comparable<Link>
 		this.source = source;
 		this.destination = destination;
 		this.weight = weight;
+	}
+	public Link(int id)
+	{
+		this.id = id;
 	}
 
 	public int getId()
