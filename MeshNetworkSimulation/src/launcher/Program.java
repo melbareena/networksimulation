@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
+import common.FileGenerator;
 import common.PrintConsole;
 import scheduling.SchedulingFacade;
 import setting.ApplicationSettingFacade;
@@ -96,6 +97,7 @@ public class Program {
 		}
 	}
 
+	static List<SchedulingResult> _finalResults = new ArrayList<SchedulingResult>();
 	/**Launch the program with the selected parameters.
 	 */
 	public static void launch()
@@ -135,12 +137,15 @@ public class Program {
 					return null;
 				}
 
-				private void multiMode() {
+				private void multiMode() 
+				{
 					PrintConsole.print("********************** Application is in multi execution mode ************************");
+			
 					for (multiExecIndex = 1; multiExecIndex <= numberOfExecution; multiExecIndex++) {
 						final int index = multiExecIndex;
 						PrintConsole.print("Exceute Number : " + index);
 						SchedulingResult result = SchedulingFacade.getScheduling(index-1);
+						_finalResults.add(result);
 						Program.loadingDialog.setIndeterminate(index-1, true);
 						Program.loadingDialog.setLabel(index-1, "Building user interface...");
 						int step = result.getThroughputData().size()/100;
@@ -172,10 +177,16 @@ public class Program {
 					super.done();
 					Program.loadingDialog.dispose();
 					Program.loadingDialog.setVisible(false);
+					if(_finalResults.size() > 0)
+					{
+						
+							FileGenerator.seceduleResult(_finalResults.toArray(new SchedulingResult[0]));
+					}
 				}
 
 			};
 			worker.execute();
+			
 		}
 		catch (Exception e) 
 		{

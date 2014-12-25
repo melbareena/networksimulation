@@ -1,6 +1,8 @@
 package transConf;
 import org.jblas.DoubleMatrix;
 
+import common.FileGenerator;
+
 import setting.ApplicationSettingFacade;
 import dataStructure.DataRate;
 import dataStructure.Link;
@@ -17,8 +19,11 @@ public class IncreaseDatarate extends PowerControlUnit
 	
 	public TCUnit increaser(TCUnit unit)
 	{
+		
+		
 		TCUnit feasible = null;
 		TCUnit T_prime = null;
+		FileGenerator.Power(unit, 0);
 		for (Link l : unit.getLinks())
 		{
 			int currentDataRate = unit.getRate(l);
@@ -47,17 +52,20 @@ public class IncreaseDatarate extends PowerControlUnit
 						double[] powers = super.getPowerValues(T_prime, T_prime.getLinks(), A, D);
 						if(isPowerFeasible(powers))
 						{
+							
 							int index = 0;
 							for (Link ll : T_prime.getLinks())
 							{
 								T_prime.setPower(ll, powers[index]*1000);
 								index++;
 							}
+							
 							feasible = T_prime.Clone();	
 						}
 					}
 				}			
 		}
+		FileGenerator.Power(feasible, 1);
 		return feasible;
 	}
 

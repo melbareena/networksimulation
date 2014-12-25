@@ -74,11 +74,15 @@ class DownlinkEstimating
 		{
 			for (Path path : dlPaths.getValue())
 			{	
-				float traffic  = dynamicTraffic.get(path.getSource()).get(path.getDestination());
-				for (Link edge : path.getEdgePath())	
+				Vertex source = path.getSource();
+				Vertex  destination = path.getDestination();			
+				if(dynamicTraffic.containsKey(source) && dynamicTraffic.get(source).containsKey(destination))
 				{
-					dl_Traffic_l.put(edge, traffic);
-				}		
+						float traffic  = dynamicTraffic.get(path.getSource()).get(path.getDestination());
+						for (Link edge : path.getEdgePath())	
+							dl_Traffic_l.put(edge, traffic);	
+				}
+				
 			}
 			
 		}

@@ -2,6 +2,7 @@ package common;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,6 +18,7 @@ import dataStructure.LinksAmbienNoiseMap;
 import dataStructure.LinksChannelMap;
 import dataStructure.Path;
 import dataStructure.PathMap;
+import dataStructure.SchedulingResult;
 import dataStructure.TCUnit;
 import dataStructure.UplinkTraffic;
 import dataStructure.Vertex;
@@ -618,97 +620,69 @@ public class FileGenerator
 	}
 
 
-	public static void needToAdjust(int counter, TCUnit unit)
+	public static int counter  = 0;
+	public static void Power(TCUnit unit, int i)
 	{
-		if(!ISFILEENABLE) return;
-		
+		String str = "before";
+		if(i==1)
+			str = "after";
 		try
 		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/AdjustmentTC/need" +counter + ".txt"));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/power/" + counter + "_"+ str + ".txt"));
 			for (Link l : unit.getLinks())
 			{
-				writer.write(l.getId() + ": " + unit.getRate(l));
+				writer.write("#" + l.getId() + "->" + unit.getPower(l) + "," + unit.getRate(l));
 				writer.newLine();
 			}
-
+			writer.write("Total:" + unit.getTCAP());
 			writer.close();
-			//PrintConsole.printErr("Adjustment for power control inserted in file successfully.");
+			if(i==1) counter++;
+			//PrintConsole.printErr("Affectance for links inserted in file successfully.");
 		} 
 		catch (Exception ex)
 		{
-			System.err.println("NeedToAdjustment/FileGenerator/Message:" + ex.getMessage());
+			//System.err.println("Affectance/FileGenerator/Message:" + ex.getMessage());
 		}
-		
 		
 		
 	}
 
-	private static int counter = 0;
-	public static void deadTC(TCUnit unit)
+
+	public static void seceduleResult(SchedulingResult[] results)
 	{
-		counter++;
-		if(!ISFILEENABLE) return;
 		
-		try
-		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/DeadTC/dead"+ counter +".txt"));
-			for (Link l : unit.getLinks())
+			
+			DecimalFormat df = new DecimalFormat();
+			df.setMaximumFractionDigits(2);
+			StringBuilder throughputBuilder = new StringBuilder();
+			StringBuilder delayBuilder = new StringBuilder();
+			for (int i = results.length - 1 ; i >= 0 ; i--)
 			{
-				writer.write(l.getId() + ": " + unit.getRate(l));
-				writer.newLine();
+				SchedulingResult sr = results[i];
+				throughputBuilder.append(df.format(sr.getAverageThroughput())  );
+				throughputBuilder.append(System.lineSeparator());
+				delayBuilder.append(((int)sr.getAveragePacketDelay()));
+				delayBuilder.append(System.lineSeparator());
+				
 			}
-
-			writer.close();
-			//PrintConsole.printErr("Adjustment for power control inserted in file successfully.");
-		} 
-		catch (Exception ex)
-		{
-			System.err.println("DeadTC/FileGenerator/Message:" + ex.getMessage());
-		}
+				try
+				{
+				
+					BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "results.txt"));
+					
+					writer.write(throughputBuilder.toString());
+					writer.newLine();
+					writer.newLine();
+					writer.write(delayBuilder.toString());
+					writer.close();
+				
+			} 
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
+			
 	}
-
-	static int TCcounter = 0; 
-	public static void TransmissionConfige(TCUnit unit)
-	{
-		try
-		{
-			String str = TCcounter + "TC_";
-			if(TCcounter % 2 == 0)
-				str += "_before_" + counter;
-			else
-			{
-				str += "_after_" + counter;
-				counter++;
-			}
-			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/PowerControl/"+ str +".txt"));
-			
-			for (Link l : unit.getLinks())
-			{
-				writer.write(l.getId() + "-> rate: " + unit.getRate(l) + ", power: " + unit.getPower(l) + ", sinrThreshold:" + unit.getSinrThreshold(l)+ ", sinr actual:"+ unit.getSinr(l));
-				writer.newLine();
-			}
-			
-			writer.write("Total cpacity: "+ unit.getTCAP());
-
-			
-
-			writer.close();
-			TCcounter++;
-			//PrintConsole.printErr("Adjustment for power control inserted in file successfully.");
-		} 
-		catch (Exception ex)
-		{
-			System.err.println("TransmissionConfige/FileGenerator/Message:" + ex.getMessage());
-		}
-		
-	}
-
-
-	
-
-
-	
-
 
 
 }

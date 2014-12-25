@@ -48,8 +48,10 @@ import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.TextAnchor;
 import org.jfree.util.ShapeUtilities;
 
+import common.FileGenerator;
 import dataStructure.SchedulingResult;
 import setting.ApplicationSettingFacade;
+import setting.BaseConfiguration.AppExecMode;
 import setting.BaseConfiguration.TypeOfGenerationEnum;
 
 /**A frame to view the main results of the scheduling.
@@ -128,7 +130,10 @@ public class HistogramViewer extends JFrame {
 		this.stepSource = step;
 		this.stepTransmit = step;
 
+		
         meanThroughput = new ValueMarker(results.getAverageThroughputInSteadyState());
+        
+
 	}
 	
 	/**Shows the graph and build all the components in the frame.
@@ -443,7 +448,7 @@ public class HistogramViewer extends JFrame {
 				+"<u>Average packet delay:</u> <em>"
 				+ String.format("%,d", Math.round(results.getAveragePacketDelay())) + " timeslots"
 				+"</em>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;"
-				+"<em>"+String.format("%,d", samplesNumber)+"</em> samples.</html>");
+				+"<em>"+String.format("%,d", samplesNumber)+"</em> samples, Average Throuhgput: " + String.format("%f2", results.getAverageThroughput())  + " </html>");
 		lblInfos.setHorizontalAlignment(JLabel.TRAILING);
 		toolBar.add(lblInfos);
 	}
@@ -481,17 +486,12 @@ public class HistogramViewer extends JFrame {
 		
 		System.out.println("Finished, displaying...");
 		
-		String titleString = "AC:"+Program.getAvailableChannels() + "\n"
+		String titleString = 
+				"Channels:"+Program.getAvailableChannels() + "," + "Topology: " + ApplicationSettingFacade.Nodes.getNodes().size()
+				+ ",Power Control: " + ApplicationSettingFacade.PowerControl.isEnable() + ","				
 				+ "TC: " + ApplicationSettingFacade.TranmissionConfiguration.getStertegy().name() + "\n"
-				+ "Scheduling: " + results.getSchedulingStrategy() + " - "
-				+ ((ApplicationSettingFacade.Router.getTypeOfGeneration() == TypeOfGenerationEnum.RANDOM) ?
-						"Topolgy: Random " : "Topology: Static ") + "\n"
-				+ "Traffic Generator: " + results.getTrafficGenerator()
-				+ ((ApplicationSettingFacade.Traffic.isDynamicType()) ? " (lambda "
-				+ ApplicationSettingFacade.Traffic.getTrafficRate()
-				+ " ; " + ApplicationSettingFacade.Traffic.getNumberOfNewEmittingNodes()
-				+ " em. nodes ; ratio "
-				+ ApplicationSettingFacade.Traffic.getRatio() + ")" : "");
+				+ "Scheduling: " + results.getSchedulingStrategy()
+				;
 		
 		/* Creating chart */
 		chart = ChartFactory.createXYLineChart(titleString,	"Samples",	"Throughput",
@@ -521,7 +521,7 @@ public class HistogramViewer extends JFrame {
 	        meanThroughput.setPaint(Color.BLUE);
 	        meanThroughput.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 	        		10.0F, new float[] {10, 10}, 0.0F));
-	        meanThroughput.setLabel("Average throughput (steady state): "+ String.format("%,f", meanThroughput.getValue()));
+	        meanThroughput.setLabel("Steady State: "+ String.format("%,f", meanThroughput.getValue()));
 	        meanThroughput.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
 	        meanThroughput.setLabelTextAnchor(TextAnchor.BOTTOM_RIGHT);
 	        meanThroughput.setOutlinePaint(Color.BLACK);

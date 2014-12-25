@@ -139,13 +139,13 @@ public class DynamicTrafficGenerator {
 	private DownlinkTraffic generateTimeSlotDownlinkTraffic(Set<Vertex> gateways,
 			PathMap downlinks, int n) {
 		DownlinkTraffic downlinkTraffic = new DownlinkTraffic();
-		if(gateways != null) {
+		if(gateways != null && gateways.size() > 0) {
 			for(Vertex gateway : gateways) {
 				TreeMap<Vertex,Float> gatewayTrafficMap = new TreeMap<Vertex,Float>();
 				// Shuffling the list of path from the gateway
 				Collections.shuffle(downlinks.get(gateway), this.randomGenerator);
 				// Adding traffic for n links
-				for(int i = 0; i < n; i++) {
+				for(int i = 0; i < n && downlinks.get(gateway).size() > i; i++) {
 					Path p = downlinks.get(gateway).get(i);
 					int rate = getPoissonArrival(this.lambda, this.randomGenerator);
 					if(rate > 0) {

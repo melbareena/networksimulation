@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import common.FileGenerator;
-
 import setting.ApplicationSettingFacade;
 import sinr.SINR;
 import trafficEstimating.TrafficEstimatingFacade;
@@ -204,11 +202,9 @@ public abstract class TCBasic
 			{
 				
 				updateTUnit = _powerUnit.powerControl(updateTUnit);	
-				FileGenerator.TransmissionConfige(updateTUnit);
 				TCUnit improve = increaser.increaser(updateTUnit);
 				if(improve != null)
 					updateTUnit = improve;
-				FileGenerator.TransmissionConfige(updateTUnit);
 			}
 			updateTT.add(updateTUnit);
 			resetMARK();
@@ -222,7 +218,7 @@ public abstract class TCBasic
 	protected TCUnit Enlarge(TCUnit tConfUnit)
 	{
 
-		Link[] links = TrafficEstimatingFacade.getSourceBuffers(0).sortByTraffic().keySet().toArray(new Link[0]);
+		Link[] links =  TrafficEstimatingFacade.getLinksTraffic().Sort().keySet().toArray(new Link[0]); 
 
 		
 		//List<Link> links = TrafficEstimatingFacade.getOptimalLinks();
