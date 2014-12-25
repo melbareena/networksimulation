@@ -65,8 +65,6 @@ public class PatternBasedTC extends TCBasic
 		_patterns = gatewaysStep(gateways, downOverUpRatio, priorityToOrthogonal,
 				_selectedLinksSet, repeatLinksToRespectRatio);
 		
-		System.out.println("Number of patterns: "+_patterns.size());
-		
 		List<TCUnit> finalList = remainingLinksStep(_patterns, _selectedLinksSet, enlargeByGateways,
 				gateways, downOverUpRatio);
 		_TT = finalList;
@@ -234,6 +232,7 @@ public class PatternBasedTC extends TCBasic
 				int currentTCUIndex = listTCU.indexOf(tcu);
 				for(Link l : LinksTraffic.Sort().keySet()) 
 				{
+					
 					if(!selectedLinksSet.contains(l)) 
 					{
 						TCUnit modifiedTC = checkAdd(l, tcu.Clone());

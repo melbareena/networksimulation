@@ -83,5 +83,9 @@ public class SchedulingResult {
         }
         return sum / ApplicationSettingFacade.Traffic.getDuration();
 	}
+	public double getAverageThroughput()
+	{
+		return getTotalTrafficGenerated() / throughputData.size();
+	}
 
 }
