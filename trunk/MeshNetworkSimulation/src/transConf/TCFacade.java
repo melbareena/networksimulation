@@ -21,6 +21,7 @@ public class TCFacade
 	
 	public static List<TCUnit> getConfigurations()
 	{
+		long startTime = System.currentTimeMillis();
 		if(configurations == null || multiExecIndex != Program.multiExecIndex)
 		{
 			PrintConsole.print("Tranmission Configuration Start.......");
@@ -40,6 +41,9 @@ public class TCFacade
 			}
 
 		}
+		long stopTime = System.currentTimeMillis();
+	    long elapsedTime = stopTime - startTime;
+	    System.out.println("---------------------------TC execution Time:" + elapsedTime);
 		return configurations;
 	}
 }

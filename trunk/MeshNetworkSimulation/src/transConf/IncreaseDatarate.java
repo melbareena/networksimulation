@@ -65,7 +65,7 @@ public class IncreaseDatarate extends PowerControlUnit
 					}
 				}			
 		}
-		FileGenerator.Power(feasible, 1);
+		//FileGenerator.Power(feasible, 1);
 		return feasible;
 	}
 

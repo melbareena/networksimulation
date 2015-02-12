@@ -71,7 +71,7 @@ public class XMLWriter {
 	public static void writeOutputFolder(String path, boolean generateFileAsOutput) {
 		Element e = doc.createElement("OutputFolder");
 		rootElement.appendChild(e);
-		if(path == null || path.length() < 1 || path.compareToIgnoreCase("null\\") == 0) path = "bin\\output";
+		if(path == null || path.length() < 1 || path.compareToIgnoreCase("null\\") == 0) path = "bin\\output\\";
 		e.setAttribute("Path", path);
 		e.setAttribute("GenerateFileAsOutput", generateFileAsOutput+"");
 		e.setAttribute("IntermidiateConsoleOutput", "false");
@@ -101,7 +101,7 @@ public class XMLWriter {
 			}
 	
 	public static void writeTraffic(boolean dynamic, String generator, String addrUp, String addrDown,
-			long upseed, long downseed, double rate, long seed, int nodes, int ratio, long duration) {
+			long upseed, long downseed, float lambda_max, float lambda_min, long seed, int ratio, long duration) {
 		Element e = doc.createElement("Traffic");
 		rootElement.appendChild(e);
 		e.setAttribute("Type", (dynamic ? "Dynamic" : "Static"));
@@ -122,11 +122,11 @@ public class XMLWriter {
 			}
 		}
 		else {
-			e.setAttribute("Rate", rate+"");
+			e.setAttribute("Lambda_max",  lambda_max +"");
+			e.setAttribute("Lambda_min",  lambda_min +"");
 			e.setAttribute("Seed", seed+"");
-			e.setAttribute("NbOfNewEmittingNodes", nodes+"");
-			e.setAttribute("Ratio", ratio+"");
-			e.setAttribute("Duration", duration+"");
+			e.setAttribute("Ratio", ratio +"");
+			e.setAttribute("Duration", duration + "");
 		}
 	}
 	

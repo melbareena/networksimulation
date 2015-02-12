@@ -494,7 +494,7 @@ public class HistogramViewer extends JFrame {
 				;
 		
 		/* Creating chart */
-		chart = ChartFactory.createXYLineChart(titleString,	"Samples",	"Throughput",
+		chart = ChartFactory.createXYLineChart(titleString,	"Time Slots",	"Throughput(Mbps)",
 				datasetThroughput, PlotOrientation.VERTICAL, true, true, false);
 		
 		/* Plot properties */
@@ -507,13 +507,14 @@ public class HistogramViewer extends JFrame {
 		/* Markers for dynamic traffic */
 		if(ApplicationSettingFacade.Traffic.isDynamicType()) {
 			/* End of traffic generation marker */
-	        endTraffic.setPaint(Color.GREEN);
+	        endTraffic.setPaint(Color.MAGENTA);
+	        
 	        endTraffic.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 	        		10.0F, new float[] {10, 10}, 0.0F));
 	        endTraffic.setLabel("End of traffic generation");
 	        endTraffic.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
 	        endTraffic.setLabelTextAnchor(TextAnchor.TOP_LEFT);
-	        endTraffic.setOutlinePaint(Color.BLACK);
+	        endTraffic.setOutlinePaint(Color.ORANGE);
 	        endTraffic.setLabelFont(endTraffic.getLabelFont().deriveFont(Font.BOLD, 12));
 	        plot.addDomainMarker(endTraffic);
 	        
@@ -526,7 +527,7 @@ public class HistogramViewer extends JFrame {
 	        meanThroughput.setLabelTextAnchor(TextAnchor.BOTTOM_RIGHT);
 	        meanThroughput.setOutlinePaint(Color.BLACK);
 	        meanThroughput.setLabelFont(meanThroughput.getLabelFont().deriveFont(Font.BOLD, 12));
-	        plot.addRangeMarker(meanThroughput);
+	        //plot.addRangeMarker(meanThroughput);
 		}
 		
 		/* Throughput renderer */
@@ -538,28 +539,28 @@ public class HistogramViewer extends JFrame {
 		
 		/* Source traffic plot and renderer */
 		if(sourceData != null) {
-			plot.setDataset(1, datasetSource);
-			plot.mapDatasetToRangeAxis(1, 1);
-			plot.setRangeAxis(1, new NumberAxis("Source Traffic"));
+			plot.setDataset(2, datasetSource);
+			plot.mapDatasetToRangeAxis(2, 2);
+			plot.setRangeAxis(2, new NumberAxis("Source Traffic"));
 			
 			XYSplineRenderer renderer1 = new XYSplineRenderer();
 			renderer1.setSeriesToolTipGenerator(0, sttg);
 			renderer1.setSeriesShape(0, ShapeUtilities.createUpTriangle(3.0F));
-			plot.setRenderer(1, renderer1);
-			changeColor(1, Color.GREEN);
+			plot.setRenderer(2, renderer1);
+			changeColor(2, Color.GREEN);
 		}
 		
 		/* Transmit traffic plot and renderer */
 		if(transmitData != null) {
-			plot.setDataset(2, datasetTransmit);
-			plot.mapDatasetToRangeAxis(2, 2);
-			plot.setRangeAxis(2, new NumberAxis("Transmit Traffic"));
+			plot.setDataset(3, datasetTransmit);
+			plot.mapDatasetToRangeAxis(3, 3);
+			plot.setRangeAxis(3, new NumberAxis("Transmit Traffic"));
 			
 			XYSplineRenderer renderer2 = new XYSplineRenderer();
 			renderer2.setSeriesToolTipGenerator(0, sttg);
 			renderer2.setSeriesShape(0, ShapeUtilities.createDownTriangle(3.0F));
-			plot.setRenderer(2, renderer2);
-			changeColor(2, Color.RED);
+			plot.setRenderer(3, renderer2);
+			changeColor(3, Color.RED);
 		}
 		
 		plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);

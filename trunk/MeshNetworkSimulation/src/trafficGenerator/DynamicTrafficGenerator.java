@@ -1,7 +1,5 @@
 package trafficGenerator;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -10,7 +8,6 @@ import java.util.TreeMap;
 import setting.ApplicationSettingFacade;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import dataStructure.DownlinkTraffic;
 import dataStructure.Path;
@@ -35,15 +32,13 @@ public class DynamicTrafficGenerator {
 	
 	/** The parameter of the Poisson law used to generate traffic.
 	 * <code>lambda</code> corresponds to the mean traffic rate of the network. */
-	private double lambda;
-	
-	/** The random number generator. */
-	private Random randomGenerator;
+	private float lambda_max;
+	private float lambda_min;
 	
 	/** The number of nodes considered at each new time slot. In other words,
 	 * the number of nodes that this generator will try to generate traffic for,
-	 * at each time slot. */
-	private int nodesToConsider;
+	 * at each time slot. 
+	private int nodesToConsider;*/
 	
 	/**The ratio for downlink traffic over uplink traffic.
 	 * This generator will generate '<code>downOverUpRatio</code>' times more
@@ -62,11 +57,10 @@ public class DynamicTrafficGenerator {
 	 * This generator will generate '<code>downOverUpRatio</code>' times more
 	 * downlink traffic than uplink traffic.
 	 */
-	private DynamicTrafficGenerator(double trafficRate, long seed,
-			int nodesToConsider, int downOverUpRatio) {
-		this.lambda = trafficRate;
-		this.randomGenerator = new Random(seed);
-		this.nodesToConsider = nodesToConsider;
+	private DynamicTrafficGenerator(float lambdamin, float lambdamax, long seed, int downOverUpRatio) {
+		this.lambda_max = lambdamax;
+		this.lambda_min = lambdamin;
+		//this.nodesToConsider = nodesToConsider;
 		this.downOverUpRatio = downOverUpRatio;
 	}
 	
@@ -74,9 +68,9 @@ public class DynamicTrafficGenerator {
 	 * config file.
 	 */
 	public DynamicTrafficGenerator() {
-		this(ApplicationSettingFacade.Traffic.getTrafficRate(),
+		this(ApplicationSettingFacade.Traffic.getLambdaMax(),
+				ApplicationSettingFacade.Traffic.getLambdaMin(),
 				ApplicationSettingFacade.Traffic.getSeed(),
-				ApplicationSettingFacade.Traffic.getNumberOfNewEmittingNodes(),
 				ApplicationSettingFacade.Traffic.getRatio());
 	}
 	
@@ -90,8 +84,16 @@ public class DynamicTrafficGenerator {
 	 * @see DynamicTrafficGenerator#generateTimeSlotUplinkTraffic(Set)
 	 * @see DynamicTrafficGenerator#generateTimeSlotDownlinkTraffic(Set, PathMap, int)
 	 */
-	Traffic generateTraffic(PathMap uplinks, PathMap downlinks) {
-		Set<Vertex> selectedNodes = pickUpRandomNodes(nodesToConsider);
+	Traffic generateTraffic(PathMap uplinks, PathMap downlinks) 
+	{
+		List<Vertex> routers = Lists.newArrayList(ApplicationSettingFacade.Router.getRouter().values());
+		UplinkTraffic uplinkTraffic = generateTimeSlotUplinkTraffic(routers);
+		
+		
+		List<Vertex> geteways = Lists.newArrayList(ApplicationSettingFacade.Gateway.getGateway().values());
+		DownlinkTraffic downlinkTraffic = generateTimeSlotDownlinkTraffic(geteways, downlinks, downOverUpRatio);
+		
+	/*	Set<Vertex> selectedNodes = pickUpRandomNodes(nodesToConsider);
 		
 		// Clone the original set of nodes in the uplink PathMap
 		Set<Vertex> cloneUplinks = new HashSet<Vertex>(uplinks.keySet());
@@ -103,8 +105,8 @@ public class DynamicTrafficGenerator {
 		Set<Vertex> cloneDownlinks = new HashSet<Vertex>(downlinks.keySet());
 		// Intersect the set of nodes with the selectedNodes set
 		cloneDownlinks.retainAll(selectedNodes);
-		DownlinkTraffic downlinkTraffic = generateTimeSlotDownlinkTraffic(cloneDownlinks, downlinks, downOverUpRatio);
 		
+		*/
 		return new Traffic(uplinkTraffic, downlinkTraffic);
 	}
 	
@@ -114,12 +116,15 @@ public class DynamicTrafficGenerator {
 	 * @param routers The set of routers to generate uplink traffic for.
 	 * @return The traffic generated.
 	 */
-	private UplinkTraffic generateTimeSlotUplinkTraffic(Set<Vertex> routers) {
+	private UplinkTraffic generateTimeSlotUplinkTraffic(List<Vertex> routers) {
 		UplinkTraffic uplinkTraffic = new UplinkTraffic();
-		if(routers != null) {
-			for(Vertex router : routers) {
-				int rate = getPoissonArrival(this.lambda, this.randomGenerator);
-				if(rate > 0) {
+		if(routers != null) 
+		{
+			for(Vertex router : routers)
+			{
+				int rate = getPoissonArrival();
+				if(rate > 0) 
+				{
 					uplinkTraffic.add(router, rate*this.rateCoeff);
 				}
 			}
@@ -133,28 +138,29 @@ public class DynamicTrafficGenerator {
 	 * of traffic independently for each router reachable by each gateway.
 	 * @param gateways The set of gateways to generate traffic for.
 	 * @param downlinks The <code>PathMap</code> containing all the downlinks in the network.
-	 * @param n The number of downlinks to consider per gateway (randomly chosen).
+	 * @param downOverUp The number of downlinks to consider per gateway (randomly chosen).
 	 * @return The traffic generated.
 	 */
-	private DownlinkTraffic generateTimeSlotDownlinkTraffic(Set<Vertex> gateways,
-			PathMap downlinks, int n) {
+	private DownlinkTraffic generateTimeSlotDownlinkTraffic(List<Vertex> gateways, PathMap downlinks, int downOverUp) 
+	{
 		DownlinkTraffic downlinkTraffic = new DownlinkTraffic();
-		if(gateways != null && gateways.size() > 0) {
-			for(Vertex gateway : gateways) {
+		if(gateways != null && gateways.size() > 0)
+		{
+			for(Vertex gateway : gateways)
+			{
 				TreeMap<Vertex,Float> gatewayTrafficMap = new TreeMap<Vertex,Float>();
 				// Shuffling the list of path from the gateway
-				Collections.shuffle(downlinks.get(gateway), this.randomGenerator);
 				// Adding traffic for n links
-				for(int i = 0; i < n && downlinks.get(gateway).size() > i; i++) {
+				for(int i = 0; i < downlinks.get(gateway).size() ; i++)
+				{
 					Path p = downlinks.get(gateway).get(i);
-					int rate = getPoissonArrival(this.lambda, this.randomGenerator);
-					if(rate > 0) {
-						gatewayTrafficMap.put(p.getDestination(), rate*this.rateCoeff*1.0F);
-					}
+					int rate = getPoissonArrival(downOverUp);
+					if(rate > 0) 
+						gatewayTrafficMap.put(p.getDestination(), rate * this.rateCoeff * 1.0F);
+
 				}
-				if(gatewayTrafficMap.size() > 0) {
+				if(gatewayTrafficMap.size() > 0)
 					downlinkTraffic.add(gateway, gatewayTrafficMap);
-				}
 			}
 		}
 		return downlinkTraffic;
@@ -164,12 +170,14 @@ public class DynamicTrafficGenerator {
 	 * and return them.
 	 * @param n The number of nodes to pick up.
 	 * @return A list of <code>n</code> randomly chosen.
-	 */
+	 
 	private Set<Vertex> pickUpRandomNodes(int n) {
 		List<Vertex> shuffledList = Lists.newArrayList(ApplicationSettingFacade.Nodes.getNodes().values());
-		Collections.shuffle(shuffledList, this.randomGenerator);
-		return Sets.newHashSet(shuffledList.subList(0, n));
-	}
+		//Collections.shuffle(shuffledList, this.randomGenerator);
+		//return Sets.newHashSet(shuffledList.subList(0, n));
+		
+		return Sets.newHashSet(shuffledList);
+	}*/
 	
 	/**Generates randomly a number of Poisson arrivals, given the <code>lambda</code> parameter.
 	 * <br/>Note: Based on Knuth algorithm.
@@ -179,15 +187,39 @@ public class DynamicTrafficGenerator {
 	 * @return The number of arrivals, generated ramdomly following the Poisson law (<code>lambda</code>).
 	 * @see <a href="http://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables">D. Knuth algorithm</a>
 	 */
-	private static int getPoissonArrival(double lambda, Random r) {
-	    double L = Math.exp(-lambda);
-	    int k = 0;
-	    double p = 1.0;
-	    do {
-	        p *= r.nextDouble();
-	        k++;
-	    } while (p > L);
-	    return k - 1;
+	private int getPoissonArrival()
+	{
+		Random random = new Random();
+		 int r = 0;
+		 double a = random.nextDouble();
+		 
+		 double mean = random.nextFloat() * ( lambda_max - lambda_min ) + lambda_min;
+
+		 double p = Math.exp(-mean);
+
+		    while (a > p) {
+		        r++;
+		        a = a - p;
+		        p = p * mean / r;
+		    }
+		    return r;
+	}
+	private int getPoissonArrival( int rate)
+	{
+		Random random = new Random();
+		 int r = 0;
+		 double a = random.nextDouble();
+		 
+		 double mean = random.nextFloat() * ( (lambda_max * rate) - (lambda_min * rate) ) + (lambda_min * rate);
+
+		 double p = Math.exp(-mean);
+
+		    while (a > p) {
+		        r++;
+		        a = a - p;
+		        p = p * mean / r;
+		    }
+		    return r;
 	}
 
 }

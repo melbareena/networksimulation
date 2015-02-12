@@ -45,6 +45,7 @@ public class DynamicTraffic
 	
 	public DownlinkTraffic getDownlink(PathMap downlinkPaths)
 	{
+       
 		if(_downlinkTraffic != null) return _downlinkTraffic;
 		
 		

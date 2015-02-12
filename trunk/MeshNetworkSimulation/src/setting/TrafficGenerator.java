@@ -14,10 +14,10 @@ class TrafficGenerator extends BaseConfiguration {
 	// XML tag'name
 	private static final String TAG = "Traffic";
 	private static final String ATTTYPE = "Type";
-	private static final String ATTRATE = "Rate";
+	private static final String ATTLAMBDAMAX = "Lambda_max";
+	private static final String ATTlAMBDAMIN = "Lambda_min";
 	private static final String ATTDURATION = "Duration";
 	private static final String ATTSEED = "Seed";
-	private static final String ATTNODES = "NbOfNewEmittingNodes";
 	private static final String ATTRATIO = "Ratio";
 	private static final String ATTGEN = "Generator";
 	private static final String ATTADDRESSUP = "AddressUp";
@@ -27,13 +27,13 @@ class TrafficGenerator extends BaseConfiguration {
 	
 	private boolean dynamicType;
 	
-	private double trafficRate;
+	private float lambda_max;
+	
+	private float lambda_min;
 	
 	private long duration;
 	
 	private long seed;
-	
-	private int numberOfNewEmittingNodes;
 	
 	private int ratio;
 	
@@ -69,11 +69,11 @@ class TrafficGenerator extends BaseConfiguration {
 					dynamicType = (eElement.getAttribute(ATTTYPE).compareToIgnoreCase("Dynamic") == 0);
 					if(dynamicType) 
 					{
-						trafficRate = Double.parseDouble(eElement.getAttribute(ATTRATE));
+						lambda_max = Float.parseFloat(eElement.getAttribute(ATTLAMBDAMAX));
+						lambda_min = Float.parseFloat(eElement.getAttribute(ATTlAMBDAMIN));
 						duration = Long.parseLong(eElement.getAttribute(ATTDURATION));
 						seed = fetchSeed(eElement);
 						ratio = Integer.parseInt(eElement.getAttribute(ATTRATIO));
-						numberOfNewEmittingNodes = Integer.parseInt(eElement.getAttribute(ATTNODES));
 					}
 					else
 					{
@@ -163,20 +163,19 @@ class TrafficGenerator extends BaseConfiguration {
 		return dynamicType;
 	}
 
-	public double getTrafficRate() {
-		return trafficRate;
+	public float getLambdaMax() {
+		return lambda_max;
 	}
 	
+	public float getLambdaMin() {
+		return lambda_min;
+	}
 	public long getDuration() {
 		return duration;
 	}
 
 	public long getSeed() {
 		return seed;
-	}
-
-	public int getNumberOfNewEmittingNodes() {
-		return numberOfNewEmittingNodes;
 	}
 
 	public int getRatio() {
