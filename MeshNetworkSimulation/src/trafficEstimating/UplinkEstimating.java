@@ -45,13 +45,13 @@ class UplinkEstimating
 		List<UplinkPathTraffic> tMAXvg = new ArrayList<UplinkPathTraffic>();
 		UplinkTraffic uplinkTraffic = StaticTraffic.getUplinkTraffic();
 		// the uplink traffic  tULv
-		for (Entry<Vertex, Integer> tULv : uplinkTraffic.getTraffic().entrySet())
+		for (Entry<Vertex, Double> tULv : uplinkTraffic.getTraffic().entrySet())
 		{
 			tMAXvg.clear();
 					
 			Vertex router = tULv.getKey();
 			
-			int trafficV = tULv.getValue();
+			double trafficV = tULv.getValue();
 				
  			List<Path> paths = this.UplinkPaths.get(router);
 	
@@ -86,13 +86,13 @@ class UplinkEstimating
 		List<UplinkPathTraffic> tMAXvg = new ArrayList<UplinkPathTraffic>();
 		UplinkTraffic uplinkTraffic = dyTraffic.getUplinkTraffic();
 		
-		for (Entry<Vertex, Integer> tULv : uplinkTraffic.getTraffic().entrySet())
+		for (Entry<Vertex, Double> tULv : uplinkTraffic.getTraffic().entrySet())
 		{
 			tMAXvg.clear();
 					
 			Vertex router = tULv.getKey();
 			
-			int trafficV = tULv.getValue();
+			Double trafficV = tULv.getValue();
 				
  			List<Path> paths = this.UplinkPaths.get(router);
 	
@@ -118,14 +118,14 @@ class UplinkEstimating
 	private List<UplinkPathTraffic> getTrafficOfPath(List<Path> paths)
 	{
 		List<UplinkPathTraffic> result = new ArrayList<>();
-		float trafficL = 0;
-		float max = 0;
+		Double trafficL = 0d;
+		Double max = 0d;
 		Link maxLink = null;
-		TreeSet<Float> traffics = new TreeSet<>();
+		TreeSet<Double> traffics = new TreeSet<>();
 		for (Path path : paths)
 		{
 			traffics = new TreeSet<>();
-			max = 0;
+			max = 0d;
 			for (Link lp : path.getEdgePath())
 			{
 				trafficL = linksTraffic.get(lp);
@@ -151,7 +151,7 @@ class UplinkEstimating
 	 * @param router : a specific router
 	 * @return: a list of uplink paths for a router with their traffic ( tULp )
 	 */
-	private List<UplinkPathTraffic> waterFilling(List<UplinkPathTraffic> trafficDistribute, int trafficUL_V, Vertex router)
+	private List<UplinkPathTraffic> waterFilling(List<UplinkPathTraffic> trafficDistribute, double trafficUL_V, Vertex router)
 	{
 		
 		if(trafficDistribute.size() < 2 )
@@ -161,7 +161,7 @@ class UplinkEstimating
 			return trafficDistribute;
 		}
 		
-		float tMaxV = 0;
+		double tMaxV = 0;
 		Path maxPath = null;
 		for (UplinkPathTraffic tulp : trafficDistribute)
 		{
@@ -219,10 +219,10 @@ class UplinkEstimating
 			
 			if(trafficUL_V != 0)
 			{
-				float divide = trafficUL_V / trafficDistribute.size();
+				double divide = trafficUL_V / trafficDistribute.size();
 				for(int index = 0 ; index < trafficDistribute.size() ; index++)
 				{
-					float traff = trafficDistribute.get(index).getPathTraffic();
+					double traff = trafficDistribute.get(index).getPathTraffic();
 					double pre =  trafficDistribute.get(index).getPercentage();
 					trafficDistribute.get(index).setPathTraffic(traff + divide);
 					trafficDistribute.get(index).setPercentage(pre + (percentage / trafficDistribute.size()) );	
@@ -252,14 +252,14 @@ class UplinkEstimating
 				p_prime = consider.remove(0);
 				
 				
-				float t_p = p.get(0).getPathTraffic();
-				float t_p_prime = p_prime.getPathTraffic();
+				double t_p = p.get(0).getPathTraffic();
+				double t_p_prime = p_prime.getPathTraffic();
 				
-				float delta = t_p_prime - t_p;
+				double delta = t_p_prime - t_p;
 				
 				if(delta * p.size() < trafficUL_V)
 				{
-					int partPercentage =(int) (totalPercentage * delta) / trafficUL_V;
+					double partPercentage =(int) (totalPercentage * delta) / trafficUL_V;
 					for (UplinkPathTraffic upt : p)
 					{
 						upt.setPathTraffic(upt.getPathTraffic() + delta);
@@ -272,7 +272,7 @@ class UplinkEstimating
 				else
 				{
 					delta  = trafficUL_V / p.size();
-					int partPercentage =(int) (totalPercentage * delta) / trafficUL_V;
+					double partPercentage =(int) (totalPercentage * delta) / trafficUL_V;
 					
 					for (UplinkPathTraffic upt : p)
 					{

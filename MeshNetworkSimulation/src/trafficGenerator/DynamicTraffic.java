@@ -35,6 +35,7 @@ public class DynamicTraffic
 			{
 				_self._dynamicTraffic.put(i, _self._dynamicTrafficGenerator.generateTraffic(uplink, downLink));
 			}
+			System.out.println("offeredLoad: " + DynamicTrafficGenerator.offerload);
 		}
 		
 		return _self;

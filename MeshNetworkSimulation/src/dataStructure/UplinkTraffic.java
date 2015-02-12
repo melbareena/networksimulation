@@ -13,28 +13,28 @@ import java.util.TreeMap;
 public class UplinkTraffic
 {
 	
-	private Map<Vertex, Integer> sortedTraffic = null;
+	private Map<Vertex, Double> sortedTraffic = null;
 	
 	/**
 	 *  key = router Id
 	 *  value = traffic 
 	 */
-	private Map<Vertex, Integer> uplinkTraffic = new TreeMap<Vertex, Integer>();
+	private Map<Vertex, Double> uplinkTraffic = new TreeMap<Vertex, Double>();
 	
-	public void add(Vertex key, int trf)
+	public void add(Vertex key, double trf)
 	{
 		uplinkTraffic.put(key, trf);
 
 	}
 	
-	public void addAll( Map<Vertex, Integer> map)
+	public void addAll( Map<Vertex, Double> map)
 	{
 		
-		for (Entry<Vertex, Integer> item : map.entrySet())
+		for (Entry<Vertex, Double> item : map.entrySet())
 		{
 			if(uplinkTraffic.containsKey(item.getKey()))
 			{
-				int preVal = uplinkTraffic.get(item.getKey());
+				double preVal = uplinkTraffic.get(item.getKey());
 				preVal += item.getValue();
 				uplinkTraffic.put(item.getKey(), preVal);
 			}
@@ -43,7 +43,7 @@ public class UplinkTraffic
 		}
 		
 	}
-	public Map<Vertex, Integer> getTraffic()
+	public Map<Vertex, Double> getTraffic()
 	{
 		if(sortedTraffic == null)
 		{
@@ -65,7 +65,7 @@ public class UplinkTraffic
 		
 	}
 	
-	public int getUplinkTraffic(Vertex node)
+	public double getUplinkTraffic(Vertex node)
 	{
 		return uplinkTraffic.get(node);
 	}
@@ -78,7 +78,7 @@ public class UplinkTraffic
 	{
 		if(uplinkTraffic == null || uplinkTraffic.size() < 1 ) return 0;
 		int sum = 0;
-		for (Integer size : uplinkTraffic.values())
+		for (Double size : uplinkTraffic.values())
 		{
 			sum += size;
 		}
@@ -90,7 +90,7 @@ public class UplinkTraffic
 		if(uplinkTraffic == null) return "";
 		
 		String str = "";
-		for (Entry<Vertex, Integer> item : uplinkTraffic.entrySet())
+		for (Entry<Vertex, Double> item : uplinkTraffic.entrySet())
 		{
 			str += item.getKey().getId() + "-->" + item.getValue() + "\n";
 		}

@@ -10,13 +10,13 @@ import java.util.TreeMap;
  * @author umroot
  *
  */
-public class LinkTrafficMap implements Map<Link,Float>
+public class LinkTrafficMap implements Map<Link,Double>
 {
 	
-	private Map<Link, Float> collection;
+	private Map<Link, Double> collection;
 	
 	public LinkTrafficMap(){collection = new TreeMap<>();}
-	public LinkTrafficMap( Map<Link, Float> sorted){ collection = sorted;}
+	public LinkTrafficMap( Map<Link, Double> sorted){ collection = sorted;}
 
 	@Override
 	public void clear()
@@ -38,13 +38,13 @@ public class LinkTrafficMap implements Map<Link,Float>
 	}
 
 	@Override
-	public Set<java.util.Map.Entry<Link, Float>> entrySet()
+	public Set<java.util.Map.Entry<Link, Double>> entrySet()
 	{
 		return collection.entrySet();
 	}
 
 	@Override
-	public Float get(Object key)
+	public Double get(Object key)
 	{
 		return collection.get(key);
 	}
@@ -65,26 +65,26 @@ public class LinkTrafficMap implements Map<Link,Float>
     * if the key is exist in the map the value add to the previous value.
 	 */
 	@Override
-	public Float put(Link key, Float value)
+	public Double put(Link key, Double value)
 	{
 		if(collection.containsKey(key))
 		{
-			 Float preValue = collection.remove(key);
+			Double preValue = collection.remove(key);
 			return collection.put(key, value + preValue);
 		}
-		Float var = collection.put(key, value);
+		Double var = collection.put(key, value);
 		return var;
 	}
 
 	@Override
-	public void putAll(Map<? extends Link, ? extends Float> m)
+	public void putAll(Map<? extends Link, ? extends Double> m)
 	{
 		collection.putAll(m);
 		
 	}
 
 	@Override
-	public Float remove(Object key)
+	public Double remove(Object key)
 	{
 		return collection.remove(key);
 	}
@@ -96,7 +96,7 @@ public class LinkTrafficMap implements Map<Link,Float>
 	}
 
 	@Override
-	public Collection<Float> values()
+	public Collection<Double> values()
 	{
 		return collection.values();
 	}
@@ -105,7 +105,7 @@ public class LinkTrafficMap implements Map<Link,Float>
 	{
 		StringBuilder builder = new StringBuilder();
 		
-		for (Entry<Link, Float> iter : collection.entrySet())
+		for (Entry<Link, Double> iter : collection.entrySet())
 		{
 			builder.append(iter.getKey().getId());
 			builder.append(": ");
@@ -118,10 +118,10 @@ public class LinkTrafficMap implements Map<Link,Float>
 	/**
 	 * @return return a stored tree map. this output sorted based on map's values.
 	 */
-	public TreeMap<Link, Float> Sort()
+	public TreeMap<Link, Double> Sort()
 	{
 		//LinksTrafficComparator com = new LinksTrafficComparator(this.collection);
-		TreeMap<Link, Float> sorted = new TreeMap<Link, Float>(new Comparator<Link>()
+		TreeMap<Link, Double> sorted = new TreeMap<Link, Double>(new Comparator<Link>()
 		{
 
 			@Override

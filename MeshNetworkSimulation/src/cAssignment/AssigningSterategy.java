@@ -49,7 +49,7 @@ public class AssigningSterategy {
 			linksChannel = new LinksChannelMap();
 
 			linksTraffics = new LinkTrafficMap(TrafficEstimatingFacade.getLinksTraffic().Sort());
-			for (Entry<Link, Float> tLink : linksTraffics.entrySet()) {
+			for (Entry<Link, Double> tLink : linksTraffics.entrySet()) {
 				linksChannel.put(tLink.getKey(), new Channel(0));
 			}
 
@@ -61,7 +61,7 @@ public class AssigningSterategy {
 		LinksAmbienNoiseMap result = new LinksAmbienNoiseMap();
 		if (linksAmbientNoise == null) {
 
-			for (Entry<Link, Float> tLink : linksTraffics.entrySet()) {
+			for (Entry<Link, Double> tLink : linksTraffics.entrySet()) {
 				double distance = getDistance(tLink.getKey());
 
 				// beta / (1- ((beta*Mue* d^a)/P))
@@ -91,7 +91,7 @@ public class AssigningSterategy {
 	public LinksChannelMap assigning() {
 		List<Link> linkSet = new ArrayList<>();
 
-		for (Entry<Link, Float> tLink : linksTraffics.entrySet()) {
+		for (Entry<Link, Double> tLink : linksTraffics.entrySet()) {
 			Link currentLink = tLink.getKey();
 			if (linkSet.size() == 0) {
 				linkSet.add(currentLink);

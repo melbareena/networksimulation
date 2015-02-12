@@ -15,10 +15,10 @@ public class UplinkPathTraffic implements Comparable<UplinkPathTraffic>
 	Path path;
 	Edge BottleNeckEdge;
 	Link bottleNeckLink;
-	float TrafficOfPath;
+	double TrafficOfPath;
 	double percentage;
 
-	public TreeSet<Float> linksTraffic;
+	public TreeSet<Double> linksTraffic;
 	
 	
 
@@ -28,21 +28,21 @@ public class UplinkPathTraffic implements Comparable<UplinkPathTraffic>
 	 * @param e : bottleneck edge
 	 * @param tarfficOfPath : the traffic of uplink link which is participating in bottleneck edge
 	 */
-	public UplinkPathTraffic(Path p, Edge e, float tarfficOfPath, TreeSet<Float> linkstraffic)
+	public UplinkPathTraffic(Path p, Edge e, double tarfficOfPath, TreeSet<Double> linkstraffic)
 	{
 		this.path = p;
 		this.BottleNeckEdge = e;
 		this.TrafficOfPath = tarfficOfPath;
 		linksTraffic = linkstraffic;
 	}
-	public UplinkPathTraffic(Path p, Edge e, float tarfficOfPath)
+	public UplinkPathTraffic(Path p, Edge e, double tarfficOfPath)
 	{
 		this.path = p;
 		this.BottleNeckEdge = e;
 		this.TrafficOfPath = tarfficOfPath;
 		linksTraffic = new TreeSet<>();
 	}
-	public UplinkPathTraffic(Path p, Link l, float tarfficOfPath, TreeSet<Float> linkstraffic)
+	public UplinkPathTraffic(Path p, Link l, double tarfficOfPath, TreeSet<Double> linkstraffic)
 	{
 		this.path = p;
 		this.bottleNeckLink = l;
@@ -71,13 +71,13 @@ public class UplinkPathTraffic implements Comparable<UplinkPathTraffic>
 	/**
 	 * @return the amount of uplink link which it is participating in bottleneck edge.
 	 */
-	public float getPathTraffic()
+	public Double getPathTraffic()
 	{
 		return TrafficOfPath;
 	}
 
 
-	public void setPathTraffic(float traffic)
+	public void setPathTraffic(double traffic)
 	{
 		this.TrafficOfPath = traffic;
 	}
@@ -86,7 +86,7 @@ public class UplinkPathTraffic implements Comparable<UplinkPathTraffic>
 	@Override
 	public int compareTo(UplinkPathTraffic o)
 	{
-		return Float.compare(this.getPathTraffic(), o.getPathTraffic());
+		return Double.compare(this.getPathTraffic(), o.getPathTraffic());
 	}
 	public String toString()
 	{
