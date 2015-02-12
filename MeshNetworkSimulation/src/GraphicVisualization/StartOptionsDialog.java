@@ -89,13 +89,14 @@ public class StartOptionsDialog extends JDialog {
 	private JPanel trafficPanel = new JPanel();
 	private final JLabel lblDuration = new JLabel("Duration:");
 	private final JSpinner durationSpinner = new JSpinner();
-	private final JLabel lblRate = new JLabel("Traffic rate:");
-	private final JSpinner rateSpinner = new JSpinner();
-	private final JLabel lblSeed = new JLabel("Seed:");
+	private final JLabel lblRatio = new JLabel("Downlink/Downlink:");
+	private final JSpinner lambdaMaxSpinner = new JSpinner();
+	private final JSpinner lambdaMinSpinner = new JSpinner();
+	private final JLabel lblSeed = new JLabel("Random Seed:");
 	private final JSpinner seedSpinner = new JSpinner();
-	private final JLabel lblNbNewNodes = new JLabel("Nb new nodes:");
 	private final JSpinner nodesSpinner = new JSpinner();
-	private final JLabel lblRatio = new JLabel("Ratio:");
+	private final JLabel lblLambdaMax = new JLabel("Lambda Max:");
+	private final JLabel lblLambdaMin = new JLabel("Lambda Min:");
 	private final JSpinner ratioSpinner = new JSpinner();
 	private final JLabel lblTraffic = new JLabel("Traffic:");
 	private final JLabel lblGenerator = new JLabel("Generator:");
@@ -407,7 +408,8 @@ public class StartOptionsDialog extends JDialog {
 			lblSetDefaults.setFont(new Font("Tahoma", Font.ITALIC, 11));
 			
 			durationSpinner.setModel(new SpinnerNumberModel(new Long(10000), new Long(1), null, new Long(100)));
-			rateSpinner.setModel(new SpinnerNumberModel(new Double(0.5), new Double(0.001), new Double(1.0), new Double(0.01)));
+			lambdaMaxSpinner.setModel(new SpinnerNumberModel(new Float(0.5), new Float(0.001), new Float(1.0), new Float(0.01)));
+			lambdaMinSpinner.setModel(new SpinnerNumberModel(new Float(0.1), new Float(0.001), new Float(1.0), new Float(0.01)));
 			seedSpinner.setModel(new SpinnerNumberModel(Math.abs(new Random().nextLong()), new Long(1), null, new Long(1)));
 			nodesSpinner.setModel(new SpinnerNumberModel(new Integer(5), new Integer(1), null, new Integer(1)));
 			ratioSpinner.setModel(new SpinnerNumberModel(new Integer(2), new Integer(1), null, new Integer(1)));
@@ -702,15 +704,25 @@ public class StartOptionsDialog extends JDialog {
 			trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[min!][grow]", "[grow][grow][grow][grow][grow]"));
 			trafficPanel.add(lblDuration, "cell 0 0,alignx trailing");
 			trafficPanel.add(durationSpinner, "cell 1 0, grow");
-			trafficPanel.add(lblRate, "cell 0 1,alignx trailing");
-			trafficPanel.add(rateSpinner, "cell 1 1, grow");
+			
+			trafficPanel.add(lblRatio, "cell 0 1,alignx trailing");
+			trafficPanel.add(ratioSpinner, "cell 1 1, grow");
+			
 			trafficPanel.add(lblSeed, "cell 0 2,alignx trailing");
-			seedSpinner.setValue(Math.abs(new Random().nextLong()));
 			trafficPanel.add(seedSpinner, "cell 1 2, grow");
-			trafficPanel.add(lblNbNewNodes, "cell 0 3,alignx trailing");
-			trafficPanel.add(nodesSpinner, "cell 1 3, grow");
-			trafficPanel.add(lblRatio, "cell 0 4,alignx trailing");
-			trafficPanel.add(ratioSpinner, "cell 1 4, grow");
+			
+			trafficPanel.add(lblLambdaMax, "cell 0 3,alignx trailing");
+			trafficPanel.add(lambdaMaxSpinner, "cell 1 3, grow");
+			
+			trafficPanel.add(lblLambdaMin, "cell 0 4,alignx trailing");
+			trafficPanel.add(lambdaMinSpinner, "cell 1 4, grow");
+						
+			seedSpinner.setValue(Math.abs(new Random().nextLong()));
+			/*
+
+			
+			*/
+			
 		} else {
 			trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[][grow][min!][grow][min!]", "[grow][grow][grow][][grow]"));
 			trafficPanel.add(lblGenerator, "cell 0 0 2 1,alignx trailing");
@@ -880,17 +892,12 @@ public class StartOptionsDialog extends JDialog {
 				(int) sinrResult.get("power"), (double) sinrResult.get("beta"),
 				(double) sinrResult.get("mu"));
 		
-		XMLWriter.writeTraffic(rdbtnDynamic.isSelected(),
-				trafficComboBox.getSelectedItem().toString(),
-				upTrafficTextField.getToolTipText()+"",
-				downTrafficTextField.getToolTipText()+"",
-				(long) upseedSpinner.getValue(),
-				(long) downseedSpinner.getValue(),
-				(double) rateSpinner.getValue(),
-				(long) seedSpinner.getValue(),
-				(int) nodesSpinner.getValue(),
-				(int) ratioSpinner.getValue(),
-				(long) durationSpinner.getValue());
+
+		XMLWriter.writeTraffic(rdbtnDynamic.isSelected(), trafficComboBox.getSelectedItem().toString() , upTrafficTextField.getToolTipText() + "" 
+				, downTrafficTextField.getToolTipText() + "", 	(long) upseedSpinner.getValue() , (long) downseedSpinner.getValue() ,
+				(float)lambdaMaxSpinner.getValue() , (float)lambdaMinSpinner.getValue() , (long) seedSpinner.getValue() , 
+				(int) ratioSpinner.getValue(), (long) durationSpinner.getValue());
+
 		
 		XMLWriter.writePowerControl(chkPowerControl.isSelected());
 

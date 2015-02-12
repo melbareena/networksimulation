@@ -142,8 +142,12 @@ public class ApplicationSettingFacade
 			return _tConf.isDynamicType();
 		}
 
-		public static double getTrafficRate() {
-			return _tConf.getTrafficRate();
+		public static float getLambdaMax() {
+			return _tConf.getLambdaMax();
+		}
+		
+		public static float getLambdaMin() {
+			return _tConf.getLambdaMin();
 		}
 		
 		public static long getDuration() {
@@ -154,9 +158,6 @@ public class ApplicationSettingFacade
 			return _tConf.getSeed();
 		}
 
-		public static int getNumberOfNewEmittingNodes() {
-			return _tConf.getNumberOfNewEmittingNodes();
-		}
 
 		public static int getRatio() {
 			return _tConf.getRatio();
