@@ -80,7 +80,7 @@ public class DynamicTrafficGenerator {
 		{
 			for(Vertex router : routers)
 			{
-				int numberOfPackets = getPoissonArrival();
+				int numberOfPackets = getPoissonArrival(1);
 				if(numberOfPackets > 0) 
 				{
 					
@@ -130,26 +130,12 @@ public class DynamicTrafficGenerator {
 		return Sets.newHashSet(shuffledList);
 	}*/
 	
-	private int getPoissonArrival()
-	{
-		Random random = new Random();
-		 int r = 0;
-		 double a = random.nextDouble();
-		 
-		 double lambda = random.nextFloat() * ( lambda_max - lambda_min ) + lambda_min;
-		
-		 double p = Math.exp(-lambda);
-
-		    while (a > p) {
-		        r++;
-		        a = a - p;
-		        p = p * lambda / r;
-		    }
-		    if(r > 0)
-		    	 offerload += calcSpeed(lambda);
-		    return r;
-	}
-	private int getPoissonArrival( int rate)
+	/**
+	 * 
+	 * @param rate : refers to ratio of downlink traffic over uplink traffic
+	 * @return the number of packets in each time slot
+	 */
+	private int getPoissonArrival(int rate)
 	{
 		Random random = new Random();
 		 int r = 0;

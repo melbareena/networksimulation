@@ -47,12 +47,8 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.TextAnchor;
 import org.jfree.util.ShapeUtilities;
-
-import common.FileGenerator;
 import dataStructure.SchedulingResult;
 import setting.ApplicationSettingFacade;
-import setting.BaseConfiguration.AppExecMode;
-import setting.BaseConfiguration.TypeOfGenerationEnum;
 
 /**A frame to view the main results of the scheduling.
  * 
