@@ -77,7 +77,7 @@ public class TrafficEstimatingFacade
 			
 			if(uplinkTraffic.hasUplinkTraffic(v))
 			{
-				int upTraffic = uplinkTraffic.getUplinkTraffic(v);
+				double upTraffic = uplinkTraffic.getUplinkTraffic(v);
 				
 				for (Path p : uplinks.get(v))
 				{		
@@ -90,7 +90,7 @@ public class TrafficEstimatingFacade
 			{
 				for (Path p : downlinkPaths.get(v))
 				{
-					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
+					double downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
 					Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
 					bfMap.put( p.getEdgePath().getFirst(), newPacket);
 				}
@@ -134,7 +134,7 @@ public class TrafficEstimatingFacade
 			Vertex v = nodesMap.get(vertexIndex);
 			// Add uplink traffic if there is
 			if(uplinkTraffic.hasUplinkTraffic(v)) {
-				int upTraffic = uplinkTraffic.getUplinkTraffic(v);
+				double upTraffic = uplinkTraffic.getUplinkTraffic(v);
 				for (Path p : uplinks.get(v)) {
 					if(upTraffic > 0) {
 						Packet newPacket = new Packet(p, upTraffic, currentTimeslot);
@@ -145,7 +145,7 @@ public class TrafficEstimatingFacade
 			// Add downlink traffic if there is
 			if(downlinkTraffic.hasTraffic(v)) {
 				for (Path p : downlinks.get(v)) {
-					float downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
+					double downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
 					if(downTraffic > 0) {
 						Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
 						bfMap.put( p.getEdgePath().getFirst(), newPacket);
@@ -252,7 +252,7 @@ public class TrafficEstimatingFacade
 	{
 		LinkTrafficMap optimalTrafficLinks = new LinkTrafficMap();
 		optimalLinks = new ArrayList<>();
-		for (Entry<Link, Float> links : tarrfic_l.entrySet())
+		for (Entry<Link, Double> links : tarrfic_l.entrySet())
 		{
 			if(links.getValue() > 0)
 			{
@@ -269,7 +269,7 @@ public class TrafficEstimatingFacade
 		LinkTrafficMap TrafficOfLinks = new LinkTrafficMap();
 		for (Entry<Integer, Link> item : gtd.LinkMap.entrySet())
 		{
-			TrafficOfLinks.put(item.getValue(), 0f);
+			TrafficOfLinks.put(item.getValue(), 0d);
 		}
 		return TrafficOfLinks;	
 	}

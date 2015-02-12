@@ -205,7 +205,7 @@ public class FileGenerator
 		try
 		{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "uplink_traffic.txt"));
-			for(Entry<Vertex, Integer> traffic : uplink.getTraffic().entrySet())
+			for(Entry<Vertex, Double> traffic : uplink.getTraffic().entrySet())
 			{
 				writer.write(traffic.getKey().getId() + " " + traffic.getValue());
 				writer.newLine();
@@ -220,18 +220,18 @@ public class FileGenerator
 		}	
 		
 	}
-	public static void dowlinkTrafficInFile(Map<Vertex,TreeMap<Vertex,Float>> downlink)
+	public static void dowlinkTrafficInFile(Map<Vertex,TreeMap<Vertex,Double>> downlink)
 	{
 		if(!ISFILEENABLE) return;
 		
 		try
 		{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "downlink_traffic.txt"));
-			for (Entry<Vertex, TreeMap<Vertex, Float>> grMap : downlink.entrySet())
+			for (Entry<Vertex, TreeMap<Vertex, Double>> grMap : downlink.entrySet())
 			{
 				//TreeMap<Vertex, Float> routerMap = 
 				
-				for (Entry<Vertex, Float> routerMap : grMap.getValue().entrySet())
+				for (Entry<Vertex, Double> routerMap : grMap.getValue().entrySet())
 				{
 					writer.write(routerMap.getKey().getId() + " " + routerMap.getValue());
 					writer.newLine();
@@ -299,7 +299,7 @@ public class FileGenerator
 		try
 		{		
 			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "link_weights.txt"));
-			for (Entry<Link, Float> links : traffic_l.Sort().entrySet())
+			for (Entry<Link, Double> links : traffic_l.Sort().entrySet())
 			{
 				writer.write(links.getKey().getId() + " " + links.getValue());
 				writer.newLine();

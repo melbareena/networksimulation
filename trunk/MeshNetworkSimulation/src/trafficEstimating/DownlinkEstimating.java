@@ -44,13 +44,13 @@ class DownlinkEstimating
 		
 		DownlinkPaths = TopologyGraphFacade.getOptimalDownLinkPath();
 	
-		Map<Vertex, TreeMap<Vertex, Float>> staticTraffic = StaticTraffic.getDownlinkTraffic(DownlinkPaths).getTraffic();
+		Map<Vertex, TreeMap<Vertex, Double>> staticTraffic = StaticTraffic.getDownlinkTraffic(DownlinkPaths).getTraffic();
 		
 		for (Entry<Vertex, List<Path>> dlPaths : DownlinkPaths.entrySet())
 		{
 			for (Path path : dlPaths.getValue())
 			{	
-				float traffic  = staticTraffic.get(path.getSource()).get(path.getDestination());
+				Double traffic  = staticTraffic.get(path.getSource()).get(path.getDestination());
 				for (Link edge : path.getEdgePath())	
 				{
 					dl_Traffic_l.put(edge, traffic);
@@ -69,7 +69,7 @@ class DownlinkEstimating
 		DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
 		DownlinkPaths = TopologyGraphFacade.getOptimalDownLinkPath();
 	
-		Map<Vertex, TreeMap<Vertex, Float>> dynamicTraffic = dyTraffic.getDownlink(DownlinkPaths).getTraffic();
+		Map<Vertex, TreeMap<Vertex, Double>> dynamicTraffic = dyTraffic.getDownlink(DownlinkPaths).getTraffic();
 		for (Entry<Vertex, List<Path>> dlPaths : DownlinkPaths.entrySet())
 		{
 			for (Path path : dlPaths.getValue())
@@ -78,7 +78,7 @@ class DownlinkEstimating
 				Vertex  destination = path.getDestination();			
 				if(dynamicTraffic.containsKey(source) && dynamicTraffic.get(source).containsKey(destination))
 				{
-						float traffic  = dynamicTraffic.get(path.getSource()).get(path.getDestination());
+						Double traffic  = dynamicTraffic.get(path.getSource()).get(path.getDestination());
 						for (Link edge : path.getEdgePath())	
 							dl_Traffic_l.put(edge, traffic);	
 				}

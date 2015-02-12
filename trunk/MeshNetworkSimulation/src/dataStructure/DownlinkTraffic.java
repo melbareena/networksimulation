@@ -6,28 +6,28 @@ import java.util.Map.Entry;
 
 public final class DownlinkTraffic
 {
-	private Map<Vertex, TreeMap<Vertex, Float>> downLinkTraffic = new TreeMap<Vertex,TreeMap<Vertex, Float>>();
+	private Map<Vertex, TreeMap<Vertex, Double>> downLinkTraffic = new TreeMap<Vertex,TreeMap<Vertex, Double>>();
 	
 	
-	public void add(Vertex gateway, TreeMap<Vertex,Float> value)
+	public void add(Vertex gateway, TreeMap<Vertex,Double> value)
 	{
 	
 		downLinkTraffic.put(gateway, value);;
 	}
-	public void addAll(Map<Vertex, TreeMap<Vertex, Float>> map)
+	public void addAll(Map<Vertex, TreeMap<Vertex, Double>> map)
 	{
 	
-		for (Entry<Vertex, TreeMap<Vertex, Float>> parentItem : map.entrySet())
+		for (Entry<Vertex, TreeMap<Vertex, Double>> parentItem : map.entrySet())
 		{
 			if(downLinkTraffic.containsKey(parentItem.getKey()))
 			{
-				TreeMap<Vertex,Float> preChild = downLinkTraffic.get(parentItem.getKey());
+				TreeMap<Vertex,Double> preChild = downLinkTraffic.get(parentItem.getKey());
 				
-				for (Entry<Vertex, Float> childeren : parentItem.getValue().entrySet())
+				for (Entry<Vertex, Double> childeren : parentItem.getValue().entrySet())
 				{
 					if(preChild.containsKey(childeren.getKey()))
 					{
-						float preVal = preChild.get(childeren.getKey());
+						double preVal = preChild.get(childeren.getKey());
 						preVal += childeren.getValue();
 						preChild.put(childeren.getKey(),preVal);
 					}
@@ -45,14 +45,14 @@ public final class DownlinkTraffic
 		
 	}
 	
-	public  Map<Vertex, TreeMap<Vertex, Float>> getTraffic()
+	public  Map<Vertex, TreeMap<Vertex, Double>> getTraffic()
 	{
 		return downLinkTraffic;
 	}
-	public float getTraffic(Vertex g, Vertex v)
+	public Double getTraffic(Vertex g, Vertex v)
 	{
 		if(downLinkTraffic.get(g) == null) {
-			return 0.0F;
+			return 0.0d;
 		}
 		return (downLinkTraffic.get(g).containsKey(v)) ? downLinkTraffic.get(g).get(v) : 0.0F;
 	}
@@ -64,9 +64,9 @@ public final class DownlinkTraffic
 	{
 		if(downLinkTraffic == null || downLinkTraffic.size() < 1 ) return 0;
 		float sum = 0;
-		for (TreeMap<Vertex, Float> vrt : downLinkTraffic.values())
+		for (TreeMap<Vertex, Double> vrt : downLinkTraffic.values())
 		{
-			for (Float size : vrt.values())
+			for (Double size : vrt.values())
 			{
 				sum += size;
 			}
@@ -81,10 +81,10 @@ public final class DownlinkTraffic
 		
 		String str = "";
 		
-		for (Entry<Vertex, TreeMap<Vertex, Float>> item : downLinkTraffic.entrySet())
+		for (Entry<Vertex, TreeMap<Vertex, Double>> item : downLinkTraffic.entrySet())
 		{		
 			str += item.getKey().getId() + "\n";
-			for (Entry<Vertex, Float> to : item.getValue().entrySet())
+			for (Entry<Vertex, Double> to : item.getValue().entrySet())
 			{
 				str += to.getKey().getId() + ": " + to.getValue() + "\n";
 			}

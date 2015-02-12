@@ -139,11 +139,11 @@ public class StaticTraffic
 		for (Entry<Vertex, List<Path>> ver_path : downlinkPaths.entrySet())
 		{
 			Vertex gateway = ver_path.getKey();
-			TreeMap<Vertex,Float> grMap = new TreeMap<>();
+			TreeMap<Vertex,Double> grMap = new TreeMap<>();
 			for (Path p : ver_path.getValue())
 			{
 				Vertex destination = p.getDestination();
-				float trf = rand.nextInt(20) + 30;
+				Double trf = (double) (rand.nextInt(20) + 30);
 				grMap.put(destination, trf*100);
 				
 				
@@ -162,11 +162,11 @@ public class StaticTraffic
 		_downlinkTraffic = new DownlinkTraffic();
 		for (Entry<Integer, Vertex> getway : ApplicationSettingFacade.Gateway.getGateway().entrySet())
 		{
-			TreeMap<Vertex,Float> grMap = new TreeMap<>();
+			TreeMap<Vertex,Double> grMap = new TreeMap<>();
 			for (Entry<Integer,Vertex> routerMap : routerSet.entrySet())
 			{
 				
-				float trf = rand.nextInt(20) + 30;
+				Double trf = (double) (rand.nextInt(20) + 30);
 				
 				grMap.put(routerMap.getValue(), trf*100);
 			}
@@ -190,7 +190,7 @@ public class StaticTraffic
 		
 		try
 		{
-			TreeMap<Vertex, Float> grMap = new TreeMap<>();
+			TreeMap<Vertex, Double> grMap = new TreeMap<>();
 			InputStream in = StaticTraffic.class.getResourceAsStream(ApplicationSettingFacade.Traffic.getAddressDown());
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			while((var=reader.readLine())!=null)
@@ -206,7 +206,7 @@ public class StaticTraffic
 				}
 				tokens = var.split("[ ]");
 				int routerID = Integer.parseInt(tokens[0]);
-				float traffic = Float.parseFloat(tokens[1]);
+				Double traffic = Double.parseDouble(tokens[1]);
 				grMap.put(ApplicationSettingFacade.Router.getRouters().get(routerID), traffic);
 				RouterIndex++;
 			}

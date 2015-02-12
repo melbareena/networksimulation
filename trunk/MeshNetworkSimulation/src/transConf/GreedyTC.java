@@ -41,7 +41,7 @@ public class GreedyTC extends TCBasic {
 			
 			//**************************  SETP ONE   ************************************
 			tConfUnit = new TCUnit();
-			for (Entry<Link, Float> links : LinksTraffic.Sort().entrySet())
+			for (Entry<Link, Double> links : LinksTraffic.Sort().entrySet())
 			{
 			
 				Link l = links.getKey();

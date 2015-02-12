@@ -20,7 +20,7 @@ public class IntermediateOutput
 
 		if(!ApplicationSettingFacade.AppOutput.showIntermediateOutput()) return;
 		PrintConsole.printErr("***********************DOWNLINK TRAFFIC ESTIMATING************************");
-		for (Entry<Link, Float> traffic : input.entrySet())
+		for (Entry<Link, Double> traffic : input.entrySet())
 		{
 			
 			PrintConsole.print(traffic.getKey() + ":" + traffic.getValue());
@@ -46,7 +46,7 @@ public class IntermediateOutput
 	{
 		if(!ApplicationSettingFacade.AppOutput.showIntermediateOutput()) return;
 		PrintConsole.printErr("***********************UPLINK TRAFFIC ESTIMATING************************");
-		for (Entry<Link, Float> traffic : input.entrySet())
+		for (Entry<Link, Double> traffic : input.entrySet())
 		{
 			PrintConsole.print(traffic.getKey() + ":" + traffic.getValue());
 			counter++;
