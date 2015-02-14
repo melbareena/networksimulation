@@ -190,7 +190,7 @@ public class GraphViewer extends JFrame {
 	/** Initiates and show the Frame.
 	 * @param throughputData The data for the throughput plot.
 	 */
-	public GraphViewer(SchedulingResult results, String availableChannels, int instanceIndex) {
+	public GraphViewer(final SchedulingResult results, String availableChannels, int instanceIndex) {
 		super();
 		
 		_availableChannels = "AC:" + availableChannels;
@@ -199,12 +199,14 @@ public class GraphViewer extends JFrame {
 		
 		this.setTitle(title);
 		
-		int step = results.getThroughputData().size()/100;
+		int step = results.getThroughputData().size()/10;
 		histogramViewerFrame = new HistogramViewer(results, step);
 		Thread t = new Thread(new Runnable() {
 			@Override
-			public void run() {
-				histogramViewerFrame.showGraph();
+			public void run() 
+			{
+				SchedulingResultGraph g = new SchedulingResultGraph(results);
+				//histogramViewerFrame.showGraph();
 			}
 		});
 		t.run();

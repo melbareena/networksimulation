@@ -56,21 +56,28 @@ public class BufferMap implements Map<Link, Buffer>
 	}
 
 	@Override
-	public Buffer put(Link key, Buffer value)
+	public Buffer put(Link key, Buffer newBuffer)
 	{
-		return collections.put(key, value);
+		if(!collections.containsKey(key))
+			return collections.put(key, newBuffer);
+		
+		for (Packet p : newBuffer.getPackets())
+		{
+			this.put(key, p);
+		}
+		return collections.get(key);
 	}
 	
-	public Buffer put(Link key, Packet value)
+	public Buffer put(Link key, Packet newPacket)
 	{
 		if(!this.containsKey(key))
 		{
 			Buffer b = new Buffer();
-			b.add(value);
+			b.add(newPacket);
 			return collections.put(key, b);
 		}
 		Buffer b = this.get(key);
-		b.add(value);
+		b.add(newPacket);
 		return collections.put(key, b);
 	
 	}
@@ -101,7 +108,7 @@ public class BufferMap implements Map<Link, Buffer>
 		{
 			size += lb.getValue().size();
 		}
-		return size;
+		return (double)Math.round(size * 100000) / 100000;
 	}
 	public double trafficSize(Link L)
 	{
@@ -137,7 +144,7 @@ public class BufferMap implements Map<Link, Buffer>
 		return sorted;
 	}
 
-	public Packet sendPacket(Link link, int dataRate, BufferMap transmissionBuffer, int currentTimeSlot)
+	public Packet sendPacket(Link link, double dataRate, BufferMap transmissionBuffer, int currentTimeSlot)
 	{
 		Buffer b = this.get(link);	
  		Packet movedPacket = b.send(dataRate, currentTimeSlot);
@@ -159,5 +166,26 @@ public class BufferMap implements Map<Link, Buffer>
 		}
 		collections.clear();
 		collections.putAll(updated);
+	}
+	
+	@Override
+	public String toString()
+	{
+		
+		StringBuilder builder = new StringBuilder();
+		for (java.util.Map.Entry<Link, Buffer> lb : collections.entrySet())
+		{
+			builder.append("Buffer Link: #" + lb.getKey().getId() + "\n");
+			builder.append(lb.getValue().toString() + "\n");
+		}
+		
+		return builder.toString();
+	}
+
+	public void Append(BufferMap newBuffer)
+	{
+		for (java.util.Map.Entry<Link, Buffer> lb : newBuffer.entrySet())
+			this.put(lb.getKey(), lb.getValue());
+	
 	}
 }

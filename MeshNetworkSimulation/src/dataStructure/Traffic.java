@@ -1,6 +1,6 @@
 package dataStructure;
 
-public class Traffic {
+public class Traffic implements Cloneable {
 	
 	private UplinkTraffic uplinkTraffic;
 	
@@ -27,9 +27,9 @@ public class Traffic {
 		this.downlinkTraffic = downlinkTraffic;
 	}
 	
-	public int size()
+	public double size()
 	{
-		return uplinkTraffic.size() + downlinkTraffic.size();
+		return (double)Math.round((uplinkTraffic.size() + downlinkTraffic.size()) * 100000) / 100000;	
 	}
 	
 	public String toString()
@@ -38,6 +38,12 @@ public class Traffic {
 		str += uplinkTraffic + "\n";
 		str += downlinkTraffic +"\n";
 		return str;
+	}
+	
+	public Traffic clone()
+	{
+		Traffic temp = new Traffic(this.getUplinkTraffic().clone(), this.getDownlinkTraffic().clone());
+		return temp;
 	}
 
 }

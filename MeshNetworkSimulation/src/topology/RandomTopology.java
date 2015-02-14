@@ -98,7 +98,7 @@ public class RandomTopology extends BaseTopology
 	
 	private boolean generateRandomPosition()
 	{
-		PrintConsole.print("Routers Position are generated randomly.");
+		
 		
 		long lSeed = this.seed;
 

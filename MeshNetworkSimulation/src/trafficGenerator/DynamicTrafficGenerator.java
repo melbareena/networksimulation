@@ -21,21 +21,27 @@ import dataStructure.Vertex;
  */
 public class DynamicTrafficGenerator {
 	
-	public static double offerload = 0;
-	
+
+	private static double _totalTraffic;
+	public static double totalTraffic()
+	{
+		return (double)Math.round(_totalTraffic * 100000) / 100000;	
+	}
 	
 	private float lambda_max;
 	private float lambda_min;
 	
 	
 	private int downOverUpRatio;
+	private long _seed;
 	
-
+	
 	private DynamicTrafficGenerator(float lambdamin, float lambdamax, long seed, int downOverUpRatio) {
 		this.lambda_max = lambdamax;
 		this.lambda_min = lambdamin;
 		//this.nodesToConsider = nodesToConsider;
 		this.downOverUpRatio = downOverUpRatio;
+		this._seed = seed;
 	}
 	
 	
@@ -132,17 +138,19 @@ public class DynamicTrafficGenerator {
 	
 	/**
 	 * 
-	 * @param rate : refers to ratio of downlink traffic over uplink traffic
+	 * @param ratio : refers to ratio of downlink traffic over uplink traffic
 	 * @return the number of packets in each time slot
 	 */
-	private int getPoissonArrival(int rate)
+	
+	private Random random = new Random(_seed);
+	private int getPoissonArrival(int ratio)
 	{
-		Random random = new Random();
+		
 		 int r = 0;
 		 double a = random.nextDouble();
 		 
-		 double lambda = random.nextFloat() * ( (lambda_max * rate) - (lambda_min * rate) ) + (lambda_min * rate);
-		 offerload += calcSpeed(lambda);
+		 double lambda = random.nextFloat() * ( (lambda_max * ratio) - (lambda_min * ratio) ) + (lambda_min * ratio);
+
 		 double p = Math.exp(-lambda);
 
 		    while (a > p) {
@@ -150,14 +158,20 @@ public class DynamicTrafficGenerator {
 		        a = a - p;
 		        p = p * lambda / r;
 		    }
-		    if(r>0)
-		    	 offerload += calcSpeed(lambda);
 		    return r;
 	}
 	
+	
+	/**
+	 * 
+	 * @param numPacket: the number of tarffic
+	 * @return packet size in mega bits 
+	 */
 	private double calcTraffic(int numPacket)
 	{
-		return (numPacket*12000)/ Math.pow(10, 6);
+		double traffic = (numPacket*12000)/ Math.pow(10, 6);
+		_totalTraffic += traffic;
+		return traffic;
 	}
 	
 	private double calcSpeed(double selectedLambda)

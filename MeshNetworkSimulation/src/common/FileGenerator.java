@@ -20,6 +20,7 @@ import dataStructure.Path;
 import dataStructure.PathMap;
 import dataStructure.SchedulingResult;
 import dataStructure.TCUnit;
+import dataStructure.Traffic;
 import dataStructure.UplinkTraffic;
 import dataStructure.Vertex;
 import setting.ApplicationSettingFacade;
@@ -137,6 +138,7 @@ public class FileGenerator
 
 	public static void allShortestPathsInFile(PathMap paths, boolean isDownlink)
 	{
+		if(!ISFILEENABLE) return;
 		String fileName = "all_downlink_Paths";
 		if(!isDownlink)
 			fileName = "all_uplink_Paths";
@@ -413,7 +415,7 @@ public class FileGenerator
 
 	public static void Throughput(Vector<Double> throughput)
 	{
-		if(!ISFILEENABLE) return;
+		//if(!ISFILEENABLE) return;
 		
 		if(ApplicationSettingFacade.getApplicationExecutionMode() == AppExecMode.Single)
 		{
@@ -424,13 +426,14 @@ public class FileGenerator
 				if(FILEOUTPUTPATH.equals("null")) {
 					path = FileGenerator.class.getResource("/output/").getPath();
 				}
-				BufferedWriter writer = new BufferedWriter(new FileWriter(path + "throughtput.txt"));
-				//int timeIndex = 0;
+				BufferedWriter writer = new BufferedWriter(new FileWriter(path + "throughtput_timeslot.txt"));
+				
 				for (Double th : throughput)
 				{
-					writer.write(th +"");
-					//timeIndex++;
-					writer.newLine();
+				
+						writer.write(th +"");
+						writer.newLine();
+						
 				}
 				writer.close();
 			
@@ -445,18 +448,17 @@ public class FileGenerator
 		{
 			try
 			{
-				String fileName = "throughtput "+ Program.multiExecIndex +".txt";
+				String fileName = "throughtput_timeslot_ "+ Program.multiExecIndex +".txt";
 				String path = FILEOUTPUTPATH;
 				if(FILEOUTPUTPATH.equals("null")) {
 					path = FileGenerator.class.getResource("/output/").getPath();
 				}
 				BufferedWriter writer = new BufferedWriter(new FileWriter(path + fileName));
-				//int timeIndex = 0;
 				for (Double th : throughput)
-				{
-					writer.write(th +"");
-					//timeIndex++;
-					writer.newLine();
+				{		
+						writer.write(th +"");
+						writer.newLine();
+						
 				}
 				writer.close();
 			
@@ -536,20 +538,20 @@ public class FileGenerator
 	public static void optimalDownlink(PathMap paths)
 	{
 		if(!ISFILEENABLE) return;
-		
 		try
 		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "optimalDownlinkPaths(LinkID).txt" ));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "optimalDownlinkPaths(NodeID).txt" ));
 			String out= "";
 			for(Entry<Vertex,List<Path>> allPath : paths.entrySet())
 			{
-				
+				writer.write("Gateway: #" + allPath.getKey().getId());
+				writer.newLine();
 				for(Path p : allPath.getValue())
 				{
-					out = "";
-					for (Link edge : p.getEdgePath())
+					out= "\t";
+					for (Vertex n : p.getNodePath())
 					{
-						out += edge.getId() + " ";
+						out += n.getId() + " ";
 					}
 					writer.write(out.trim());
 					writer.newLine();
@@ -620,32 +622,7 @@ public class FileGenerator
 	}
 
 
-	public static int counter  = 0;
-	public static void Power(TCUnit unit, int i)
-	{
-		String str = "before";
-		if(i==1)
-			str = "after";
-		try
-		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/power/" + counter + "_"+ str + ".txt"));
-			for (Link l : unit.getLinks())
-			{
-				writer.write("#" + l.getId() + "->" + unit.getPower(l) + "," + unit.getRate(l));
-				writer.newLine();
-			}
-			writer.write("Total:" + unit.getTCAP());
-			writer.close();
-			if(i==1) counter++;
-			//PrintConsole.printErr("Affectance for links inserted in file successfully.");
-		} 
-		catch (Exception ex)
-		{
-			//System.err.println("Affectance/FileGenerator/Message:" + ex.getMessage());
-		}
-		
-		
-	}
+	
 
 
 	public static void seceduleResult(SchedulingResult[] results)
@@ -682,6 +659,102 @@ public class FileGenerator
 				ex.printStackTrace();
 			}
 			
+	}
+
+
+	public static void SchedulingResult(SchedulingResult results)
+	{
+		
+		
+		try
+		{
+			BufferedWriter THwriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "schedulingResult_throughput_mbps.txt" ));
+			
+			for(Double throughput : results.getThroughputData())
+			{
+				THwriter.write(throughput + "");
+				THwriter.newLine();
+			}
+			THwriter.close();
+			
+			BufferedWriter Swriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "schedulingResult_SourceBuffer_mbps.txt" ));
+			for(Double SBuffer : results.getSourceData())
+			{
+				Swriter.write(SBuffer + "");
+				Swriter.newLine();
+			}
+			Swriter.close();
+			
+			BufferedWriter Twriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "schedulingResult_TransmitBuffer_mbps.txt" ));
+			for(Double TBuffer : results.getTransmitData())
+			{
+				Twriter.write(TBuffer + "");
+				Twriter.newLine();
+			}
+			Twriter.close();
+			
+			PrintConsole.print("Schdeuling Result In File..........................");
+		}
+		catch(Exception ex)
+		{
+			System.err.println("SchedulingResult/FileGenerator/Message:" + ex.getMessage());
+		}
+		
+	}
+
+
+	public static void dynamicTraffic(Map<Integer, Traffic> _dynamicTraffic)
+	{
+		if(!ISFILEENABLE) return;
+		try
+		{
+			BufferedWriter THwriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "dynamicTraffic.txt" ));
+			
+			for(Entry<Integer, Traffic> dt : _dynamicTraffic.entrySet())
+			{
+				THwriter.write("Time slot:" + dt.getKey());
+				THwriter.newLine();
+				THwriter.write("\t Downlink:");
+				THwriter.newLine();
+				for (Entry<Vertex, TreeMap<Vertex, Double>> downlinkT : dt.getValue().getDownlinkTraffic().getTraffic().entrySet())
+				{
+					THwriter.write("\t\t Gateway: #" + downlinkT.getKey().getId());
+					THwriter.newLine();
+					for (Entry<Vertex, Double> rT : downlinkT.getValue().entrySet())
+					{
+						THwriter.write("\t\t\t Router: #" + rT.getKey().getId() + " t: " + rT.getValue());
+						THwriter.newLine();
+					}
+					THwriter.write("--------------------------------------------------------------------------------------------------");
+					THwriter.newLine();
+				} 
+				THwriter.write("___________________________________________________________________________________________________________");
+				THwriter.newLine();
+				THwriter.newLine();
+				THwriter.write("\t Uplink:");
+				THwriter.newLine();
+				for (Entry<Vertex, Double> uplinkT : dt.getValue().getUplinkTraffic().getTraffic().entrySet())
+				{
+					THwriter.write("\t\t Routers: #" + uplinkT.getKey().getId() + " t: " + uplinkT.getValue());
+					THwriter.newLine();
+				}
+				THwriter.write("*************************************************************************************************************");
+				THwriter.newLine();
+			}
+			
+			
+			
+			
+			THwriter.close();
+			
+			
+			PrintConsole.print("Dynamic Traffic In File..........................");
+		}
+		catch(Exception ex)
+		{
+			System.err.println("SchedulingResult/FileGenerator/Message:" + ex.getMessage());
+		}
+		
 	}
 
 

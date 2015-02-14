@@ -167,7 +167,8 @@ public class TopologyGraphFacade
 					}
 				}
 				
-				optimalPaths.add(optimal);
+				if(optimal != null && optimal.getSource().getId() == vp.getKey().getId())
+					optimalPaths.add(optimal);
 				
 				
 			}
@@ -175,9 +176,63 @@ public class TopologyGraphFacade
 			optimalsPathMap.put(vp.getKey(), optimalPaths);
 			
 		}
+		
+		optimalsPathMap = removeDuplicates(optimalsPathMap);
 		_optimalDownPath = optimalsPathMap;
 		
 		FileGenerator.optimalDownlink(_optimalDownPath);
 		
+	}
+	private static PathMap removeDuplicates(PathMap optimalsPathMap)
+	{
+		//destination, list of duplicate path
+		List<Path> duplicationPath = new ArrayList<Path>(); 
+		for (Entry<Vertex, List<Path>> vp : optimalsPathMap.entrySet())
+		{
+			for (Path p : vp.getValue())
+			{
+				Vertex destination = p.getDestination();
+				for (Entry<Vertex, List<Path>> vp2 : optimalsPathMap.entrySet())
+					if(vp.getKey() != vp2.getKey())
+						for (Path path : vp2.getValue())
+							if(path.getDestination() == destination && !duplicationPath.contains(path))
+								duplicationPath.add(path);
+			}
+		}
+		
+		PathMap noDuplicate = new PathMap();
+		for (Entry<Vertex, List<Path>> vp : optimalsPathMap.entrySet())
+		{
+			Vertex source = vp.getKey();
+			ArrayList<Path> newPaths = new ArrayList<Path>();
+			
+			for (Path p : vp.getValue())
+			{
+				if(!duplicationPath.contains(p))
+					newPaths.add(p);
+				else
+				{
+					 if( getNumberOfIdenticalPath(p,duplicationPath) < 2)
+						 newPaths.add(p);
+					 else
+						 duplicationPath.remove(p);
+				}
+			}
+			noDuplicate.put(source, newPaths);
+			
+			
+		}
+		return noDuplicate;
+			
+	}
+	private static int getNumberOfIdenticalPath(Path p, List<Path> duplicationPath)
+	{
+		int counter = 0;
+		for (Path path : duplicationPath)
+		{
+			if(path.getDestination() == p.getDestination())
+				counter++;
+		}
+		return counter;
 	}
 }

@@ -3,6 +3,10 @@ import java.util.Hashtable;
 import java.util.Map;
 
 
+import java.util.Map.Entry;
+
+import common.FileGenerator;
+
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
 import dataStructure.*;
@@ -18,9 +22,10 @@ public class DynamicTraffic
 	private final DynamicTrafficGenerator _dynamicTrafficGenerator = new DynamicTrafficGenerator();
 	
 	
-	public Traffic getDynamicTraffic(Integer timeSlot)
+	public Traffic getDynamicTraffic(int timeSlot)
 	{
-		return _dynamicTraffic.get(timeSlot);
+		Traffic t = _dynamicTraffic.get(timeSlot).clone();	
+		return t;
 	}
 	public static DynamicTraffic Initilization()
 	{
@@ -32,15 +37,33 @@ public class DynamicTraffic
 			//_self.Initialization();
 			_self._dynamicTraffic = new Hashtable<Integer, Traffic>();
 			for(int i = 0; i < _self._duration ; i++)
-			{
 				_self._dynamicTraffic.put(i, _self._dynamicTrafficGenerator.generateTraffic(uplink, downLink));
-			}
-			System.out.println("offeredLoad: " + DynamicTrafficGenerator.offerload);
+			
+			
+			System.out.println("Total Traffic: " + DynamicTrafficGenerator.totalTraffic());
+			System.out.println("Total Traffic in TrafficMAP: " + getTotalTrafficInDynamicMap());
 		}
-		
+	
 		return _self;
 	}
 	
+	public static double getTotalTrafficInDynamicMap()
+	{
+		
+		double total = 0;
+		
+		for (Entry<Integer, Traffic> tt : _self._dynamicTraffic.entrySet())
+		{
+			
+			total += tt.getValue().getDownlinkTraffic().size();
+			total += tt.getValue().getUplinkTraffic().size();
+		}
+		
+		
+		FileGenerator.dynamicTraffic(_self._dynamicTraffic);
+		return (double)Math.round(total * 100000) / 100000;	
+	}
+
 	private DownlinkTraffic _downlinkTraffic;
 	private UplinkTraffic _uplinkTraffic;
 	
@@ -52,7 +75,7 @@ public class DynamicTraffic
 		
 		_downlinkTraffic = new DownlinkTraffic();
 		for (Traffic traffic : _dynamicTraffic.values())	
-			_downlinkTraffic.addAll(traffic.getDownlinkTraffic().getTraffic());
+			_downlinkTraffic.addAll(traffic.clone().getDownlinkTraffic().getTraffic());
 
 	
 		return _downlinkTraffic;
@@ -65,7 +88,7 @@ public class DynamicTraffic
 		
 		_uplinkTraffic = new UplinkTraffic();
 		for (Traffic traffic : _dynamicTraffic.values())	
-			_uplinkTraffic.addAll(traffic.getUplinkTraffic().getTraffic()); 
+			_uplinkTraffic.addAll(traffic.clone().getUplinkTraffic().getTraffic()); 
 		
 		return _uplinkTraffic;
 		

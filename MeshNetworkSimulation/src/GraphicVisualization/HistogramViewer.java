@@ -47,6 +47,9 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.TextAnchor;
 import org.jfree.util.ShapeUtilities;
+
+import common.FileGenerator;
+
 import dataStructure.SchedulingResult;
 import setting.ApplicationSettingFacade;
 
@@ -96,7 +99,7 @@ public class HistogramViewer extends JFrame {
 	public final StandardXYToolTipGenerator sttg = new StandardXYToolTipGenerator("{0}: (Sample {1} -> Value {2})",
 			NumberFormat.getNumberInstance(), NumberFormat.getNumberInstance());
 	
-	public final Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration());
+	public final Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration() / 50);
 	
 	public final ValueMarker meanThroughput;
 	
@@ -104,12 +107,14 @@ public class HistogramViewer extends JFrame {
 	 * @param results The results from the scheduling.
 	 * @param step The step that will be used to draw the graph.
 	 */
-	public HistogramViewer(SchedulingResult results, int step) {
+	public HistogramViewer(SchedulingResult results, int step) 
+	{
+		FileGenerator.SchedulingResult(results);
 		this.self = this;		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("AC:" + Program.getAvailableChannels()
 				+ " - " + results.getSchedulingStrategy() + " - Traffic Generator: " + results.getTrafficGenerator() + " ");
-		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+		 
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -546,7 +551,7 @@ public class HistogramViewer extends JFrame {
 			changeColor(2, Color.GREEN);
 		}
 		
-		/* Transmit traffic plot and renderer */
+		/* Transmit traffic plot and renderer*/
 		if(transmitData != null) {
 			plot.setDataset(3, datasetTransmit);
 			plot.mapDatasetToRangeAxis(3, 3);
@@ -557,7 +562,7 @@ public class HistogramViewer extends JFrame {
 			renderer2.setSeriesShape(0, ShapeUtilities.createDownTriangle(3.0F));
 			plot.setRenderer(3, renderer2);
 			changeColor(3, Color.RED);
-		}
+		} 
 		
 		plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
 		
@@ -602,8 +607,7 @@ public class HistogramViewer extends JFrame {
 	 * @param data The data to put into the serie.
 	 * @param step The averaging step for collecting the data.
 	 */
-	private void updateDataset(DefaultXYDataset ds, String serieKey,
-			Vector<Double> data, int step) {
+	private void updateDataset(DefaultXYDataset ds, String serieKey, Vector<Double> data, int step) {
 		ds.removeSeries(serieKey);
 		ds.addSeries(serieKey, collectData(data, step));
 	}
