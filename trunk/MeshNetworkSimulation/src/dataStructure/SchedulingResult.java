@@ -20,15 +20,19 @@ public class SchedulingResult {
 	
 	private double averagePacketDelay;
 
-	public void setThroughputData(Vector<Double> throughputData) {
+	public void setThroughputData(Vector<Double> throughputData) 
+	
+	{
 		this.throughputData = throughputData;
 	}
 
-	public void setSourceData(Vector<Double> sourceData) {
+	public void setSourceBufferData(Vector<Double> sourceData) 
+	{
 		this.sourceData = sourceData;
 	}
 
-	public void setTransmitData(Vector<Double> transmitData) {
+	public void setTransmitBufferData(Vector<Double> transmitData)
+	{
 		this.transmitData = transmitData;
 	}
 
@@ -44,16 +48,69 @@ public class SchedulingResult {
 		this.totalTrafficGenerated = totalTrafficGenerated;
 	}
 
-	public Vector<Double> getThroughputData() {
-		return throughputData;
+	/**
+	 * 
+	 * @return return throughput in Mbps
+	 */
+	public Vector<Double> getThroughputData() 
+	{
+		
+		Vector<Double> mbps = new Vector<Double>();
+		
+		mbps.add(throughputData.get(0));
+		
+		int slotCounter = 1;
+		double throughputAccumulation = 0;
+		for (Double slotT : throughputData)
+		{
+			throughputAccumulation += slotT;
+			slotCounter++;
+			if(slotCounter == 50)
+			{
+				mbps.add(throughputAccumulation);
+				slotCounter = 1;
+				throughputAccumulation = 0;
+			}
+		}
+		
+		return mbps;
 	}
 
-	public Vector<Double> getSourceData() {
-		return sourceData;
+	public Vector<Double> getSourceData() 
+	{
+		Vector<Double> mbps = new Vector<Double>();
+		mbps.add(sourceData.get(0));
+		int slotCounter = 1;
+		for (Double slotT : sourceData)
+		{
+			slotCounter++;
+			if(slotCounter == 50)
+			{
+				mbps.add(slotT);
+				slotCounter = 1;
+			}
+		}
+		
+		return mbps;
 	}
 
-	public Vector<Double> getTransmitData() {
-		return transmitData;
+	public Vector<Double> getTransmitData() 
+	{
+		
+		
+		Vector<Double> mbps = new Vector<Double>();
+		mbps.add(transmitData.get(0));
+		int slotCounter = 1;
+		for (Double slotT : transmitData)
+		{
+			slotCounter++;
+			if(slotCounter == 50)
+			{
+				mbps.add(slotT);
+				slotCounter = 1;
+			}
+		}
+		return mbps;
 	}
 
 	public String getSchedulingStrategy() {

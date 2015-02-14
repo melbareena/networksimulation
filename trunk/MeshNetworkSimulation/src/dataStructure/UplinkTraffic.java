@@ -10,7 +10,7 @@ import java.util.TreeMap;
  * @author Mahdi
  *
  */
-public class UplinkTraffic
+public class UplinkTraffic implements Cloneable
 {
 	
 	private Map<Vertex, Double> sortedTraffic = null;
@@ -74,10 +74,10 @@ public class UplinkTraffic
 		return uplinkTraffic.containsKey(v);
 	}
 	
-	public int size()
+	public double size()
 	{
 		if(uplinkTraffic == null || uplinkTraffic.size() < 1 ) return 0;
-		int sum = 0;
+		double sum = 0;
 		for (Double size : uplinkTraffic.values())
 		{
 			sum += size;
@@ -97,6 +97,20 @@ public class UplinkTraffic
 		str += "totol uplink size: " + size();
 		
 		return str;
+	}
+	
+	@Override
+	public UplinkTraffic clone()
+	{
+		UplinkTraffic temp = new UplinkTraffic();
+		
+		Map<Vertex, Double> tempMap = new TreeMap<Vertex, Double>();
+		for (Entry<Vertex, Double> ut : uplinkTraffic.entrySet())
+		{
+			tempMap.put(ut.getKey(), ut.getValue());
+		}
+		temp.addAll(tempMap);
+		return temp;
 	}
 	
 	

@@ -1,8 +1,6 @@
 package transConf;
 import org.jblas.DoubleMatrix;
 
-import common.FileGenerator;
-
 import setting.ApplicationSettingFacade;
 import dataStructure.DataRate;
 import dataStructure.Link;
@@ -23,7 +21,7 @@ public class IncreaseDatarate extends PowerControlUnit
 		
 		TCUnit feasible = null;
 		TCUnit T_prime = null;
-		FileGenerator.Power(unit, 0);
+		//FileGenerator.Power(unit, 0);
 		for (Link l : unit.getLinks())
 		{
 			int currentDataRate = unit.getRate(l);

@@ -7,12 +7,11 @@ import java.util.Stack;
 import java.util.Map.Entry;
 
 import setting.ApplicationSettingFacade;
-
 import common.PrintConsole;
 
 public class TopologyChecker
 {
-	private static int ACCESSIBLE = 0;
+	//private static int ACCESSIBLE = 0;
 	private int _minDistance;
 	private int _transmissionRate ;
 	private Map<String, Point> _markedRouters =  new HashMap<String, Point>();
@@ -43,8 +42,7 @@ public class TopologyChecker
 		
 		if(routersLocations.containsKey(key) || gatewayLocation.containsKey(key))
 		{
-			if(ApplicationSettingFacade.AppOutput.showIntermediateOutput())
-				PrintConsole.printErr("Reject: Duplicated Point (X:" + x + " Y:" + y + ")");
+			PrintConsole.printErr("Reject: Duplicated Point (X:" + x + " Y:" + y + ")");
 			return true;
 		}
 			
@@ -63,7 +61,6 @@ public class TopologyChecker
 			
 			if(dist < _minDistance)
 			{
-				if(ApplicationSettingFacade.AppOutput.showIntermediateOutput())
 					PrintConsole.printErr("Reject: Point (X:" + x + 
 							" Y:" + y + ") becuase of its distance (" + dist + ") " +
 							"with point (X:" + p2.x + " Y:" + p2.y +").");
@@ -90,7 +87,6 @@ public class TopologyChecker
 					
 					if(dist < _minDistance)
 					{
-						if(ApplicationSettingFacade.AppOutput.showIntermediateOutput())
 							PrintConsole.printErr("FAIL: Point (X:" + p1.x + 
 									" Y:" + p1.y + ") becuase of its distance (" + dist + ") " +
 									"with the point (X:" + p2.x + " Y:" + p2.y +").");
@@ -110,36 +106,29 @@ public class TopologyChecker
 			Map<String, Point> gatewayLocations)
 	{
 		
-		
-		PrintConsole.print("Checking all routers are accessible from at least one getway.");
-		
 		Stack<String> getwayNeighborsStack = new Stack<>();
 		for(Entry<String, Point> getway : gatewayLocations.entrySet() )
 		{
 			
-			ACCESSIBLE = 0;
+			//ACCESSIBLE = 0;
 			for(Entry<String, Point> router : routersLocations.entrySet())
 			{
 				if(isInTranssmisonRateRate(getway.getValue(), router.getValue()) 
 						&& ! _markedRouters.containsKey(router.getKey()) )
 				{							
 					_markedRouters.put(router.getKey(), router.getValue());
-					ACCESSIBLE++;
+					//ACCESSIBLE++;
 					getwayNeighborsStack.push(router.getKey());
 				}
 			}
 			
 			if(getwayNeighborsStack.size() > 0)
-				findMarkedRouterNeighbors(getwayNeighborsStack, routersLocations);
-			if(ApplicationSettingFacade.AppOutput.showIntermediateOutput())
-				PrintConsole.print("The number of accessible router from the getway " +
-						"<"+getway.getValue().x+", "+getway.getValue().y +
-						"> is: " + ACCESSIBLE);
-			
+				findMarkedRouterNeighbors(getwayNeighborsStack, routersLocations);			
 		}
 		
 		if(routersLocations.size() != _markedRouters.size())
 		{
+			
 			printIsolatedRouters(routersLocations);
 			return false;
 		}
@@ -160,6 +149,7 @@ public class TopologyChecker
 			}
 		}
 		
+		
 	}
 	private void findMarkedRouterNeighbors(Stack<String> neighbors , Map<String, Point> routersLocations) {
 		
@@ -176,7 +166,7 @@ public class TopologyChecker
 				 	if(! _markedRouters.containsKey(router.getKey()))
 					{
 				 		_markedRouters.put(router.getKey(), router.getValue());
-						ACCESSIBLE ++;
+						//ACCESSIBLE ++;
 						NeighborsStack.push(router.getKey());
 					}
 				}

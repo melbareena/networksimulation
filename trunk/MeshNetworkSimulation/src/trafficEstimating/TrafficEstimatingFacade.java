@@ -9,7 +9,6 @@ import java.util.Vector;
 import common.FileGenerator;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
-import trafficGenerator.DynamicTrafficGenerator;
 import trafficGenerator.DynamicTraffic;
 import dataStructure.BufferMap;
 import dataStructure.DownlinkTraffic;
@@ -30,19 +29,6 @@ public class TrafficEstimatingFacade
 	
 	private static List<Link> optimalLinks; 
 	
-	
-	
-	
-	/*private static void addToBuffers(Vertex v , BufferSet bs)
-	{
-		if(!buffers.containsKey(v))
-			buffers.put(v, bs);
-		else
-		{
-			BufferSet storedBS = buffers.get(v);
-			storedBS.Append(bs);
-		}
-	}*/
 	
 	private static DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
 	
@@ -108,51 +94,71 @@ public class TrafficEstimatingFacade
 	 * @param trafficGenerator The traffic generator used to add new traffic.
 	 * @return The updated <code>BufferMap</code>.
 	 */
-	public static BufferMap getDynamicSourceBuffers(BufferMap currentBufferMap, DynamicTrafficGenerator trafficGenerator, int currentTimeslot) 
+	
+	
+
+	public static BufferMap getDynamicSourceBuffers(int currentTimeslot) 
 	{
 		
 		
 		PathMap uplinks = TopologyGraphFacade.getOptimalUplinkPaths();
 		PathMap downlinks = TopologyGraphFacade.getOptimalDownLinkPath();
+		
+		
 
 		
 		BufferMap bfMap = null;
 		//Creating a new BufferMap if the current one is null
-		if(currentBufferMap == null) {
-			bfMap = new BufferMap();
-		} else {
-			bfMap = currentBufferMap;
-		}
+	
 
 		//Initializing
 		Traffic globalTraffic = dyTraffic.getDynamicTraffic(currentTimeslot);
+		
 		UplinkTraffic uplinkTraffic = globalTraffic.getUplinkTraffic();
 		DownlinkTraffic downlinkTraffic = globalTraffic.getDownlinkTraffic();
 		Map<Integer, Vertex> nodesMap = ApplicationSettingFacade.Nodes.getNodes();
 		
-		for (int vertexIndex : nodesMap.keySet()) {
+		if(uplinkTraffic.size() > 0 || downlinkTraffic.size() > 0)
+		{
+			bfMap = new BufferMap();
+			for (int vertexIndex : nodesMap.keySet()) {
 			Vertex v = nodesMap.get(vertexIndex);
 			// Add uplink traffic if there is
-			if(uplinkTraffic.hasUplinkTraffic(v)) {
+			if(uplinkTraffic.hasUplinkTraffic(v)) 
+			{
 				double upTraffic = uplinkTraffic.getUplinkTraffic(v);
-				for (Path p : uplinks.get(v)) {
-					if(upTraffic > 0) {
+				
+				if(upTraffic > 0)
+				{
+					List<Path> pathList = uplinks.get(v);
+					upTraffic = upTraffic / pathList.size();
+					for (Path p : pathList) 
+					{
 						Packet newPacket = new Packet(p, upTraffic, currentTimeslot);
-						bfMap.put( p.getEdgePath().getFirst(), newPacket);
+						bfMap.put( p.getEdgePath().getFirst(), newPacket);		
 					}
 				}
 			}
 			// Add downlink traffic if there is
-			if(downlinkTraffic.hasTraffic(v)) {
-				for (Path p : downlinks.get(v)) {
-					double downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
-					if(downTraffic > 0) {
-						Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
-						bfMap.put( p.getEdgePath().getFirst(), newPacket);
+			if(downlinkTraffic.hasTraffic(v))
+			{
+				
+				List<Path> dPath = downlinks.get(v);
+				
+				for (Path p : dPath)
+				{
+						double downTraffic = downlinkTraffic.getTraffic(p.getSource(), p.getDestination());
+						if(downTraffic > 0) 
+						{
+	
+							Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
+							bfMap.put( p.getEdgePath().getFirst(), newPacket);
+						}
 					}
 				}
 			}
 		}
+			
 		return bfMap;
 	}
 	

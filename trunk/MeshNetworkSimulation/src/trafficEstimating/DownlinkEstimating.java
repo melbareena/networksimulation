@@ -11,6 +11,7 @@ import common.PrintConsole;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
 import trafficGenerator.DynamicTraffic;
+import trafficGenerator.DynamicTrafficGenerator;
 import trafficGenerator.StaticTraffic;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
@@ -68,7 +69,9 @@ class DownlinkEstimating
 	{
 		DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
 		DownlinkPaths = TopologyGraphFacade.getOptimalDownLinkPath();
-	
+		
+		assert((float) DynamicTraffic.getTotalTrafficInDynamicMap() == (float) DynamicTrafficGenerator.totalTraffic()) : "Before  traffic in map dynamic is not valid  " + DynamicTraffic.getTotalTrafficInDynamicMap()  + " != "  + DynamicTrafficGenerator.totalTraffic();
+		
 		Map<Vertex, TreeMap<Vertex, Double>> dynamicTraffic = dyTraffic.getDownlink(DownlinkPaths).getTraffic();
 		for (Entry<Vertex, List<Path>> dlPaths : DownlinkPaths.entrySet())
 		{
@@ -79,6 +82,7 @@ class DownlinkEstimating
 				if(dynamicTraffic.containsKey(source) && dynamicTraffic.get(source).containsKey(destination))
 				{
 						Double traffic  = dynamicTraffic.get(path.getSource()).get(path.getDestination());
+						
 						for (Link edge : path.getEdgePath())	
 							dl_Traffic_l.put(edge, traffic);	
 				}
@@ -86,8 +90,11 @@ class DownlinkEstimating
 			}
 			
 		}
+		
+		assert(DynamicTraffic.getTotalTrafficInDynamicMap() == DynamicTrafficGenerator.totalTraffic()) : " After  traffic in map dynamic is not valid "  + DynamicTraffic.getTotalTrafficInDynamicMap()  + " != "  + DynamicTrafficGenerator.totalTraffic() ;
 		IntermediateOutput.downLinkTrafficEstimationResult(dl_Traffic_l);
 		PrintConsole.print("Estimating downlink traffic is done successfully.");
+		
 		return dl_Traffic_l;
 	}
 }

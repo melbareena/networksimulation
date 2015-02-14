@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-public final class DownlinkTraffic
+public final class DownlinkTraffic implements Cloneable
 {
 	private Map<Vertex, TreeMap<Vertex, Double>> downLinkTraffic = new TreeMap<Vertex,TreeMap<Vertex, Double>>();
 	
@@ -60,10 +60,10 @@ public final class DownlinkTraffic
 	{
 		return downLinkTraffic.containsKey(v);
 	}
-	public int size()
+	public double size()
 	{
 		if(downLinkTraffic == null || downLinkTraffic.size() < 1 ) return 0;
-		float sum = 0;
+		double sum = 0;
 		for (TreeMap<Vertex, Double> vrt : downLinkTraffic.values())
 		{
 			for (Double size : vrt.values())
@@ -72,7 +72,7 @@ public final class DownlinkTraffic
 			}
 			
 		}
-		return (int)sum;
+		return sum;
 	}
 	
 	public String toString()
@@ -93,5 +93,26 @@ public final class DownlinkTraffic
 		str += "total uplink size: " + size();
 		
 		return str;
+	}
+	@Override
+	public DownlinkTraffic clone()
+	{
+		DownlinkTraffic temp = new DownlinkTraffic();
+		Map<Vertex, TreeMap<Vertex, Double>> tempDownlinkTrafficMap = new TreeMap<Vertex,TreeMap<Vertex, Double>>();
+		TreeMap<Vertex,Double> destiTempMap;
+		
+		for (Entry<Vertex, TreeMap<Vertex, Double>> downMap : downLinkTraffic.entrySet())
+		{
+			Vertex key = downMap.getKey();
+			destiTempMap = new TreeMap<Vertex, Double>();
+			for (Entry<Vertex, Double> item : downMap.getValue().entrySet())
+			{
+				destiTempMap.put(item.getKey(), item.getValue());
+			}
+			
+			tempDownlinkTrafficMap.put(key, destiTempMap);
+		}
+		temp.addAll(tempDownlinkTrafficMap);
+		return temp;
 	}
 }

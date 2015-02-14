@@ -186,7 +186,7 @@ class RouterConfig extends BaseConfiguration
 		Vector<Point> staticRouters = new Vector<Point>();
 		NodeList childNodes = eElement.getElementsByTagName(CHILD);
 		int size = 0;
-		for (int counter = 0; counter < childNodes.getLength() && counter < numberOfNodes; counter++)
+		for (int counter = 0; counter < childNodes.getLength(); counter++)
 		{
 			Node childNode = childNodes.item(counter);
 			if (childNode.getNodeType() == Node.ELEMENT_NODE)

@@ -54,8 +54,24 @@ public class Buffer {
 			return packets.get(0);	
 		return null;
 	}
+	public List<Packet> getPackets(double dataRate)
+	{
+		List<Packet> list = new ArrayList<Packet>();
+		
+		int sum = 0;
+		for (Packet p : packets)
+		{
+			sum += p.getTraffic();
+			list.add(p);
+			if(sum >= dataRate)
+				break;
+		}
+		return list;
+		
+		
+	}
 
-	public Packet send(int dataRate, int currentTimeSlot)
+	public Packet send(double dataRate, int currentTimeSlot)
 	{
 		
 		Packet max = this.getMax();

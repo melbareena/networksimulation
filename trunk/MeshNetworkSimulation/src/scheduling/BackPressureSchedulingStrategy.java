@@ -11,6 +11,7 @@ import java.util.Vector;
 import launcher.Program;
 import common.FileGenerator;
 import trafficEstimating.TrafficEstimatingFacade;
+import trafficGenerator.DynamicTraffic;
 import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.Buffer;
 import dataStructure.Link;
@@ -76,31 +77,36 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 
 		trafficGenerator = "Dynamic";
 
-		int timeSlot = 0; // Current number of time slot
-
+		int timeSlot = -1; // Current number of time slot
+		
 		sourceBuffers = null;
-		do {
+		do 
+		{
+			timeSlot++;
 			totalTrafficGenerated = updateTraffic(0); // Fill the source buffers with random traffic
+			
 		} while (sourceBuffers.trafficSize() == 0);
 
-		while (sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0
-				|| timeSlot < durationOfTrafficGenerating) {
+		while (sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0	|| timeSlot < durationOfTrafficGenerating) 
+		{
 			
 			disposeOfTraffic(timeSlot);
 
 			timeSlot++;
-			if (timeSlot < durationOfTrafficGenerating) {
+			if (timeSlot < durationOfTrafficGenerating)
+			{
 				totalTrafficGenerated += updateTraffic(timeSlot);
 				Program.loadingDialog.setProgress(this.instanceIndex,
 						(int) (99 * timeSlot / durationOfTrafficGenerating),
 						"Generating traffic (slot " + timeSlot + " over " + durationOfTrafficGenerating + ")");
-			} else {
+			} 
+			else 
 				updateProgress(timeSlot);
-			}
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
-
+		assert(accumulationOfThroughput() == DynamicTraffic.getTotalTrafficInDynamicMap() && accumulationOfThroughput() == DynamicTrafficGenerator.totalTraffic())
+		: "throughput is not valid \n traffic in MAP:" +  DynamicTraffic.getTotalTrafficInDynamicMap() + " Throughput =" + accumulationOfThroughput();
 		return super.getResults();
 	}
 	
