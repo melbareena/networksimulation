@@ -54,27 +54,42 @@ public class Buffer {
 			return packets.get(0);	
 		return null;
 	}
-	public List<Packet> getPackets(double dataRate)
+	
+	
+	private List<Packet> getPackets(double dataRate)
 	{
-		List<Packet> list = new ArrayList<Packet>();
+		List<Packet> candidatePackets = new ArrayList<Packet>();
 		
-		int sum = 0;
+		double remainedDataRate = dataRate;
 		for (Packet p : packets)
 		{
-			sum += p.getTraffic();
-			list.add(p);
-			if(sum >= dataRate)
+			remainedDataRate -= p.getTraffic();
+			candidatePackets.add(p);
+			if(remainedDataRate <= 0)
 				break;
 		}
-		return list;
+		return candidatePackets;
 		
 		
 	}
 
-	public Packet send(double dataRate, int currentTimeSlot)
+	public List<Packet> send(double dataRate, int currentTimeSlot)
 	{
+		List<Packet> candidatePackets  = getPackets(dataRate);
+		assert(candidatePackets.size() > 0) : "No packets, class: Buffer, Method: send";
+		List<Packet> movedPackets = new ArrayList<Packet>();
+		double remainedDataRate = dataRate;
 		
-		Packet max = this.getMax();
+		for (Packet p : candidatePackets) 
+		{
+			if(p.getTraffic() <= remainedDataRate)
+				packets.remove(p);
+			
+			movedPackets.add(p.send(remainedDataRate, currentTimeSlot));
+			remainedDataRate -= p.getTraffic();
+		}
+		return movedPackets;
+		/*Packet max = this.getMax();
 		if(max != null)
 		{
 			if(max.getTraffic() < dataRate)
@@ -82,6 +97,7 @@ public class Buffer {
 			return max.send(dataRate, currentTimeSlot);
 		}
 		return null;
+		*/
 	}
 	
 	@Override

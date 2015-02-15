@@ -122,31 +122,41 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 		for (Link link : tcu.getLinks()) {
 			// Source buffers
 			calcWeight(true);
-			if (sourceBuffers.containsKey(link)) {
-				int dataRate = tcu.getRate(link);
-				Packet moved = sourceBuffers.sendPacket(link, dataRate,	transmitBuffers, timeSlot);
-				if (moved.isReceived()) {
-					double movedTraffic = moved.getTraffic();
-					if(!moved.isFragment()) {
-						packetsDelay.add(moved.getDelay());
+			if (sourceBuffers.containsKey(link))
+			{
+				double dataRate = tcu.getRate(link);
+				List<Packet> movedPackets = sourceBuffers.sendPacket(link, dataRate,	transmitBuffers, timeSlot);
+				for (Packet moved : movedPackets)
+				{
+					if (moved.isReceived())
+					{
+						double movedTraffic = moved.getTraffic();
+						if(!moved.isFragment()) 
+							packetsDelay.add(moved.getDelay());
+						slotThroughtput += movedTraffic;
+						tcu.addThroughput(movedTraffic);
 					}
-					slotThroughtput += movedTraffic;
-					tcu.addThroughput(movedTraffic);
 				}
+				
 			}
 			// Transit buffers
 			calcWeight(false);
-			if (transmitBuffers.containsKey(link)) {
-				int dataRate = tcu.getRate(link);
-				Packet moved = transmitBuffers.sendPacket(link, dataRate, transmitBuffers, timeSlot);
-				if (moved.isReceived()) {
-					double movedTraffic = moved.getTraffic();
-					if(!moved.isFragment()) {
-						packetsDelay.add(moved.getDelay());
+			if (transmitBuffers.containsKey(link)) 
+			{
+				double dataRate = tcu.getRate(link);
+				List<Packet> movedPackets = transmitBuffers.sendPacket(link, dataRate, transmitBuffers, timeSlot);
+				for (Packet moved : movedPackets)
+				{
+					if (moved.isReceived())
+					{
+						double movedTraffic = moved.getTraffic();
+						if(!moved.isFragment())
+							packetsDelay.add(moved.getDelay());
+						slotThroughtput += movedTraffic;
+						tcu.addThroughput(movedTraffic);
 					}
-					slotThroughtput += movedTraffic;
-					tcu.addThroughput(movedTraffic);
 				}
+				
 			}
 		}
 		throughput.add(slotThroughtput);

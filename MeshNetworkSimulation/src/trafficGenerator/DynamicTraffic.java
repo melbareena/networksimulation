@@ -21,6 +21,7 @@ public class DynamicTraffic
 	private final long _duration = ApplicationSettingFacade.Traffic.getDuration();
 	private final DynamicTrafficGenerator _dynamicTrafficGenerator = new DynamicTrafficGenerator();
 	
+	public double offerLoadTraffic = 0;
 	
 	public Traffic getDynamicTraffic(int timeSlot)
 	{
@@ -37,7 +38,9 @@ public class DynamicTraffic
 			//_self.Initialization();
 			_self._dynamicTraffic = new Hashtable<Integer, Traffic>();
 			for(int i = 0; i < _self._duration ; i++)
+			{
 				_self._dynamicTraffic.put(i, _self._dynamicTrafficGenerator.generateTraffic(uplink, downLink));
+			}
 			
 			
 			System.out.println("Total Traffic: " + DynamicTrafficGenerator.totalTraffic());

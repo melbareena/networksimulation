@@ -20,7 +20,7 @@ import setting.ApplicationSettingFacade;
 public class TCUnit
 {	
 	
-	private Map<Link, Integer> _rateCollection = new HashMap<Link, Integer>();
+	private Map<Link, Double> _rateCollection = new HashMap<Link, Double>();
 	private Map<Link, Double> _sinrCollection = new HashMap<Link, Double>();
 	private Map<Link, Double> _powerCollection = new HashMap<Link, Double>(); 
 	private Map<Link,Double> _linkWeight = new HashMap<Link, Double>();
@@ -67,7 +67,7 @@ public class TCUnit
 			this.isLock = false;
 			
 	}
-	public Map<Link, Integer> getRateMap()
+	public Map<Link, Double> getRateMap()
 	{
 		return _rateCollection;
 	}
@@ -110,7 +110,7 @@ public class TCUnit
 		{
 			Link l = traffic.getKey();
 			double traff = traffic.getValue();
-			int r = this.getRate(l);
+			double r = this.getRate(l);
 			_linkWeight.put(l, r/traff);
 		}
 	}
@@ -139,21 +139,21 @@ public class TCUnit
 		
 	}
 	
-	public boolean isLinkAvailable(Link l)
+	public boolean containsLink(Link l)
 	{
 		return _rateCollection.containsKey(l);
 	}
 	
-	public boolean isLinksAvailable(Vector<Link> links)
+	public boolean containsLinks(Vector<Link> links)
 	{
-		boolean is  = true;
+		
 		for (Link l : links)
 		{
-			if(!isLinkAvailable(l))
-				is = false;
+			if(!containsLink(l))
+				return false;
 		}
 		
-		return is;
+		return true;
 	}
 		
 	public int getCounter_g(Vertex g , LinkType ty)
@@ -179,7 +179,7 @@ public class TCUnit
 		
 	}
 	
-	public void putRate(Link l, int rate)
+	public void putRate(Link l, double rate)
 	{
 		_rateCollection.put(l, rate);
 	}	
@@ -203,9 +203,14 @@ public class TCUnit
 		return links;
 	}
 	
-	public int getRate(Link l)
+	/**
+	 * 
+	 * @param l : a link
+	 * @return return rate per time slot (NOT second)
+	 */
+	public double getRate(Link l)
 	{
-		return _rateCollection.get(l);
+		return  _rateCollection.get(l) ;
 	}	
 	public double getSinr(Link l)
 	{	
@@ -213,7 +218,7 @@ public class TCUnit
 	}
 	public double getSinrThreshold(Link l)
 	{
-		int DataRate = _rateCollection.get(l);
+		double DataRate = _rateCollection.get(l);
 		return ApplicationSettingFacade.DataRate.getSINRthreshold(DataRate);
 	}
 	public Map<Link,Double> getPower()
@@ -225,7 +230,7 @@ public class TCUnit
 		if(!_powerCollection.containsKey(l)) return -1;
 		return _powerCollection.get(l);
 	}
-	private void setDataRate(Link l , int dataRate)
+	private void setDataRate(Link l , double dataRate)
 	{
 		_rateCollection.put(l, dataRate);
 	}
@@ -239,7 +244,7 @@ public class TCUnit
 		//_rateCollection.remove(l);
 		_powerCollection.put(l, power);
 	}
-	public void setSinrRate(Link l, int dataRate,double sinr)
+	public void setSinrRate(Link l, double dataRate,double sinr)
 	{
 		this.setDataRate(l, dataRate);
 		this.setSinr(l, sinr);
@@ -261,7 +266,7 @@ public class TCUnit
 	/**
 	 * @return Integer value is data rate.
 	 */
-	public Set<Entry<Link, Integer>> entrySetRate()
+	public Set<Entry<Link, Double>> entrySetRate()
 	{
 		return _rateCollection.entrySet();
 	}
@@ -280,11 +285,11 @@ public class TCUnit
 		return _rateCollection.size();
 	}
 	
-	public int getTCAP()
+	public double getTCAP()
 	{
 		if(_rateCollection.size() == 0 ) return 0;
-		int tcap = 0;
-		for (Entry<Link, Integer> linkDataRate : _rateCollection.entrySet())
+		double tcap = 0;
+		for (Entry<Link, Double> linkDataRate : _rateCollection.entrySet())
 		{
 			tcap += linkDataRate.getValue();
 		}
@@ -297,7 +302,7 @@ public class TCUnit
 		if(_rateCollection.size() == 0 ) return "";
 		
 		String out = "";
-		for (Entry<Link, Integer> linkDataRate : _rateCollection.entrySet())
+		for (Entry<Link, Double> linkDataRate : _rateCollection.entrySet())
 		{
 			out += "Link: " + linkDataRate.getKey() + ", rate:" + linkDataRate.getValue();
 			if(_powerCollection.containsKey(linkDataRate.getKey()))
@@ -312,7 +317,7 @@ public class TCUnit
 	public TCUnit Clone()
 	{
 		TCUnit copy = new TCUnit();
-		for (Entry<Link, Integer> currentLink : this.entrySetRate())
+		for (Entry<Link, Double> currentLink : this.entrySetRate())
 		{
 			Link l = currentLink.getKey();
 			copy.putRate(l, currentLink.getValue());
@@ -332,7 +337,7 @@ public class TCUnit
 		Set<Link> links = _rateCollection.keySet();
 		for (Link link : links)
 		{
-			_rateCollection.put(link, 0);
+			_rateCollection.put(link, 0d);
 		}
 		
 	}
@@ -352,7 +357,7 @@ public class TCUnit
 		this.setNeedAdjusmentpower(false);
 		this.setDead(false);
 	}
-	public void setRates(Map<Link, Integer> newRates)
+	public void setRates(Map<Link, Double> newRates)
 	{
 		_rateCollection = newRates;
 		

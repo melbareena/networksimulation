@@ -397,7 +397,7 @@ public class FileGenerator
 			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "transmission_configuration.txt"));
 			for(TCUnit tcu : tT)
 			{
-				for (Entry<Link, Integer> linkDataRate : tcu.entrySetRate() )
+				for (Entry<Link, Double> linkDataRate : tcu.entrySetRate() )
 					writer.write(linkDataRate.getKey().getId() + " ");
 				writer.newLine();
 			}
@@ -488,7 +488,7 @@ public class FileGenerator
 				totalDataRate = 0;
 				counter  = 0;
 				
-				for (Entry<Link, Integer> linkDataRate : tcu.entrySetRate() )
+				for (Entry<Link, Double> linkDataRate : tcu.entrySetRate() )
 				{
 					totalDataRate += linkDataRate.getValue();
 					counter++;

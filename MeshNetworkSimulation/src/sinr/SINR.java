@@ -119,9 +119,9 @@ public class SINR
 		return tConfUnit;
 	}
 
-	public Map<Link, Integer> calcDataRate(TCUnit tConfUnit, Map<Link, Double> powerCollection)
+	public Map<Link, Double> calcDataRate(TCUnit tConfUnit, Map<Link, Double> powerCollection)
 	{
-		Map<Link,Integer> rateMap = new HashMap<Link, Integer>();
+		Map<Link,Double> rateMap = new HashMap<Link, Double>();
 		List<Link>  links;
 		for (Link l : tConfUnit.getLinks())
 		{

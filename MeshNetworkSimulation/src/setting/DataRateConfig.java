@@ -66,7 +66,8 @@ class DataRateConfig extends BaseConfiguration
 						if (childNode.getNodeType() == Node.ELEMENT_NODE)
 						{
 							Element childElem = (Element) childNode;
-							int r = Integer.valueOf(childElem.getAttribute(RATEATT));
+							int rS = Integer.valueOf(childElem.getAttribute(RATEATT));
+							double r = (double) rS / 50;
 							float d = Float.valueOf(childElem.getAttribute(SINRATT));
 							DataRate drate = new DataRate( r ,  d);
 							dataRates.add( drate );

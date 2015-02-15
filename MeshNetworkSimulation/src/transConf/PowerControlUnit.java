@@ -104,7 +104,7 @@ class PowerControlUnit
 			if(powerAllocationIsOk)
 			{
 				//calculate data rate with the powers------------------------------------------
-				Map<Link, Integer> newRates = _sinr.calcDataRate(unit,unit.getPower());
+				Map<Link, Double> newRates = _sinr.calcDataRate(unit,unit.getPower());
 				unit.setRates(newRates);
 				
 				

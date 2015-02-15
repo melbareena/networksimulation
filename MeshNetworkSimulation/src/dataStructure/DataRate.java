@@ -2,7 +2,7 @@ package dataStructure;
 
 public class DataRate implements Comparable<DataRate>
 {
-	public int getRate()
+	public double getRate()
 	{
 		return Rate;
 	}
@@ -16,12 +16,12 @@ public class DataRate implements Comparable<DataRate>
 
 
 
-	private int Rate;
+	private double Rate;
 	private float SINR;
 	
 	
 	
-	public DataRate(Integer rate, float sinr)
+	public DataRate(double rate, float sinr)
 	{
 		this.Rate = rate;
 		this.SINR = sinr;

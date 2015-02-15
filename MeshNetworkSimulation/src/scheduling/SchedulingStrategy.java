@@ -99,17 +99,17 @@ public abstract class SchedulingStrategy
 					{
 						if(sourceBuffers.containsKey(link))
 						{
-							int dataRate = tcunit.getRate(link);
-							Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
-							if(moved.isReceived())
-							{
-								double movedTraffic = moved.getTraffic();
-								if(!moved.isFragment()) {
-									packetsDelay.add(moved.getDelay());
-								}
-								slotThroughtput += movedTraffic;
-								tcunit.addThroughput(movedTraffic);
-							}
+							double dataRate = (double)tcunit.getRate(link) ;															
+							List<Packet> movedPackets = sourceBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
+							for (Packet moved : movedPackets) 
+								if(moved.isReceived())
+								{
+									double movedTraffic = moved.getTraffic();
+									if(!moved.isFragment())
+										packetsDelay.add(moved.getDelay());
+									slotThroughtput += movedTraffic;
+									tcunit.addThroughput(movedTraffic);
+								}						
 						}
 					}
 					timeSlot++;
@@ -134,17 +134,21 @@ public abstract class SchedulingStrategy
 					{
 						if(transmitBuffers.containsKey(link))
 						{
-							int dataRate = tcunit.getRate(link);
-							Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
-							if(moved.isReceived())
+							double dataRate = (double) tcunit.getRate(link);
+							List<Packet> movedPackets = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
+							
+							for (Packet moved : movedPackets)
 							{
-								double movedTraffic = moved.getTraffic();
-								if(!moved.isFragment()) {
-									packetsDelay.add(moved.getDelay());
+								if(moved.isReceived()) 
+								{
+									double movedTraffic = moved.getTraffic();
+									if(!moved.isFragment()) 
+										packetsDelay.add(moved.getDelay());
+									slotThroughtput += movedTraffic;
+									tcunit.addThroughput(movedTraffic);
 								}
-								slotThroughtput += movedTraffic;
-								tcunit.addThroughput(movedTraffic);
 							}
+							
 						}
 					}
 					timeSlot++;
@@ -207,100 +211,113 @@ public abstract class SchedulingStrategy
 
 		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating) 
 		{
-			
-			if(timeSlot == 198)
-				System.out.println("hello");
-			// Source Buffers
 			double slotThroughtput = 0;
-			this.calcWeight(true);
-			selectedBuffers = getBufferStrategy(true);
-			if(selectedBuffers.size() > 0)
-			{
-				
-	 			transmissionConfigurations = matching(selectedBuffers);
-	 			for (TCUnit tcunit : transmissionConfigurations) {
-					slotThroughtput = 0;
-					for (Link link : tcunit.getLinks()) {
-						if(sourceBuffers.containsKey(link)) {
-							double dataRate = (double)tcunit.getRate(link) / 50;
-							Packet moved = sourceBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
-							if(moved.isReceived())
-							{
-								double movedTraffic = moved.getTraffic();
-								if(!moved.isFragment()) {
-									packetsDelay.add(moved.getDelay());
-								}
-								slotThroughtput += movedTraffic;
-								tcunit.addThroughput(movedTraffic);
-							}
-						}
-					}
-					throughput.add(slotThroughtput);
-					trafficSource.add(sourceBuffers.trafficSize());
-					trafficTransit.add(transmitBuffers.trafficSize());
-					/*----------------------*
-					 * Generate new traffic *
-					 * And display progress *
-					 *----------------------*/
-					timeSlot++;
-					if(timeSlot < durationOfTrafficGenerating) {
-						totalTrafficGenerated += updateTraffic(timeSlot);
-						Program.loadingDialog.setProgress(this.instanceIndex,
-								(int) (99*timeSlot/durationOfTrafficGenerating),
-								"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
-					} else {
-						updateProgress(timeSlot);
-					}
-				}
-			}
-			else
+			
+			//both of buffers are empty 
+			if(sourceBuffers.trafficSize() == 0 && transmitBuffers.trafficSize() == 0)
 			{
 				timeSlot++;
-				
+				throughput.add(0d);
+				trafficSource.add(sourceBuffers.trafficSize());
+				trafficTransit.add(transmitBuffers.trafficSize());
 				if(timeSlot < durationOfTrafficGenerating)
 					totalTrafficGenerated += updateTraffic(timeSlot);
+				continue;
 			}
- 			// Transmit buffers
- 			this.calcWeight(false);
- 			selectedBuffers = getBufferStrategy(false);
- 			if(selectedBuffers.size() > 0)
- 			{
- 			
-	 			transmissionConfigurations = matching(selectedBuffers);
-	 			for (TCUnit tcunit : transmissionConfigurations) {
-					slotThroughtput = 0;
-					for (Link link : tcunit.getLinks()) {
-						if(transmitBuffers.containsKey(link)) {
-							double dataRate = (double) tcunit.getRate(link) / 50;
-							Packet moved = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
-							if(moved.isReceived()) {
-								double movedTraffic = moved.getTraffic();
-								if(!moved.isFragment()) {
-									packetsDelay.add(moved.getDelay());
-								}
-								slotThroughtput += movedTraffic;
-								tcunit.addThroughput(movedTraffic);
+			 
+		
+			if(sourceBuffers.trafficSize() > 0)
+			{
+				this.calcWeight(true);
+				selectedBuffers = getBufferStrategy(true);
+				if(selectedBuffers.size() > 0)
+				{
+					
+		 			transmissionConfigurations = matching(selectedBuffers);
+		 			for (TCUnit tcunit : transmissionConfigurations) 
+		 			{
+						slotThroughtput = 0;
+						for (Link link : tcunit.getLinks()) 
+						{
+							if(sourceBuffers.containsKey(link)) 
+							{
+								double dataRate = (double)tcunit.getRate(link) ;															
+								List<Packet> movedPackets = sourceBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
+								for (Packet moved : movedPackets) 
+									if(moved.isReceived())
+									{
+										double movedTraffic = moved.getTraffic();
+										if(!moved.isFragment())
+											packetsDelay.add(moved.getDelay());
+										slotThroughtput += movedTraffic;
+										tcunit.addThroughput(movedTraffic);
+									}						
 							}
 						}
-					}
-					throughput.add(slotThroughtput);
-					trafficSource.add(sourceBuffers.trafficSize());
-					trafficTransit.add(transmitBuffers.trafficSize());
-					/*----------------------*
-					 * Generate new traffic *
-					 * And display progress *
-					 *----------------------*/
-					timeSlot++;
-					if(timeSlot < durationOfTrafficGenerating) {
-						totalTrafficGenerated += updateTraffic(timeSlot);
-						Program.loadingDialog.setProgress(this.instanceIndex,
-								(int) (99*timeSlot/durationOfTrafficGenerating),
-								"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
-					} else {
-						updateProgress(timeSlot);
+						throughput.add(slotThroughtput);
+						trafficSource.add(sourceBuffers.trafficSize());
+						trafficTransit.add(transmitBuffers.trafficSize());
+						timeSlot++;
+						if(timeSlot < durationOfTrafficGenerating) 
+						{
+							totalTrafficGenerated += updateTraffic(timeSlot);
+							Program.loadingDialog.setProgress(this.instanceIndex,
+									(int) (99*timeSlot/durationOfTrafficGenerating),
+									"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
+						}
+						else
+							updateProgress(timeSlot);
 					}
 				}
 			}
+			if(transmitBuffers.trafficSize() > 0)
+			{
+				if(selectedBuffers.size() > 0)
+	 			{
+	 			
+		 			transmissionConfigurations = matching(selectedBuffers);
+		 			for (TCUnit tcunit : transmissionConfigurations)
+		 			{
+						slotThroughtput = 0;
+						for (Link link : tcunit.getLinks())
+						{
+							if(transmitBuffers.containsKey(link)) 
+							{
+								double dataRate = (double) tcunit.getRate(link);
+								List<Packet> movedPackets = transmitBuffers.sendPacket(link,dataRate,transmitBuffers, timeSlot);
+								
+								for (Packet moved : movedPackets)
+								{
+									if(moved.isReceived()) 
+									{
+										double movedTraffic = moved.getTraffic();
+										if(!moved.isFragment()) 
+											packetsDelay.add(moved.getDelay());
+										slotThroughtput += movedTraffic;
+										tcunit.addThroughput(movedTraffic);
+									}
+								}
+								
+							}
+						}
+						throughput.add(slotThroughtput);
+						trafficSource.add(sourceBuffers.trafficSize());
+						trafficTransit.add(transmitBuffers.trafficSize());
+						timeSlot++;
+						if(timeSlot < durationOfTrafficGenerating) 
+						{
+							totalTrafficGenerated += updateTraffic(timeSlot);
+							Program.loadingDialog.setProgress(this.instanceIndex,
+									(int) (99*timeSlot/durationOfTrafficGenerating),
+									"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
+						} else 
+							updateProgress(timeSlot);
+					}
+				}
+			}
+ 			this.calcWeight(false);
+ 			selectedBuffers = getBufferStrategy(false);
+ 			
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
@@ -389,7 +406,7 @@ public abstract class SchedulingStrategy
 		Vector<TCUnit> allInOneTC = new Vector<>();
 		for (TCUnit tc : configurations)
 		{
-			if(tc.isLinksAvailable(maxKBuffer))
+			if(tc.containsLinks(maxKBuffer))
 				allInOneTC.add(tc);
 		}
 		if(allInOneTC.size() >= k)
