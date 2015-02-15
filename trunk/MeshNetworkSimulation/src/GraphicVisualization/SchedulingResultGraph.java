@@ -26,6 +26,7 @@ import org.jfree.ui.RefineryUtilities;
 import org.jfree.ui.TextAnchor;
 
 import setting.ApplicationSettingFacade;
+import trafficGenerator.DynamicTrafficGenerator;
 import dataStructure.SchedulingResult;
 
 public class SchedulingResultGraph extends JFrame
@@ -39,7 +40,7 @@ public class SchedulingResultGraph extends JFrame
 	private static final long	serialVersionUID	= 1L;
 	
 	public final Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration() / 50);
-	
+	public final ValueMarker offerLoad = new ValueMarker(DynamicTrafficGenerator.offerloadTraffic);
 	
 	public SchedulingResultGraph(SchedulingResult result)
 	{
@@ -114,6 +115,13 @@ public class SchedulingResultGraph extends JFrame
 		        endTraffic.setOutlinePaint(Color.ORANGE);
 		        endTraffic.setLabelFont(endTraffic.getLabelFont().deriveFont(Font.BOLD, 12));
 		        plot.addDomainMarker(endTraffic);
+		        
+		        offerLoad.setLabel("OfferLoad");
+		        offerLoad.setPaint(Color.BLACK);
+		        offerLoad.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+		        		10.0F, new float[] {10, 10}, 0.0F));
+		        plot.addRangeMarker(offerLoad);
+		        
 		        
 		        // change the auto tick unit selection to integer units only...
 		        final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();

@@ -68,13 +68,13 @@ public class ApplicationSettingFacade
 	
 	public static class DataRate
 	{
-		private static int max = 0;
+		private static double max = 0;
 		public static List<dataStructure.DataRate> getDataRate()
 		{
 			return _dCong.getDataRates();
 		}
 		
-		public static int getMax()
+		public static double getMax()
 		{
 			if(max == 0)
 			{
@@ -90,9 +90,9 @@ public class ApplicationSettingFacade
 		}
 		
 		
-		public static int getMin()
+		public static double getMin()
 		{
-			int min = Integer.MAX_VALUE;
+			double min = Integer.MAX_VALUE;
 			
 			List<dataStructure.DataRate> rates = getDataRate();
 			for (dataStructure.DataRate r : rates)
@@ -103,7 +103,7 @@ public class ApplicationSettingFacade
 			return min;
 		}
 		
-		public static double getSINRthreshold(int DataRate)
+		public static double getSINRthreshold(double DataRate)
 		{
 			List<dataStructure.DataRate> rates = getDataRate();
 			

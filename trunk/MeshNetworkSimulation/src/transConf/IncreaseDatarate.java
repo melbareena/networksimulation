@@ -24,7 +24,7 @@ public class IncreaseDatarate extends PowerControlUnit
 		//FileGenerator.Power(unit, 0);
 		for (Link l : unit.getLinks())
 		{
-			int currentDataRate = unit.getRate(l);
+			double currentDataRate = unit.getRate(l);
 			T_prime = unit.Clone();
 			if(currentDataRate == ApplicationSettingFacade.DataRate.getMax()) continue;
 				for (DataRate dataRateOBJ : ApplicationSettingFacade.DataRate.getDataRate())

@@ -23,6 +23,7 @@ public class DynamicTrafficGenerator {
 	
 
 	private static double _totalTraffic;
+	
 	public static double totalTraffic()
 	{
 		return (double)Math.round(_totalTraffic * 100000) / 100000;	
@@ -35,7 +36,8 @@ public class DynamicTrafficGenerator {
 	private int downOverUpRatio;
 	private long _seed;
 	
-	
+	public static double offerloadTraffic = 0;
+	private static int  numberOfPackets = 0;
 	private DynamicTrafficGenerator(float lambdamin, float lambdamax, long seed, int downOverUpRatio) {
 		this.lambda_max = lambdamax;
 		this.lambda_min = lambdamin;
@@ -52,7 +54,7 @@ public class DynamicTrafficGenerator {
 				ApplicationSettingFacade.Traffic.getRatio());
 	}
 	
-	
+	private int currentTimeSlot;
 	Traffic generateTraffic(PathMap uplinks, PathMap downlinks) 
 	{
 		List<Vertex> routers = Lists.newArrayList(ApplicationSettingFacade.Router.getRouter().values());
@@ -62,6 +64,13 @@ public class DynamicTrafficGenerator {
 		List<Vertex> geteways = Lists.newArrayList(ApplicationSettingFacade.Gateway.getGateway().values());
 		DownlinkTraffic downlinkTraffic = generateTimeSlotDownlinkTraffic(geteways, downlinks, downOverUpRatio);
 		
+		currentTimeSlot ++;
+		
+		if(currentTimeSlot==49)
+		{
+			System.out.println("Number Of Packets in one second: " + numberOfPackets);
+			offerloadTraffic = calcSpeed(numberOfPackets);
+		}
 	/*	Set<Vertex> selectedNodes = pickUpRandomNodes(nodesToConsider);
 		
 		// Clone the original set of nodes in the uplink PathMap
@@ -158,6 +167,8 @@ public class DynamicTrafficGenerator {
 		        a = a - p;
 		        p = p * lambda / r;
 		    }
+		    
+		    numberOfPackets += r;
 		    return r;
 	}
 	
@@ -176,7 +187,7 @@ public class DynamicTrafficGenerator {
 	
 	private double calcSpeed(double selectedLambda)
 	{
-		double x = selectedLambda * 12000;
+		double x = (selectedLambda / ApplicationSettingFacade.Nodes.getNodes().size()) * 12000;
 		double y = x * 50;
 		return y / (Math.pow(10, 6));
 	}

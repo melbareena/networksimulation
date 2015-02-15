@@ -3,6 +3,7 @@ package dataStructure;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -144,15 +145,20 @@ public class BufferMap implements Map<Link, Buffer>
 		return sorted;
 	}
 
-	public Packet sendPacket(Link link, double dataRate, BufferMap transmissionBuffer, int currentTimeSlot)
+	public List<Packet> sendPacket(Link link, double dataRate, BufferMap transmissionBuffer, int currentTimeSlot)
 	{
 		Buffer b = this.get(link);	
- 		Packet movedPacket = b.send(dataRate, currentTimeSlot);
+ 		List<Packet> movedPackets = b.send(dataRate, currentTimeSlot);
+ 		assert(movedPackets.size() > 0) : "No packets, class: BufferMap, Method: send";
+ 		
+ 		for (Packet p : movedPackets)
+ 		{
+ 			if(!p.isReceived())
+ 				transmissionBuffer.put(p.getCurrentLink(), p);
+ 			this.update();
+		}
 		
-		if(!movedPacket.isReceived())
-			transmissionBuffer.put(movedPacket.getCurrentLink(), movedPacket);
-		this.update();
-		return movedPacket;
+		return movedPackets;
 		
 	}
 	

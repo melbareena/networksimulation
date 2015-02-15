@@ -119,7 +119,7 @@ public abstract class TCBasic
 		
 		if(this.checkRadio(newLink))
 		{
-			if(!balanceGatewayLinks(newLink,tConfig)) return null;
+			//if(!balanceGatewayLinks(newLink,tConfig)) return null;
 			tPrime.putRate(newLink, 0);
 			tPrime.setTCAPZero();
 			

@@ -129,7 +129,7 @@ public class GraphViewer extends JFrame {
 	
 	/** Map containing the Datarates for each Transmission Configuration
 	 * <code>key: configID (integer) -> value: datarate (List)</code>*/
-	private static HashMap<Integer, ArrayList<Integer>> mapDatarates;
+	private static HashMap<Integer, ArrayList<Double>> mapDatarates;
 	private static HashMap<Integer,ArrayList<Double>> mapPowerRate;
 	
 	/* Swing stuff */
@@ -175,9 +175,9 @@ public class GraphViewer extends JFrame {
 	{
 		if(mapDatarates == null) return 0;
 		int sum = 0;
-		for (Entry<Integer, ArrayList<Integer>> items : mapDatarates.entrySet())
+		for (Entry<Integer, ArrayList<Double>> items : mapDatarates.entrySet())
 		{
-			for (Integer rate : items.getValue())
+			for (double rate : items.getValue())
 			{
 				sum += rate;
 			}
@@ -200,13 +200,15 @@ public class GraphViewer extends JFrame {
 		this.setTitle(title);
 		
 		int step = results.getThroughputData().size()/10;
+		
+		if(step == 0) step =1;
 		histogramViewerFrame = new HistogramViewer(results, step);
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() 
 			{
 				SchedulingResultGraph g = new SchedulingResultGraph(results);
-				//histogramViewerFrame.showGraph();
+				histogramViewerFrame.showGraph();
 			}
 		});
 		t.run();
@@ -240,7 +242,7 @@ public class GraphViewer extends JFrame {
 		GraphViewer.mapVertices = new HashMap<Integer, mxCell>();
 		GraphViewer.mapEdges = new HashMap<Integer, Link>();
 		GraphViewer.mapConfigurations = new HashMap<Integer, ArrayList<Integer>>();
-		GraphViewer.mapDatarates = new HashMap<Integer, ArrayList<Integer>>();
+		GraphViewer.mapDatarates = new HashMap<Integer, ArrayList<Double>>();
 		GraphViewer.mapPowerRate = new HashMap<Integer, ArrayList<Double>>();
 
 		getDataAndFillGraph();
@@ -1112,7 +1114,7 @@ public class GraphViewer extends JFrame {
 		int tcuIndex = 0;
 		for(TCUnit tcu : TCFacade.getConfigurations()) {
 			ArrayList<Integer> tabConfig = new ArrayList<Integer>();
-			ArrayList<Integer> tabRates = new ArrayList<Integer>();
+			ArrayList<Double> tabRates = new ArrayList<Double>();
 			ArrayList<Double> tabPower = new ArrayList<Double>();
 			for(dataStructure.Link l : tcu.getLinks()) {
 				tabConfig.add(l.getId());

@@ -149,6 +149,7 @@ public class Program {
 						Program.loadingDialog.setIndeterminate(index-1, true);
 						Program.loadingDialog.setLabel(index-1, "Building user interface...");
 						int step = result.getThroughputData().size()/100;
+						if(step == 0 ) step = 1;
 						HistogramViewer histogramViewerFrame = new HistogramViewer(result, step);
 						histogramViewerFrame.showGraph();
 						histogramViewerFrame.setVisible(true);
