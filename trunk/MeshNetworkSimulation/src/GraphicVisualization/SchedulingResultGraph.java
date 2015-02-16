@@ -1,11 +1,22 @@
 package GraphicVisualization;
 
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Vector;
 
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.border.EmptyBorder;
 
 import launcher.Program;
 
@@ -21,7 +32,9 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.LengthAdjustmentType;
 import org.jfree.ui.RectangleAnchor;
+import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.ui.TextAnchor;
 
@@ -41,23 +54,56 @@ public class SchedulingResultGraph extends JFrame
 	
 	public final Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration() / 50);
 	public final ValueMarker offerLoad = new ValueMarker(DynamicTrafficGenerator.offerloadTraffic);
-	
+	private final ChartPanel chartPanel;
+	private final JPanel contentPane;
 	public SchedulingResultGraph(SchedulingResult result)
 	{
 		super("Scheduling Result");
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+		
 		_sResult = result;
 		final XYDataset dataSet = createDataSet();
         final JFreeChart chart = createChart(dataSet);
-        final ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel = new ChartPanel(chart);
         //chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
-        setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        setContentPane(chartPanel);
+        contentPane.add(chartPanel, BorderLayout.CENTER);
+        
+        
+        buildToolBar();
         showDiagram();
 	}
 
+	private void buildToolBar() {
+		JToolBar toolBar = new JToolBar();
+		toolBar.setFloatable(false);
+		toolBar.setRollover(true);
+		contentPane.add(toolBar, BorderLayout.SOUTH);
+		
+		JLabel lblInfos = new JLabel("<html><u>Total Traffic: </u>" + DynamicTrafficGenerator.totalTraffic() + "Mb"
+				+ "     <u>Average Throughpu: </u>"+ getAverageThorughput() + " Mbps"
+						+ "  <u>Delay: </u> "+ _sResult.getAveragePacketDelay() +" time slots  </html>");
+		lblInfos.setHorizontalAlignment(JLabel.TRAILING);
+		toolBar.add(lblInfos);
+	}
+	private double getAverageThorughput() 
+	{
+		Vector<Double> th = _sResult.getThroughputData();
+		double sum = 0;
+		for(int i = 0; i < th.size() ; i++)
+			sum += th.get(i);
+		double average = (double) sum / th.size();
+		return  (double) Math.round( average * 1000 ) / 1000 ;
+		
+		
+			
+	}
 
 	private void showDiagram()
-	{
+	{ 
 		
         this.pack();
         RefineryUtilities.centerFrameOnScreen(this);
@@ -116,17 +162,14 @@ public class SchedulingResultGraph extends JFrame
 		        endTraffic.setLabelFont(endTraffic.getLabelFont().deriveFont(Font.BOLD, 12));
 		        plot.addDomainMarker(endTraffic);
 		        
-		        offerLoad.setLabel("OfferLoad");
+
 		        offerLoad.setPaint(Color.BLACK);
 		        offerLoad.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 		        		10.0F, new float[] {10, 10}, 0.0F));
 		        plot.addRangeMarker(offerLoad);
 		        
 		        
-		        // change the auto tick unit selection to integer units only...
-		        final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-		        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-		        // OPTIONAL CUSTOMISATION COMPLETED.
+		       
 		                
 		        return chart;
 	}
