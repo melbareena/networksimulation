@@ -477,9 +477,7 @@ public abstract class SchedulingStrategy
 		for(int i = 0; i < packetsDelay.size(); i++) {
 			sum += packetsDelay.get(i);
 		}
-		System.out.println("Somme: "+sum);
-		System.out.println("Mean: "+ (sum / packetsDelay.size()));
-		results.setAveragePacketDelay(sum / packetsDelay.size());
+		results.setAveragePacketDelay(sum );
 		return results;
 	}
 	

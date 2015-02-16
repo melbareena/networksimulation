@@ -66,7 +66,7 @@ public class DynamicTrafficGenerator {
 		
 		currentTimeSlot ++;
 		
-		if(currentTimeSlot==49)
+		if(currentTimeSlot== 49)
 		{
 			System.out.println("Number Of Packets in one second: " + numberOfPackets);
 			offerloadTraffic = calcSpeed(numberOfPackets);
@@ -187,7 +187,8 @@ public class DynamicTrafficGenerator {
 	
 	private double calcSpeed(double selectedLambda)
 	{
-		double x = (selectedLambda / ApplicationSettingFacade.Nodes.getNodes().size()) * 12000;
+		//double x = (selectedLambda / ApplicationSettingFacade.Nodes.getNodes().size()) * 12000;
+		double x = (selectedLambda ) * 12000;
 		double y = x * 50;
 		return y / (Math.pow(10, 6));
 	}
