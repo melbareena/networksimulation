@@ -208,6 +208,7 @@ public class GraphViewer extends JFrame {
 			public void run() 
 			{
 				SchedulingResultGraph g = new SchedulingResultGraph(results);
+				g.createDiagram();
 				histogramViewerFrame.showGraph();
 			}
 		});

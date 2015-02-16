@@ -541,7 +541,7 @@ public class HistogramViewer extends JFrame {
 		/* Source traffic plot and renderer */
 		if(sourceData != null) {
 			plot.setDataset(2, datasetSource);
-			plot.mapDatasetToRangeAxis(2, 2);
+			plot.mapDatasetToRangeAxis(0, 0);
 			plot.setRangeAxis(2, new NumberAxis("Source Traffic"));
 			
 			XYSplineRenderer renderer1 = new XYSplineRenderer();

@@ -72,7 +72,8 @@ public class SchedulingResult {
 				throughputAccumulation = 0;
 			}
 		}
-		
+		if(sourceData.size() % 50 != 0)
+			mbps.add(throughputData.get(throughputData.size() - 1 ));
 		return mbps;
 	}
 
@@ -90,7 +91,8 @@ public class SchedulingResult {
 				slotCounter = 1;
 			}
 		}
-		
+		if(sourceData.size() % 50 != 0)
+			mbps.add(0d);
 		return mbps;
 	}
 
@@ -110,6 +112,8 @@ public class SchedulingResult {
 				slotCounter = 1;
 			}
 		}
+		if(transmitData.size() % 50 != 0)
+			mbps.add(0d);
 		return mbps;
 	}
 
@@ -129,8 +133,9 @@ public class SchedulingResult {
 		return averagePacketDelay;
 	}
 
-	public void setAveragePacketDelay(double averagePacketsDelay) {
-		this.averagePacketDelay = averagePacketsDelay;
+	public void setAveragePacketDelay(double averagePacketsDelay) 
+	{
+		this.averagePacketDelay = (int)(averagePacketsDelay / 50);
 	}
 	
 	public double getAverageThroughputInSteadyState() {

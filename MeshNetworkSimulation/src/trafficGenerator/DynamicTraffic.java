@@ -42,7 +42,7 @@ public class DynamicTraffic
 				_self._dynamicTraffic.put(i, _self._dynamicTrafficGenerator.generateTraffic(uplink, downLink));
 			}
 			
-			
+			System.out.println("Number Of Packets: " + DynamicTrafficGenerator.totalTraffic());
 			System.out.println("Total Traffic: " + DynamicTrafficGenerator.totalTraffic());
 			System.out.println("Total Traffic in TrafficMAP: " + getTotalTrafficInDynamicMap());
 		}
