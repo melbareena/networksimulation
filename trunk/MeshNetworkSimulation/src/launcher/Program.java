@@ -16,6 +16,7 @@ import setting.BaseConfiguration.AppExecMode;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.HistogramViewer;
 import GraphicVisualization.LoadingDialog;
+import GraphicVisualization.SchedulingResultGraph;
 import GraphicVisualization.StartOptionsDialog;
 import dataStructure.Channel;
 import dataStructure.SchedulingResult;
@@ -150,9 +151,8 @@ public class Program {
 						Program.loadingDialog.setLabel(index-1, "Building user interface...");
 						int step = result.getThroughputData().size()/100;
 						if(step == 0 ) step = 1;
-						HistogramViewer histogramViewerFrame = new HistogramViewer(result, step);
-						histogramViewerFrame.showGraph();
-						histogramViewerFrame.setVisible(true);
+						SchedulingResultGraph g = new SchedulingResultGraph(result);
+						g.createDiagram();
 						Program.loadingDialog.setProgress(index-1, 100, "Done!");
 						
 						samplesList.add(result.getThroughputData().size());

@@ -1,6 +1,9 @@
 package trafficGenerator;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -36,8 +39,12 @@ public class DynamicTrafficGenerator {
 	private int downOverUpRatio;
 	private long _seed;
 	
-	public static double offerloadTraffic = 0;
-	private static int  numberOfPackets = 0;
+	public static double _offerloadTraffic = 0;
+	public static int _numPackets = 0;
+	
+	public static Map<Integer, Integer> _timeSlotNode = new HashMap<Integer, Integer>();
+	private static int _numNode = 0;
+	
 	private DynamicTrafficGenerator(float lambdamin, float lambdamax, long seed, int downOverUpRatio) {
 		this.lambda_max = lambdamax;
 		this.lambda_min = lambdamin;
@@ -57,6 +64,9 @@ public class DynamicTrafficGenerator {
 	private int currentTimeSlot;
 	Traffic generateTraffic(PathMap uplinks, PathMap downlinks) 
 	{
+		_numNode = 0;
+		
+		
 		List<Vertex> routers = Lists.newArrayList(ApplicationSettingFacade.Router.getRouter().values());
 		UplinkTraffic uplinkTraffic = generateTimeSlotUplinkTraffic(routers);
 		
@@ -64,13 +74,18 @@ public class DynamicTrafficGenerator {
 		List<Vertex> geteways = Lists.newArrayList(ApplicationSettingFacade.Gateway.getGateway().values());
 		DownlinkTraffic downlinkTraffic = generateTimeSlotDownlinkTraffic(geteways, downlinks, downOverUpRatio);
 		
-		currentTimeSlot ++;
 		
-		if(currentTimeSlot== 49)
+		_timeSlotNode.put(currentTimeSlot, _numNode);
+		
+		
+		
+		if(currentTimeSlot== 1)
 		{
-			System.out.println("Number Of Packets in one second: " + numberOfPackets);
-			offerloadTraffic = calcSpeed(numberOfPackets);
+			System.out.println("Number Of Packets in one second: " + _numPackets);
+			_offerloadTraffic = calcSpeed(_numPackets);
 		}
+		
+		currentTimeSlot ++;
 	/*	Set<Vertex> selectedNodes = pickUpRandomNodes(nodesToConsider);
 		
 		// Clone the original set of nodes in the uplink PathMap
@@ -98,7 +113,7 @@ public class DynamicTrafficGenerator {
 				int numberOfPackets = getPoissonArrival(1);
 				if(numberOfPackets > 0) 
 				{
-					
+					_numNode++;
 					uplinkTraffic.add(router, calcTraffic(numberOfPackets));
 				}
 			}
@@ -122,7 +137,10 @@ public class DynamicTrafficGenerator {
 					Path p = downlinks.get(gateway).get(i);
 					int numberOfPackets = getPoissonArrival(downOverUp);
 					if(numberOfPackets > 0) 
+					{
+						_numNode++;
 						gatewayTrafficMap.put(p.getDestination(), calcTraffic(numberOfPackets));
+					}
 
 				}
 				if(gatewayTrafficMap.size() > 0)
@@ -151,10 +169,10 @@ public class DynamicTrafficGenerator {
 	 * @return the number of packets in each time slot
 	 */
 	
-	private Random random = new Random(_seed);
+	Random random = new Random(_seed);
 	private int getPoissonArrival(int ratio)
 	{
-		
+		 
 		 int r = 0;
 		 double a = random.nextDouble();
 		 
@@ -168,7 +186,7 @@ public class DynamicTrafficGenerator {
 		        p = p * lambda / r;
 		    }
 		    
-		    numberOfPackets += r;
+		    _numPackets += r;
 		    return r;
 	}
 	
@@ -187,8 +205,12 @@ public class DynamicTrafficGenerator {
 	
 	private double calcSpeed(double selectedLambda)
 	{
-		//double x = (selectedLambda / ApplicationSettingFacade.Nodes.getNodes().size()) * 12000;
-		double x = (selectedLambda ) * 12000;
+		int n = 0;
+		for (Entry<Integer, Integer> tn : _timeSlotNode.entrySet())
+			n += tn.getValue();
+		System.out.println("Number of node with traffic in first second: " + n);
+		double x = (selectedLambda / n) * 12000;
+		//double x = (selectedLambda ) * 12000;
 		double y = x * 50;
 		return y / (Math.pow(10, 6));
 	}

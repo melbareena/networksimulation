@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
@@ -24,19 +25,25 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Marker;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYSplineRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.LengthAdjustmentType;
+import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleAnchor;
+import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.ui.TextAnchor;
+import org.jfree.ui.VerticalAlignment;
+import org.jfree.util.ShapeUtilities;
 
 import setting.ApplicationSettingFacade;
 import trafficGenerator.DynamicTrafficGenerator;
@@ -51,23 +58,29 @@ public class SchedulingResultGraph extends JFrame
 	
 	private SchedulingResult _sResult; 
 	private static final long	serialVersionUID	= 1L;
-	
-	public final Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration() / 50);
-	public final ValueMarker offerLoad = new ValueMarker(DynamicTrafficGenerator.offerloadTraffic);
-	private final ChartPanel chartPanel;
-	private final JPanel contentPane;
+	public   Paint white = Color.black;
+	public  Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration() / 50);
+	public  ValueMarker offerLoad = new ValueMarker(DynamicTrafficGenerator._offerloadTraffic);
+	private  ChartPanel chartPanel;
+	private  JPanel contentPane;
+	private JFreeChart chart;
 	public SchedulingResultGraph(SchedulingResult result)
 	{
 		super("Scheduling Result");
+		_sResult = result;
+	}
+
+	public void createDiagram()
+	{
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
 		
-		_sResult = result;
+		
 		final XYDataset dataSet = createDataSet();
-        final JFreeChart chart = createChart(dataSet);
+        chart = createChart(dataSet);
         chartPanel = new ChartPanel(chart);
         //chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
         contentPane.add(chartPanel, BorderLayout.CENTER);
@@ -82,6 +95,18 @@ public class SchedulingResultGraph extends JFrame
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
 		contentPane.add(toolBar, BorderLayout.SOUTH);
+		
+		JButton saveButton = new JButton(
+				new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Save24.gif")));
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GraphViewer.saveImage(contentPane, "Plot");
+			}
+		});
+		toolBar.add(saveButton);
+		
+		toolBar.add(Box.createHorizontalGlue());
 		
 		JLabel lblInfos = new JLabel("<html><u>Total Traffic: </u>" + DynamicTrafficGenerator.totalTraffic() + "Mb"
 				+ "     <u>Average Throughpu: </u>"+ getAverageThorughput() + " Mbps"
@@ -114,18 +139,18 @@ public class SchedulingResultGraph extends JFrame
 
 	private JFreeChart createChart(XYDataset dataSet)
 	{
-		String title = "Channels:"+Program.getAvailableChannels() + "," + "Topology: " + ApplicationSettingFacade.Nodes.getNodes().size()
-				+ ",Power Control: " + ApplicationSettingFacade.PowerControl.isEnable() + ","				
-				+ "TC: " + ApplicationSettingFacade.TranmissionConfiguration.getStertegy().name() + "\n"
-				+ "Scheduling: " + _sResult.getSchedulingStrategy()
+		String title = "Channels:"+Program.getAvailableChannels() +  ",Topology: " + ApplicationSettingFacade.Nodes.getNodes().size()
+				+ ",Power Control: " + ApplicationSettingFacade.PowerControl.isEnable() 		
+				+ ",TC: " + ApplicationSettingFacade.TranmissionConfiguration.getStertegy().name()
+				+ ",Scheduling: " + _sResult.getSchedulingStrategy()
 				;
 		
 		
 		
-		 final JFreeChart chart = ChartFactory.createXYLineChart(
-				 	title,      // chart title
+		  chart = ChartFactory.createXYLineChart(
+				 	"",      // chart title
 		                                
-		            "Time Slots (s)",   // x axis label
+		            "Seconds (s)",   // x axis label
 		            "Average Throughput (Mbps)", // y axis label
 		            dataSet,                  // data
 		            PlotOrientation.VERTICAL,
@@ -134,38 +159,73 @@ public class SchedulingResultGraph extends JFrame
 		            false                     // urls
 		        );
 
+		  TextTitle titleT = new TextTitle(title, new Font("Tahoma", 0, 12),Color.BLACK,RectangleEdge.TOP,HorizontalAlignment.CENTER,VerticalAlignment.CENTER, new RectangleInsets(15, .45, .25, .45));
+		 
+		  chart.setTitle(titleT);
 		        // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
-		        chart.setBackgroundPaint(Color.gray);
+		        chart.setBackgroundPaint(Color.white);
 
-//		        final StandardLegend legend = (StandardLegend) chart.getLegend();
-		  //      legend.setDisplaySeriesShapes(true);
-		        
-		        // get a reference to the plot for further customisation...
 		        final XYPlot plot = chart.getXYPlot();
+		        
+		        final NumberAxis transmitAxis = new NumberAxis("Mega bits");    
+		        plot.setDataset(2,createTransmitDataSet());
+		        final NumberAxis sourceAxis = new NumberAxis("Mega bits");
+		        plot.setDataset(1,createSourceDataSet());
+		        
+		        ValueAxis thAxis = plot.getRangeAxis(0);
+		        thAxis.setRange(0, getMaxRange());
+		         
+		       
+		        sourceAxis.setRange(0, getMaxRange());
+		         plot.setRangeAxis(1, sourceAxis);
+		         
+		         
+		         
+		        
+		        transmitAxis.setRange(0, getMaxRange());
+		        plot.setRangeAxis(2, transmitAxis);
+		        
+		       // plot.setRangeAxis(2, bufferAxis);
+		        plot.mapDatasetToRangeAxis(1, 1);
 		        plot.setBackgroundPaint(Color.lightGray);
 		        plot.setDomainGridlinePaint(Color.white);
 		        plot.setRangeGridlinePaint(Color.white);
 		        plot.setRangeGridlinesVisible(true);
 		        
-		        final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-
-		        plot.setRenderer(renderer);
-
+		        XYSplineRenderer rendererTh = new XYSplineRenderer();		
+		        rendererTh.setSeriesShape(0, ShapeUtilities.createDiagonalCross(3.0F, 0.5F));
+				plot.setRenderer(0, rendererTh);
+		        
+		        XYSplineRenderer rendererSou = new XYSplineRenderer();		
+		        rendererSou.setSeriesShape(1, ShapeUtilities.createUpTriangle(3.0F));
+				plot.setRenderer(1, rendererSou);
+				
+				 XYSplineRenderer rendererTrans = new XYSplineRenderer();		
+				 rendererTrans.setSeriesShape(2, ShapeUtilities.createDownTriangle(3.0F));
+			     plot.setRenderer(2, rendererTrans);
+		        
+		        changeColor(0, Color. BLUE);
+		        changeColor(1, Color.GREEN);
+		        changeColor(2, Color.RED);
 		        
 		        endTraffic.setPaint(Color.MAGENTA);
-		        
+		        endTraffic.setLabel("End Traffic");
 		        endTraffic.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 		        		10.0F, new float[] {10, 10}, 0.0F));
-		        endTraffic.setLabelAnchor(RectangleAnchor.TOP_RIGHT);
-		        endTraffic.setLabelTextAnchor(TextAnchor.TOP_LEFT);
-		        endTraffic.setOutlinePaint(Color.ORANGE);
+		        endTraffic.setLabelAnchor(RectangleAnchor.BOTTOM_RIGHT);
+		        endTraffic.setLabelTextAnchor(TextAnchor.BOTTOM_LEFT);
 		        endTraffic.setLabelFont(endTraffic.getLabelFont().deriveFont(Font.BOLD, 12));
+		        endTraffic.setPaint(Color.MAGENTA);
 		        plot.addDomainMarker(endTraffic);
 		        
 
 		        offerLoad.setPaint(Color.BLACK);
 		        offerLoad.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 		        		10.0F, new float[] {10, 10}, 0.0F));
+		        offerLoad.setLabel("Offered Load");
+		        offerLoad.setLabelAnchor(RectangleAnchor.BOTTOM_LEFT);
+		        offerLoad.setLabelTextAnchor(TextAnchor.TOP_LEFT);
+		        offerLoad.setLabelFont(offerLoad.getLabelFont().deriveFont(Font.BOLD, 12));
 		        plot.addRangeMarker(offerLoad);
 		        
 		        
@@ -175,6 +235,22 @@ public class SchedulingResultGraph extends JFrame
 	}
 
 
+	private void changeColor(int index, Color c)
+	{
+		XYPlot plot = chart.getXYPlot();
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(index);
+		renderer.setSeriesPaint(0, c);
+		plot.setRenderer(index,renderer);
+		ValueAxis axis0 = plot.getRangeAxis(index);
+		axis0.setAxisLinePaint(c);
+		axis0.setLabelPaint(c);
+		axis0.setTickLabelPaint(c);
+		axis0.setTickMarkPaint(c);
+		plot.setRangeAxis(index, axis0);	
+	}
+
+	
+	private double maxThroughput  = 0;
 	private XYDataset createDataSet()
 	{
 		//first throughput
@@ -184,34 +260,73 @@ public class SchedulingResultGraph extends JFrame
 		
 		for (Double t : _sResult.getThroughputData())
 		{
+			if(t> maxThroughput)
+				maxThroughput = t;
 			throughputSeries.add(timeIndex,t);
 			timeIndex++;
 		}
 
-		final XYSeries sourceDataSeries = new XYSeries("Source Traffic");
-		timeIndex = 0;
-		for (Double t : _sResult.getSourceData())
-		{
-			sourceDataSeries.add(timeIndex,t);
-			timeIndex++;
-		}
 		
-		final XYSeries transmitDataSeries = new XYSeries("Transmit Traffic");
-		timeIndex = 0;
-		for (Double t : _sResult.getTransmitData())
-		{
-			transmitDataSeries.add(timeIndex,t);
-			timeIndex++;
-		}
+		
+	/*	*/
 		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(throughputSeries);
-        dataset.addSeries(sourceDataSeries);
-        dataset.addSeries(transmitDataSeries);
+       // dataset.addSeries(sourceDataSeries);
+        //dataset.addSeries(transmitDataSeries);
                 
         return dataset;
 		
 		
+	}
+	private double maxSource = 0;
+	private XYDataset createSourceDataSet()
+	{
+		final XYSeries sourceDataSeries = new XYSeries("Source Traffic");
+		int timeIndex = 0;
+		for (Double t : _sResult.getSourceData())
+		{
+			if(t > maxSource) maxSource = t;
+			sourceDataSeries.add(timeIndex,t);
+			timeIndex++;
+		}
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(sourceDataSeries);
+                
+        return dataset;
+	
+	
+	}
+	
+	private double maxTransmit  = 0 ;
+	private XYDataset createTransmitDataSet()
+	{
+
+		final XYSeries transmitDataSeries = new XYSeries("Transmit Traffic");
+		int timeIndex = 0;
+		for (Double t : _sResult.getTransmitData())
+		{
+			if(t> maxTransmit) maxTransmit = t;
+			transmitDataSeries.add(timeIndex,t);
+			timeIndex++;
+		}
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(transmitDataSeries);       
+        return dataset;
+	
+	
+	}
+	private double getMaxRange()
+	{
+		return getMax() + (getMax() / 10);
+	}
+	private double getMax()
+	{
+		if(maxSource > maxThroughput && maxSource > maxTransmit)
+			return maxSource;
+		if(maxThroughput > maxSource && maxThroughput > maxTransmit)
+			return maxThroughput;
+		return maxTransmit;
 	}
 
 }
