@@ -266,6 +266,7 @@ public class TrafficEstimatingFacade
 				optimalTrafficLinks.put(links.getKey(),links.getValue());
 			}
 		}
+		System.out.println("Size::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" + optimalLinks.size());
 		FileGenerator.optimalLinksInFile(optimalLinks);
 		return optimalTrafficLinks;
 	}
