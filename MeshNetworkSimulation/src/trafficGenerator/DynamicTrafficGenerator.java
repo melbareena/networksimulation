@@ -34,16 +34,11 @@ public class DynamicTrafficGenerator {
 	
 	private float lambda_max;
 	private float lambda_min;
-	
-	
 	private int downOverUpRatio;
 	private long _seed;
 	
 	public static double _offerloadTraffic = 0;
 	public static int _numPackets = 0;
-	
-	public static Map<Integer, Integer> _timeSlotNode = new HashMap<Integer, Integer>();
-	private static int _numNode = 0;
 	
 	private DynamicTrafficGenerator(float lambdamin, float lambdamax, long seed, int downOverUpRatio) {
 		this.lambda_max = lambdamax;
@@ -64,8 +59,6 @@ public class DynamicTrafficGenerator {
 	private int currentTimeSlot;
 	Traffic generateTraffic(PathMap uplinks, PathMap downlinks) 
 	{
-		_numNode = 0;
-		
 		
 		List<Vertex> routers = Lists.newArrayList(ApplicationSettingFacade.Router.getRouter().values());
 		UplinkTraffic uplinkTraffic = generateTimeSlotUplinkTraffic(routers);
@@ -75,11 +68,7 @@ public class DynamicTrafficGenerator {
 		DownlinkTraffic downlinkTraffic = generateTimeSlotDownlinkTraffic(geteways, downlinks, downOverUpRatio);
 		
 		
-		_timeSlotNode.put(currentTimeSlot, _numNode);
-		
-		
-		
-		if(currentTimeSlot== 1)
+		if(currentTimeSlot==49)
 		{
 			System.out.println("Number Of Packets in one second: " + _numPackets);
 			_offerloadTraffic = calcSpeed(_numPackets);
@@ -113,7 +102,6 @@ public class DynamicTrafficGenerator {
 				int numberOfPackets = getPoissonArrival(1);
 				if(numberOfPackets > 0) 
 				{
-					_numNode++;
 					uplinkTraffic.add(router, calcTraffic(numberOfPackets));
 				}
 			}
@@ -138,7 +126,6 @@ public class DynamicTrafficGenerator {
 					int numberOfPackets = getPoissonArrival(downOverUp);
 					if(numberOfPackets > 0) 
 					{
-						_numNode++;
 						gatewayTrafficMap.put(p.getDestination(), calcTraffic(numberOfPackets));
 					}
 
@@ -203,16 +190,11 @@ public class DynamicTrafficGenerator {
 		return traffic;
 	}
 	
-	private double calcSpeed(double selectedLambda)
+	private double calcSpeed(double numberOfPackets)
 	{
-		int n = 0;
-		for (Entry<Integer, Integer> tn : _timeSlotNode.entrySet())
-			n += tn.getValue();
-		System.out.println("Number of node with traffic in first second: " + n);
-		double x = (selectedLambda / n) * 12000;
-		//double x = (selectedLambda ) * 12000;
-		double y = x * 50;
-		return y / (Math.pow(10, 6));
+		double x = (numberOfPackets ) * 12000;
+		double rate = x / (Math.pow(10, 6));
+		return rate;
 	}
 
 }
