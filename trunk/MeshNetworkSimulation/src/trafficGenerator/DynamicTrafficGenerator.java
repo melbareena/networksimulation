@@ -20,43 +20,85 @@ import dataStructure.Vertex;
 
 /** Produces dynamic traffic for the network, with poisson arrival for the packets.
  * @author Mahdi
- * @version 1.1
+ * @version 2
  */
 public class DynamicTrafficGenerator {
 	
+	
+	/**
+	 * Internal Veriables
+	 */
 
-	private static double _totalTraffic;
+	public static double _offerloadTraffic = 0;
+	public static int _numPackets = 0;
 	
 	public static double totalTraffic()
 	{
 		return (double)Math.round(_totalTraffic * 100000) / 100000;	
 	}
 	
-	private float lambda_max;
-	private float lambda_min;
-	private int downOverUpRatio;
-	private long _seed;
 	
-	public static double _offerloadTraffic = 0;
-	public static int _numPackets = 0;
+	private static double _totalTraffic;
 	
-	private DynamicTrafficGenerator(float lambdamin, float lambdamax, long seed, int downOverUpRatio) {
-		this.lambda_max = lambdamax;
-		this.lambda_min = lambdamin;
-		//this.nodesToConsider = nodesToConsider;
-		this.downOverUpRatio = downOverUpRatio;
-		this._seed = seed;
+	
+	static Map<Vertex, Double> _nodesRates;
+	
+	private static Map<Vertex, Double> _nodesLambda;
+	
+	private static float _lambda_max = ApplicationSettingFacade.Traffic.getLambdaMax();
+	private static float _lambda_min = ApplicationSettingFacade.Traffic.getLambdaMin();
+	private static int _downOverUpRatio = ApplicationSettingFacade.Traffic.getRatio();
+	private static long _seed = ApplicationSettingFacade.Traffic.getSeed();
+	private static Random  random = new Random(_seed);
+	
+	
+	private static double generateLambda(int ratio)
+	{
+		return random.nextFloat() * ( (_lambda_max * ratio) - (_lambda_min * ratio) ) + (_lambda_min * ratio);
 	}
 	
 	
-	public DynamicTrafficGenerator() {
-		this(ApplicationSettingFacade.Traffic.getLambdaMax(),
-				ApplicationSettingFacade.Traffic.getLambdaMin(),
-				ApplicationSettingFacade.Traffic.getSeed(),
-				ApplicationSettingFacade.Traffic.getRatio());
+	private static Map<Vertex, Double> getNodeLambda()
+	{
+		if(_nodesLambda == null)
+		{
+			_nodesLambda = new HashMap<Vertex, Double>();
+			
+			for (Vertex router :  ApplicationSettingFacade.Router.getRouter().values())
+				_nodesLambda.put(router, generateLambda(1));
+			
+			for(Vertex gateway : ApplicationSettingFacade.Gateway.getGateway().values())
+				_nodesLambda.put(gateway, generateLambda(_downOverUpRatio));
+			
+			_nodesRates = calcRates();
+		}
+		return _nodesLambda;
 	}
+
+	private static double sumRate = 0;
+	private static Map<Vertex, Double> calcRates()
+	{
+		
+		if(_nodesRates != null) return _nodesRates;
+		
+		 Map<Vertex, Double> ratesMap = new HashMap<Vertex, Double>();
+		 
+		 for(Entry<Vertex, Double> numPackets : _nodesLambda.entrySet())
+		 {
+			 double x = numPackets.getValue() * 12000;
+			 double rate = x / (Math.pow(10, 6));
+			sumRate += rate;
+			 ratesMap.put(numPackets.getKey(), rate);
+		 }
+		 System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + sumRate);
+		 return ratesMap;
+		
+	}
+
+
+	private static int currentTimeSlot;
 	
-	private int currentTimeSlot;
+	
 	Traffic generateTraffic(PathMap uplinks, PathMap downlinks) 
 	{
 		
@@ -65,7 +107,7 @@ public class DynamicTrafficGenerator {
 		
 		
 		List<Vertex> geteways = Lists.newArrayList(ApplicationSettingFacade.Gateway.getGateway().values());
-		DownlinkTraffic downlinkTraffic = generateTimeSlotDownlinkTraffic(geteways, downlinks, downOverUpRatio);
+		DownlinkTraffic downlinkTraffic = generateTimeSlotDownlinkTraffic(geteways, downlinks, _downOverUpRatio);
 		
 		
 		if(currentTimeSlot==49)
@@ -75,20 +117,7 @@ public class DynamicTrafficGenerator {
 		}
 		
 		currentTimeSlot ++;
-	/*	Set<Vertex> selectedNodes = pickUpRandomNodes(nodesToConsider);
-		
-		// Clone the original set of nodes in the uplink PathMap
-		Set<Vertex> cloneUplinks = new HashSet<Vertex>(uplinks.keySet());
-		// Intersect the set of nodes with the selectedNodes set
-		cloneUplinks.retainAll(selectedNodes);
-		UplinkTraffic uplinkTraffic = generateTimeSlotUplinkTraffic(cloneUplinks);
-		
-		// Clone the original set of nodes in the downlink PathMap
-		Set<Vertex> cloneDownlinks = new HashSet<Vertex>(downlinks.keySet());
-		// Intersect the set of nodes with the selectedNodes set
-		cloneDownlinks.retainAll(selectedNodes);
-		
-		*/
+	
 		return new Traffic(uplinkTraffic, downlinkTraffic);
 	}
 	
@@ -99,7 +128,7 @@ public class DynamicTrafficGenerator {
 		{
 			for(Vertex router : routers)
 			{
-				int numberOfPackets = getPoissonArrival(1);
+				int numberOfPackets = getPoissonArrival(router);
 				if(numberOfPackets > 0) 
 				{
 					uplinkTraffic.add(router, calcTraffic(numberOfPackets));
@@ -123,7 +152,7 @@ public class DynamicTrafficGenerator {
 				for(int i = 0; i < downlinks.get(gateway).size() ; i++)
 				{
 					Path p = downlinks.get(gateway).get(i);
-					int numberOfPackets = getPoissonArrival(downOverUp);
+					int numberOfPackets = getPoissonArrival(gateway);
 					if(numberOfPackets > 0) 
 					{
 						gatewayTrafficMap.put(p.getDestination(), calcTraffic(numberOfPackets));
@@ -137,33 +166,14 @@ public class DynamicTrafficGenerator {
 		return downlinkTraffic;
 	}
 	
-	/**Picks up randomly <code>n</code> nodes from the set of all nodes,
-	 * and return them.
-	 * @param n The number of nodes to pick up.
-	 * @return A list of <code>n</code> randomly chosen.
-	 
-	private Set<Vertex> pickUpRandomNodes(int n) {
-		List<Vertex> shuffledList = Lists.newArrayList(ApplicationSettingFacade.Nodes.getNodes().values());
-		//Collections.shuffle(shuffledList, this.randomGenerator);
-		//return Sets.newHashSet(shuffledList.subList(0, n));
-		
-		return Sets.newHashSet(shuffledList);
-	}*/
 	
-	/**
-	 * 
-	 * @param ratio : refers to ratio of downlink traffic over uplink traffic
-	 * @return the number of packets in each time slot
-	 */
-	
-	Random random = new Random(_seed);
-	private int getPoissonArrival(int ratio)
+	private int getPoissonArrival(Vertex sender)
 	{
 		 
 		 int r = 0;
 		 double a = random.nextDouble();
 		 
-		 double lambda = random.nextFloat() * ( (lambda_max * ratio) - (lambda_min * ratio) ) + (lambda_min * ratio);
+		 double lambda = getNodeLambda().get(sender);
 
 		 double p = Math.exp(-lambda);
 
