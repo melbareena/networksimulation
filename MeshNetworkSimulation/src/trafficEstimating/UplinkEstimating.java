@@ -92,8 +92,13 @@ class UplinkEstimating
 					
 			Vertex router = tULv.getKey();
 			
-			Double trafficV = tULv.getValue();
-				
+			
+			
+			Double trafficV =  dyTraffic.NodesRates.get(router);
+			
+			
+			
+			
  			List<Path> paths = this.UplinkPaths.get(router);
 	
 			List<UplinkPathTraffic> pathsTraffic = getTrafficOfPath(paths);

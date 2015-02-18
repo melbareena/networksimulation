@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import common.FileGenerator;
-
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
 import dataStructure.*;
@@ -22,7 +21,7 @@ public class DynamicTraffic
 	private final DynamicTrafficGenerator _dynamicTrafficGenerator = new DynamicTrafficGenerator();
 	
 	public double offerLoadTraffic = 0;
-	
+	public Map<Vertex, Double> NodesRates;
 	public Traffic getDynamicTraffic(int timeSlot)
 	{
 		Traffic t = _dynamicTraffic.get(timeSlot).clone();	
@@ -41,7 +40,7 @@ public class DynamicTraffic
 			{
 				_self._dynamicTraffic.put(i, _self._dynamicTrafficGenerator.generateTraffic(uplink, downLink));
 			}
-			
+			_self.NodesRates = DynamicTrafficGenerator._nodesRates;
 			System.out.println("Number Of Packets: " + DynamicTrafficGenerator.totalTraffic());
 			System.out.println("Total Traffic: " + DynamicTrafficGenerator.totalTraffic());
 			System.out.println("Total Traffic in TrafficMAP: " + getTotalTrafficInDynamicMap());

@@ -81,8 +81,10 @@ class DownlinkEstimating
 				Vertex  destination = path.getDestination();			
 				if(dynamicTraffic.containsKey(source) && dynamicTraffic.get(source).containsKey(destination))
 				{
-						Double traffic  = dynamicTraffic.get(path.getSource()).get(path.getDestination());
+						//Double traffic  = dynamicTraffic.get(path.getSource()).get(path.getDestination());
 						
+					Double traffic = dyTraffic.NodesRates.get(source);
+					
 						for (Link edge : path.getEdgePath())	
 							dl_Traffic_l.put(edge, traffic);	
 				}
