@@ -22,17 +22,17 @@ import dataStructure.Vertex;
  * @author Mahdi
  * @version 2
  */
-public class DynamicTrafficGenerator {
+class DynamicTrafficGenerator {
 	
 	
 	/**
 	 * Internal Veriables
 	 */
 
-	public static double _offerloadTraffic = 0;
-	public static int _numPackets = 0;
+	static double _offerloadTraffic = 0;
+	static int _numPackets = 0;
 	
-	public static double totalTraffic()
+	static double totalTraffic()
 	{
 		return (double)Math.round(_totalTraffic * 100000) / 100000;	
 	}
@@ -75,7 +75,6 @@ public class DynamicTrafficGenerator {
 		return _nodesLambda;
 	}
 
-	private static double sumRate = 0;
 	private static Map<Vertex, Double> calcRates()
 	{
 		
@@ -87,10 +86,8 @@ public class DynamicTrafficGenerator {
 		 {
 			 double x = numPackets.getValue() * 12000;
 			 double rate = x / (Math.pow(10, 6));
-			sumRate += rate;
 			 ratesMap.put(numPackets.getKey(), rate);
 		 }
-		 System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + sumRate);
 		 return ratesMap;
 		
 	}

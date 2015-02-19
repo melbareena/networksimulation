@@ -11,7 +11,7 @@ import java.util.TreeSet;
 import common.IntermediateOutput;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
-import trafficGenerator.DynamicTraffic;
+import trafficGenerator.DTGFacade;
 import trafficGenerator.StaticTraffic;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
@@ -78,7 +78,7 @@ class UplinkEstimating
 
 	private LinkTrafficMap dynamicEstimating()
 	{
-		DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
+		DTGFacade dyTraffic = DTGFacade.Initilization();
 		UplinkPaths = TopologyGraphFacade.getOptimalUplinkPaths();
 		
 		
@@ -93,7 +93,7 @@ class UplinkEstimating
 			Vertex router = tULv.getKey();
 			
 			
-			
+			//Double trafficV = tULv.getValue();
 			Double trafficV =  dyTraffic.NodesRates.get(router);
 			
 			

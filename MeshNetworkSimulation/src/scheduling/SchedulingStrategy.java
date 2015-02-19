@@ -12,8 +12,7 @@ import common.FileGenerator;
 import common.PrintConsole;
 import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
-import trafficGenerator.DynamicTraffic;
-import trafficGenerator.DynamicTrafficGenerator;
+import trafficGenerator.DTGFacade;
 import transConf.TCFacade;
 import dataStructure.Buffer;
 import dataStructure.BufferMap;
@@ -30,9 +29,7 @@ public abstract class SchedulingStrategy
 	protected BufferMap sourceBuffers;
 	protected BufferMap transmitBuffers;
 	protected List<TCUnit> configurations;
-	
-	/** The generator used to generate dynamically some new traffic in the network. */
-	protected DynamicTrafficGenerator dynamicTrafficGenerator;
+
 	
 	/* For collecting results */
 	protected Vector<Double> throughput;
@@ -212,12 +209,13 @@ public abstract class SchedulingStrategy
 		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating) 
 		{
 			double slotThroughtput = 0;
-			
+			int slotDelay = 0;
 			//both of buffers are empty 
 			if(sourceBuffers.trafficSize() == 0 && transmitBuffers.trafficSize() == 0)
 			{
 				timeSlot++;
 				throughput.add(0d);
+				packetsDelay.add(0);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
 				if(timeSlot < durationOfTrafficGenerating)
@@ -248,13 +246,14 @@ public abstract class SchedulingStrategy
 									{
 										double movedTraffic = moved.getTraffic();
 										if(!moved.isFragment())
-											packetsDelay.add(moved.getDelay());
+											slotDelay += moved.getDelay();
 										slotThroughtput += movedTraffic;
 										tcunit.addThroughput(movedTraffic);
 									}						
 							}
 						}
 						throughput.add(slotThroughtput);
+						packetsDelay.add(slotDelay);
 						trafficSource.add(sourceBuffers.trafficSize());
 						trafficTransit.add(transmitBuffers.trafficSize());
 						timeSlot++;
@@ -279,6 +278,7 @@ public abstract class SchedulingStrategy
 		 			for (TCUnit tcunit : transmissionConfigurations)
 		 			{
 						slotThroughtput = 0;
+						slotDelay = 0;
 						for (Link link : tcunit.getLinks())
 						{
 							if(transmitBuffers.containsKey(link)) 
@@ -292,7 +292,7 @@ public abstract class SchedulingStrategy
 									{
 										double movedTraffic = moved.getTraffic();
 										if(!moved.isFragment()) 
-											packetsDelay.add(moved.getDelay());
+											slotDelay +=moved.getDelay();
 										slotThroughtput += movedTraffic;
 										tcunit.addThroughput(movedTraffic);
 									}
@@ -301,6 +301,7 @@ public abstract class SchedulingStrategy
 							}
 						}
 						throughput.add(slotThroughtput);
+						packetsDelay.add(slotDelay);
 						trafficSource.add(sourceBuffers.trafficSize());
 						trafficTransit.add(transmitBuffers.trafficSize());
 						timeSlot++;
@@ -322,8 +323,8 @@ public abstract class SchedulingStrategy
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
 		
-		assert(accumulationOfThroughput() == DynamicTraffic.getTotalTrafficInDynamicMap() && accumulationOfThroughput() == DynamicTrafficGenerator.totalTraffic())
-		: "throughput is not valid \n traffic in MAP:" +  DynamicTraffic.getTotalTrafficInDynamicMap() + " Throughput =" + accumulationOfThroughput();
+		assert(accumulationOfThroughput() == DTGFacade.getTotalReaffic())
+		: "throughput is not valid \n traffic in MAP:" +  DTGFacade.getTotalReaffic() + " Throughput =" + accumulationOfThroughput();
 
 		
 		return getResults();

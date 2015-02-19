@@ -448,7 +448,7 @@ public class HistogramViewer extends JFrame {
 				+"<u>Average packet delay:</u> <em>"
 				+ String.format("%,d", Math.round(results.getAveragePacketDelay())) + " timeslots"
 				+"</em>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;"
-				+"<em>"+String.format("%,d", samplesNumber)+"</em> Time slots, Average Throuhgput: " + String.format("%f2", results.getAverageThroughput())  + " Mbps </html>");
+				+"<em>"+String.format("%,d", samplesNumber)+"</em> Time slots, Average Throuhgput: " + String.format("%f2", results.getAverageThorughput())  + " Mbps </html>");
 		lblInfos.setHorizontalAlignment(JLabel.TRAILING);
 		toolBar.add(lblInfos);
 	}

@@ -48,6 +48,12 @@ public class SchedulingResult {
 		this.totalTrafficGenerated = totalTrafficGenerated;
 	}
 
+	
+	public Vector<Double> getThroughputPerTimeSlot()
+	{
+		return throughputData;
+	}
+	
 	/**
 	 * 
 	 * @return return throughput in Mbps
@@ -57,9 +63,9 @@ public class SchedulingResult {
 		
 		Vector<Double> mbps = new Vector<Double>();
 		
-		mbps.add(throughputData.get(0));
+		mbps.add(0d);
 		
-		int slotCounter = 1;
+		int slotCounter = 0;
 		double throughputAccumulation = 0;
 		for (Double slotT : throughputData)
 		{
@@ -68,52 +74,60 @@ public class SchedulingResult {
 			if(slotCounter == 50)
 			{
 				mbps.add(throughputAccumulation);
-				slotCounter = 1;
+				slotCounter = 0;
 				throughputAccumulation = 0;
 			}
 		}
-		if(sourceData.size() % 50 != 0)
-			mbps.add(throughputData.get(throughputData.size() - 1 ));
 		return mbps;
 	}
 
 	public Vector<Double> getSourceData() 
 	{
 		Vector<Double> mbps = new Vector<Double>();
-		mbps.add(sourceData.get(0));
-		int slotCounter = 1;
+		mbps.add(0d);
+		int slotCounter = 0;
 		for (Double slotT : sourceData)
 		{
 			slotCounter++;
 			if(slotCounter == 50)
 			{
 				mbps.add(slotT);
-				slotCounter = 1;
+				slotCounter = 0;
 			}
 		}
-		if(sourceData.size() % 50 != 0)
-			mbps.add(0d);
+
 		return mbps;
 	}
-
+	public double getAverageThorughput() 
+	{
+		Vector<Double> th = getThroughputData();
+		double sum = 0;
+		int index = 0;
+		int limit = (int) (ApplicationSettingFacade.Traffic.getDuration() / 50);
+		for(index = 0; index < limit ; index++)
+			sum += th.get(index);
+		double average = (double) sum / (limit);
+		return  (double) Math.round( average * 1000 ) / 1000 ;
+		
+		
+			
+	}
 	public Vector<Double> getTransmitData() 
 	{
 		
 		
 		Vector<Double> mbps = new Vector<Double>();
-		mbps.add(transmitData.get(0));
-		int slotCounter = 1;
+		mbps.add(0d);
+		int slotCounter = 0;
 		for (Double slotT : transmitData)
 		{
 			slotCounter++;
 			if(slotCounter == 50)
 			{
 				mbps.add(slotT);
-				slotCounter = 1;
+				slotCounter = 0;
 			}
 		}
-		if(transmitData.size() % 50 != 0)
-			mbps.add(0d);
 		return mbps;
 	}
 
@@ -135,7 +149,7 @@ public class SchedulingResult {
 
 	public void setAveragePacketDelay(double averagePacketsDelay) 
 	{
-		this.averagePacketDelay = (int)(averagePacketsDelay / 50);
+		this.averagePacketDelay = (int)(averagePacketsDelay);
 	}
 	
 	public double getAverageThroughputInSteadyState() {
@@ -145,9 +159,14 @@ public class SchedulingResult {
         }
         return sum / ApplicationSettingFacade.Traffic.getDuration();
 	}
-	public double getAverageThroughput()
+	public double getDelay()
 	{
-		return getTotalTrafficGenerated() / throughputData.size();
+		long actualStopTime = getThroughputPerTimeSlot().size();
+		long stopTime = ApplicationSettingFacade.Traffic.getDuration();
+		
+		long delaySlot = actualStopTime - stopTime;
+		return (double) delaySlot / 50;
 	}
+
 
 }

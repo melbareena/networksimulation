@@ -136,7 +136,6 @@ public class AssigningSterategy {
 															// ∑RI_l (l′)
 			channelAffectSet.put(chan, affect);
 		}
-		FileGenerator.Affectance(channelAffectSet, currentLink);
 		Channel actualChannel = getActualChannel(channelAffectSet);
 		return actualChannel;
 	}
