@@ -9,7 +9,7 @@ import java.util.Vector;
 import common.FileGenerator;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
-import trafficGenerator.DynamicTraffic;
+import trafficGenerator.DTGFacade;
 import dataStructure.BufferMap;
 import dataStructure.DownlinkTraffic;
 import dataStructure.LinkType;
@@ -30,7 +30,7 @@ public class TrafficEstimatingFacade
 	private static List<Link> optimalLinks; 
 	
 	
-	private static DynamicTraffic dyTraffic = DynamicTraffic.Initilization();
+	private static DTGFacade dyTraffic = DTGFacade.Initilization();
 	
 	
 	public static BufferMap getSourceBuffers(int currentTimeslot)

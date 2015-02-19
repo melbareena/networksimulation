@@ -9,7 +9,6 @@ public class Packet implements Comparable<Packet>
 	private LinkedList<Link> packetPath;
 	private Vertex currentNode;
 	private double traffic;
-	
 	private int dateOfBirth;
 	private int dateOfDeath;
 	
@@ -62,8 +61,9 @@ public class Packet implements Comparable<Packet>
 		return this.orginalPath;
 	}
 	
-	public int getDelay() {
-		return isReceived ? Math.max(dateOfDeath - dateOfBirth, 0) : 0;
+	public int getDelay()
+	{
+		return isReceived ? Math.max( ((dateOfDeath - dateOfBirth ) - orginalPath.getEdgePath().size()), 0) : 0;
 	}
 	
 	public double getTraffic()

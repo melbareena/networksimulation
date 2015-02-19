@@ -14,7 +14,6 @@ import scheduling.SchedulingFacade;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.AppExecMode;
 import GraphicVisualization.GraphViewer;
-import GraphicVisualization.HistogramViewer;
 import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.SchedulingResultGraph;
 import GraphicVisualization.StartOptionsDialog;

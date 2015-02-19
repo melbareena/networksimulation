@@ -412,7 +412,29 @@ public class FileGenerator
 		
 	}
 
-
+	private static Vector<Double> toMegaBits(Vector<Double> bits)
+	{
+	
+			
+			Vector<Double> mbps = new Vector<Double>();
+			
+			mbps.add(0d);
+			
+			int slotCounter = 0;
+			double throughputAccumulation = 0;
+			for (Double slotT : bits)
+			{
+				throughputAccumulation += slotT;
+				slotCounter++;
+				if(slotCounter == 50)
+				{
+					mbps.add(throughputAccumulation);
+					slotCounter = 0;
+					throughputAccumulation = 0;
+				}
+			}
+			return mbps;
+	}
 	public static void Throughput(Vector<Double> throughput)
 	{
 		//if(!ISFILEENABLE) return;
@@ -454,7 +476,7 @@ public class FileGenerator
 					path = FileGenerator.class.getResource("/output/").getPath();
 				}
 				BufferedWriter writer = new BufferedWriter(new FileWriter(path + fileName));
-				for (Double th : throughput)
+				for (Double th : toMegaBits(throughput))
 				{		
 						writer.write(th +"");
 						writer.newLine();
@@ -596,68 +618,40 @@ public class FileGenerator
 	}
 
 
-	public static void Affectance(Map<Channel, Double> channelAffectSet,
-			Link currentLink)
-	{
-		if(!ISFILEENABLE) return;
-		
-		try
-		{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "/affectance/" +currentLink.getId() + ".txt"));
-			for (Entry<Channel, Double> chAffectance : channelAffectSet.entrySet())
-			{
-				writer.write(chAffectance.getKey().getChannel() + ": " + chAffectance.getValue());
-				writer.newLine();
-			}
-
-			writer.close();
-			//PrintConsole.printErr("Affectance for links inserted in file successfully.");
-		} 
-		catch (Exception ex)
-		{
-			//System.err.println("Affectance/FileGenerator/Message:" + ex.getMessage());
-		}
-		
-		
-	}
-
-
-	
-
-
 	public static void seceduleResult(SchedulingResult[] results)
 	{
 		
 			
-			DecimalFormat df = new DecimalFormat();
-			df.setMaximumFractionDigits(2);
-			StringBuilder throughputBuilder = new StringBuilder();
-			StringBuilder delayBuilder = new StringBuilder();
-			for (int i = results.length - 1 ; i >= 0 ; i--)
+
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(2);
+		StringBuilder throughputBuilder = new StringBuilder();
+		StringBuilder delayBuilder = new StringBuilder();
+		for (int i = results.length - 1 ; i >= 0 ; i--)
+		{
+			SchedulingResult sr = results[i];
+			throughputBuilder.append(df.format(sr.getAverageThorughput())  );
+			throughputBuilder.append(System.lineSeparator());
+			delayBuilder.append(((double)sr.getDelay()));
+			delayBuilder.append(System.lineSeparator());
+			
+		}
+			try
 			{
-				SchedulingResult sr = results[i];
-				throughputBuilder.append(df.format(sr.getAverageThroughput())  );
-				throughputBuilder.append(System.lineSeparator());
-				delayBuilder.append(((int)sr.getAveragePacketDelay()));
-				delayBuilder.append(System.lineSeparator());
+			
+				BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "results.txt"));
 				
-			}
-				try
-				{
-				
-					BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "results.txt"));
-					
-					writer.write(throughputBuilder.toString());
-					writer.newLine();
-					writer.newLine();
-					writer.write(delayBuilder.toString());
-					writer.close();
-				
-			} 
-			catch (Exception ex)
-			{
-				ex.printStackTrace();
-			}
+				writer.write(throughputBuilder.toString());
+				writer.newLine();
+				writer.newLine();
+				writer.write(delayBuilder.toString());
+				writer.close();
+			
+		} 
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
 			
 	}
 

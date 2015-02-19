@@ -8,7 +8,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -46,7 +45,7 @@ import org.jfree.ui.VerticalAlignment;
 import org.jfree.util.ShapeUtilities;
 
 import setting.ApplicationSettingFacade;
-import trafficGenerator.DynamicTrafficGenerator;
+import trafficGenerator.DTGFacade;
 import dataStructure.SchedulingResult;
 
 public class SchedulingResultGraph extends JFrame
@@ -60,7 +59,7 @@ public class SchedulingResultGraph extends JFrame
 	private static final long	serialVersionUID	= 1L;
 	public   Paint white = Color.black;
 	public  Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration() / 50);
-	public  ValueMarker offerLoad = new ValueMarker(DynamicTrafficGenerator._offerloadTraffic);
+	public  ValueMarker offerLoad = new ValueMarker(DTGFacade.offeredLoad);
 	private  ChartPanel chartPanel;
 	private  JPanel contentPane;
 	private JFreeChart chart;
@@ -108,25 +107,13 @@ public class SchedulingResultGraph extends JFrame
 		
 		toolBar.add(Box.createHorizontalGlue());
 		
-		JLabel lblInfos = new JLabel("<html><u>Total Traffic: </u>" + DynamicTrafficGenerator.totalTraffic() + "Mb"
-				+ "     <u>Average Throughpu: </u>"+ getAverageThorughput() + " Mbps"
-						+ "  <u>Delay: </u> "+ _sResult.getAveragePacketDelay() +" time slots  </html>");
+		JLabel lblInfos = new JLabel("<html><u>Total Traffic: </u>" + DTGFacade.getTotalReaffic() + "Mb"
+				+ "     <u>Average Throughpu: </u>"+ _sResult.getAverageThorughput() + " Mbps"
+						+ "  <u>Delay: </u> "+ _sResult.getDelay() +"s, total packets delay: " +_sResult.getAveragePacketDelay() + " time slots</html>");
 		lblInfos.setHorizontalAlignment(JLabel.TRAILING);
 		toolBar.add(lblInfos);
 	}
-	private double getAverageThorughput() 
-	{
-		Vector<Double> th = _sResult.getThroughputData();
-		double sum = 0;
-		for(int i = 0; i < th.size() ; i++)
-			sum += th.get(i);
-		double average = (double) sum / th.size();
-		return  (double) Math.round( average * 1000 ) / 1000 ;
-		
-		
-			
-	}
-
+	
 	private void showDiagram()
 	{ 
 		

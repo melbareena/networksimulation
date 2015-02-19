@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import common.FileGenerator;
 
 import dataStructure.Channel;
 import dataStructure.Link;
@@ -42,7 +41,7 @@ public class SINRSterategy extends AssigningSterategy
 			double sinr = (POWER * Math.pow(distance, -(ALPHA) )) / (MUE + i_l_lprime);
 			channelAffectSet.put(chan,sinr);
 		}
-		FileGenerator.Affectance(channelAffectSet,currentLink);
+	
 		Channel actualChannel =  getActualChannel(channelAffectSet);
 		return actualChannel;
 		

@@ -157,7 +157,7 @@ public abstract class TCBasic
  	 * @param tConfig 
  	 * @param a new link which wants to add the TC.
  	 * @return can be added or not
- 	 */
+ 	
 	private boolean balanceGatewayLinks(Link newLink, TCUnit tConfig)
 	{
 	
@@ -185,7 +185,7 @@ public abstract class TCBasic
 				
 		}
 		return true;
-	}
+	} */
 	
 	protected void Enlarge()
 	{
@@ -280,27 +280,27 @@ public abstract class TCBasic
 	
 		return tConfUnit;
 	}
-	protected float getAverageCapacity()
+	protected double getAverageCapacity()
 	{
-		int sum = 0;
+		double sum = 0;
 		
 		for (TCUnit tcUnit : _TT)
 		{
 			sum += tcUnit.getTCAP();
 		}
-		
-		return (float) sum/_TT.size();
+		double average  = (double) sum/_TT.size();
+		return (double)Math.round(average * 1000) / 1000;
 	}
-	protected float getTotalCapacity()
+	protected double getTotalCapacity()
 	{
-		int sum = 0;
+		double sum = 0;
 		
 		for (TCUnit tcUnit : _TT)
 		{
 			sum += tcUnit.getTCAP();
 		}
 		
-		return sum;
+		return (double)Math.round(sum * 1000) / 1000;
 	}
 
 }
