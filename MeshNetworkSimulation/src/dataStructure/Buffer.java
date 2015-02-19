@@ -38,6 +38,11 @@ public class Buffer {
 		Collections.sort(packets, Collections.reverseOrder());
 	}
 	
+	
+	/**
+	 *  
+	 * @return: available traffic in the current buffer
+	 */
 	public double size()
 	{
 		

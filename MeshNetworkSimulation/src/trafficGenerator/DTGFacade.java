@@ -1,4 +1,5 @@
 package trafficGenerator;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -32,6 +33,62 @@ public class DTGFacade
 		Traffic t = _dynamicTraffic.get(timeSlot).clone();	
 		return t;
 	}
+	
+	/**
+	 * * return next periodic traffic which is between two time slot.
+	 *  this method add exists traffic to next periodic traffic
+	 * @param startTimeSlot: specify the start point
+	 * @param endTimeSlot: specify the end point
+	 * @param sourceBuffer: source buffer
+	 * @param transmitBuffer: transmit buffer
+	 * @return
+	 */
+	public Map<Integer,Traffic> getDynamicTraffic(int startTimeSlot, int endTimeSlot, BufferMap sourceBuffer, BufferMap transmitBuffer)
+	{
+		Map<Integer,Traffic> periodTraffic = new HashMap<Integer, Traffic>();
+		for(int i = startTimeSlot + 1 ; i <= endTimeSlot; i++)
+			periodTraffic.put(i, getDynamicTraffic(i));
+		 
+		
+		Traffic startTraffic = getDynamicTraffic(startTimeSlot);
+		
+		DownlinkTraffic downT = startTraffic.getDownlinkTraffic();
+		UplinkTraffic upT = startTraffic.getUplinkTraffic();
+		if(sourceBuffer.trafficSize() > 0)
+		{
+			for (Entry<Link, Buffer> lb : sourceBuffer.entrySet())
+			{
+				Vertex source = lb.getKey().getSource();
+				
+				
+				// source is gateways , traffic should be added on downlink traffic
+				if(ApplicationSettingFacade.Gateway.isGateway(source))
+					for (Packet p : lb.getValue().getPackets())
+						downT.appendTraffic(source, p.getDestination(), p.getTraffic());
+				else
+					for (Packet p : lb.getValue().getPackets())
+						upT.appendTraffic(source, p.getTraffic());
+			}
+		}
+		if(transmitBuffer.size() > 0 )
+		{
+			for (Entry<Link, Buffer> lb : transmitBuffer.entrySet())
+			{
+				Vertex source = lb.getKey().getSource();
+				
+				
+				// source is gateways , traffic should be added on downlink traffic
+				if(ApplicationSettingFacade.Gateway.isGateway(source))
+					for (Packet p : lb.getValue().getPackets())
+						downT.appendTraffic(source, p.getDestination(), p.getTraffic());
+				else
+					for (Packet p : lb.getValue().getPackets())
+						upT.appendTraffic(source, p.getTraffic());
+			}
+		}
+		periodTraffic.put(0, startTraffic);
+		return periodTraffic;
+	}
 	public static DTGFacade Initilization()
 	{
 		if(_self == null)
@@ -50,7 +107,7 @@ public class DTGFacade
 			totalPackets = DynamicTrafficGenerator._numPackets;
 			System.out.println("Number Of Packets: " + totalPackets);
 			System.out.println("Total Traffic: " + DynamicTrafficGenerator.totalTraffic());
-			System.out.println("Total Traffic in TrafficMAP: " + getTotalReaffic());
+			System.out.println("Total Traffic in TrafficMAP: " + getTotalTraffic());
 		}
 	
 		return _self;
@@ -58,7 +115,7 @@ public class DTGFacade
 	
 	
 	private static Double totalTraffic = null;
-	public static double getTotalReaffic()
+	public static double getTotalTraffic()
 	{
 		if(totalTraffic != null) return totalTraffic;
 		double total = 0;

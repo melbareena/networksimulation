@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import launcher.Program;
+import luncher.Luncher;
 import common.FileGenerator;
 import common.PrintConsole;
 import setting.ApplicationSettingFacade;
@@ -260,7 +260,7 @@ public abstract class SchedulingStrategy
 						if(timeSlot < durationOfTrafficGenerating) 
 						{
 							totalTrafficGenerated += updateTraffic(timeSlot);
-							Program.loadingDialog.setProgress(this.instanceIndex,
+							Luncher.loadingDialog.setProgress(this.instanceIndex,
 									(int) (99*timeSlot/durationOfTrafficGenerating),
 									"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 						}
@@ -308,7 +308,7 @@ public abstract class SchedulingStrategy
 						if(timeSlot < durationOfTrafficGenerating) 
 						{
 							totalTrafficGenerated += updateTraffic(timeSlot);
-							Program.loadingDialog.setProgress(this.instanceIndex,
+							Luncher.loadingDialog.setProgress(this.instanceIndex,
 									(int) (99*timeSlot/durationOfTrafficGenerating),
 									"Generating traffic (slot "+timeSlot+" over "+durationOfTrafficGenerating+")");
 						} else 
@@ -323,8 +323,8 @@ public abstract class SchedulingStrategy
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
 		
-		assert(accumulationOfThroughput() == DTGFacade.getTotalReaffic())
-		: "throughput is not valid \n traffic in MAP:" +  DTGFacade.getTotalReaffic() + " Throughput =" + accumulationOfThroughput();
+		assert(accumulationOfThroughput() == DTGFacade.getTotalTraffic())
+		: "throughput is not valid \n traffic in MAP:" +  DTGFacade.getTotalTraffic() + " Throughput =" + accumulationOfThroughput();
 
 		
 		return getResults();
@@ -489,19 +489,19 @@ public abstract class SchedulingStrategy
 	protected void updateProgress(int timeSlot) {
 		if (maxTrafficSource < 0) {
 			maxTrafficSource = sourceBuffers.trafficSize();
-			Program.loadingDialog.setProgress(this.instanceIndex, 0);
+			Luncher.loadingDialog.setProgress(this.instanceIndex, 0);
 		}
 		if (sourceBuffers.trafficSize() == 0) {
 			if (maxTrafficTransmit < 0) {
 				maxTrafficTransmit = transmitBuffers.trafficSize();
-				Program.loadingDialog.setProgress(this.instanceIndex, 0);
+				Luncher.loadingDialog.setProgress(this.instanceIndex, 0);
 			}
-			Program.loadingDialog.setProgress(this.instanceIndex,
+			Luncher.loadingDialog.setProgress(this.instanceIndex,
 					(int) (100 - (99 * transmitBuffers.trafficSize() / maxTrafficTransmit)),
 					"Disposing of transmit traffic ("+ transmitBuffers.trafficSize()
 							+ " remaining, timeslot " + timeSlot + ")");
 		} else {
-			Program.loadingDialog.setProgress(this.instanceIndex,
+			Luncher.loadingDialog.setProgress(this.instanceIndex,
 					(int) (100 - (99 * sourceBuffers.trafficSize() / maxTrafficSource)),
 					"Disposing of source traffic (" + sourceBuffers.trafficSize()
 							+ " remaining, timeslot " + timeSlot + ")");

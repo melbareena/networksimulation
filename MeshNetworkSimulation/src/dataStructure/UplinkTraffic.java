@@ -23,8 +23,13 @@ public class UplinkTraffic implements Cloneable
 	
 	public void add(Vertex key, double trf)
 	{
-		uplinkTraffic.put(key, trf);
-
+		if(!uplinkTraffic.containsKey(key))
+			uplinkTraffic.put(key, trf);
+		else
+		{
+			double pre = uplinkTraffic.get(key);
+			uplinkTraffic.put(key, pre + trf);
+		}
 	}
 	
 	public void addAll( Map<Vertex, Double> map)
@@ -111,6 +116,12 @@ public class UplinkTraffic implements Cloneable
 		}
 		temp.addAll(tempMap);
 		return temp;
+	}
+
+	public void appendTraffic(Vertex source, double traffic)
+	{
+		add(source,traffic);
+		
 	}
 	
 	

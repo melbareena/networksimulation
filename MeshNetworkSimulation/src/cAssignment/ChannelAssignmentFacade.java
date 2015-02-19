@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 
 import common.PrintConsole;
 
-import launcher.Program;
+import luncher.Luncher;
 import setting.ApplicationSettingFacade;
 import dataStructure.ChannelOccuranceMap;
 import dataStructure.LinksChannelMap;
@@ -21,28 +21,28 @@ public class ChannelAssignmentFacade
 	
 	public static LinksChannelMap getChannels()
 	{
-		if(linksChannel == null || multiExecIndex != Program.multiExecIndex)
+		if(linksChannel == null || multiExecIndex != Luncher.multiExecIndex)
 		{
-			getDynamicChannel();
+			getChannelsForMultipleExecution();
 		}
 		return linksChannel;
 	}
 	public static ChannelOccuranceMap getChannelOccurance()
 	{
-		if(linksChannel == null || multiExecIndex != Program.multiExecIndex)
+		if(linksChannel == null || multiExecIndex != Luncher.multiExecIndex)
 		{
-			getDynamicChannel();
+			getChannelsForMultipleExecution();
 		}
 		return channelOccurance;
 		
 	}
 	
-	private static LinksChannelMap getDynamicChannel()
+	private static LinksChannelMap getChannelsForMultipleExecution()
 	{
-		if(linksChannel == null || multiExecIndex != Program.multiExecIndex)
+		if(linksChannel == null || multiExecIndex != Luncher.multiExecIndex)
 		{
 			PrintConsole.print("Channel Assignment Configuration Start.......");
-			multiExecIndex = Program.multiExecIndex;
+			multiExecIndex = Luncher.multiExecIndex;
 			String className = "";
 			try
 			{

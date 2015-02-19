@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
-import launcher.Program;
+import luncher.Luncher;
 import setting.BaseConfiguration.AppExecMode;
 import setting.BaseConfiguration.ChannelMode;
 import setting.BaseConfiguration.TCStrategy;
@@ -433,11 +433,11 @@ public class ApplicationSettingFacade
 				return _cCong.getChannel();
 			
 			else if(_appConf.getAppExceMode() == AppExecMode.AllCombination &&
-					(chans == null || multiExecIndex != Program.multiExecIndex))
+					(chans == null || multiExecIndex != Luncher.multiExecIndex))
 			{
 				chans = new ArrayList<dataStructure.Channel>();
-				multiExecIndex = Program.multiExecIndex;
-				switch (Program.multiExecIndex)
+				multiExecIndex = Luncher.multiExecIndex;
+				switch (Luncher.multiExecIndex)
 				{
 					case 1:
 						chans.add(new dataStructure.Channel(1));
@@ -537,11 +537,11 @@ public class ApplicationSettingFacade
 			}
 			
 			else if(_appConf.getAppExceMode() == AppExecMode.ApartCombination &&
-					(chans == null || multiExecIndex != Program.multiExecIndex))
+					(chans == null || multiExecIndex != Luncher.multiExecIndex))
 			{
 				chans = new ArrayList<dataStructure.Channel>();
-				multiExecIndex = Program.multiExecIndex;
-				switch (Program.multiExecIndex) {
+				multiExecIndex = Luncher.multiExecIndex;
+				switch (Luncher.multiExecIndex) {
 				case 1:
 					chans.add(new dataStructure.Channel(1));
 					break;

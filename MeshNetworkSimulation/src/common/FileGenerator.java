@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import launcher.Program;
+import luncher.Luncher;
 import dataStructure.Channel;
 import dataStructure.ChannelOccuranceMap;
 import dataStructure.Link;
@@ -367,7 +367,7 @@ public class FileGenerator
 		{
 			try
 			{
-				String fileName = "channels_assignment "+ Program.multiExecIndex +".txt";
+				String fileName = "channels_assignment "+ Luncher.multiExecIndex +".txt";
 				BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + fileName));
 				for(Entry<Link, Channel> LC : linksChannel.entrySet())
 				{
@@ -470,7 +470,7 @@ public class FileGenerator
 		{
 			try
 			{
-				String fileName = "throughtput_timeslot_ "+ Program.multiExecIndex +".txt";
+				String fileName = "throughtput_timeslot_ "+ Luncher.multiExecIndex +".txt";
 				String path = FILEOUTPUTPATH;
 				if(FILEOUTPUTPATH.equals("null")) {
 					path = FileGenerator.class.getResource("/output/").getPath();
