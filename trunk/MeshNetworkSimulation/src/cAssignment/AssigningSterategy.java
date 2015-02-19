@@ -43,35 +43,34 @@ public class AssigningSterategy {
 		return ChannelOccurance;
 	}
 
-	protected void InitiateVriables() {
+	protected void InitiateVriables() 
+	{
 		if (nodesDistances == null && linksChannel == null) {
 			nodesDistances = TopologyFacade.getDistanceForEachNode();
 			linksChannel = new LinksChannelMap();
 
 			linksTraffics = new LinkTrafficMap(TrafficEstimatingFacade.getLinksTraffic().Sort());
-			for (Entry<Link, Double> tLink : linksTraffics.entrySet()) {
+			for (Entry<Link, Double> tLink : linksTraffics.entrySet())
 				linksChannel.put(tLink.getKey(), new Channel(0));
-			}
 
 			linksAmbientNoise = calcLinksAmbienNoise();
 		}
 	}
 
-	protected LinksAmbienNoiseMap calcLinksAmbienNoise() {
+	protected LinksAmbienNoiseMap calcLinksAmbienNoise()
+	{
+		
+		if(linksAmbientNoise != null) return linksAmbientNoise;
 		LinksAmbienNoiseMap result = new LinksAmbienNoiseMap();
-		if (linksAmbientNoise == null) {
-
-			for (Entry<Link, Double> tLink : linksTraffics.entrySet()) {
-				double distance = getDistance(tLink.getKey());
-
-				// beta / (1- ((beta*Mue* d^a)/P))
-				double noise = BETA
-						/ (1 - ((BETA * MUE * Math.pow(distance, ALPHA)) / POWER));
-				result.put(tLink.getKey(), noise);
-			}
-			FileGenerator.LinksAmbienNoiseInFile(result);
-		} else
-			result = linksAmbientNoise;
+		
+		for (Entry<Link, Double> tLink : linksTraffics.entrySet()) 
+		{
+			double distance = getDistance(tLink.getKey());
+			// beta / (1- ((beta*Mue* d^a)/P))
+			double noise = BETA	/ (1 - ((BETA * MUE * Math.pow(distance, ALPHA)) / POWER));
+			result.put(tLink.getKey(), noise);
+		}
+		FileGenerator.LinksAmbienNoiseInFile(result);
 		return result;
 	}
 

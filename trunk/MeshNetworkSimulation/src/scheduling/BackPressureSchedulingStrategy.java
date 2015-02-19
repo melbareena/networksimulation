@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import launcher.Program;
+import luncher.Luncher;
 import common.FileGenerator;
 import trafficEstimating.TrafficEstimatingFacade;
 import trafficGenerator.DTGFacade;
@@ -95,7 +95,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 			if (timeSlot < durationOfTrafficGenerating)
 			{
 				totalTrafficGenerated += updateTraffic(timeSlot);
-				Program.loadingDialog.setProgress(this.instanceIndex,
+				Luncher.loadingDialog.setProgress(this.instanceIndex,
 						(int) (99 * timeSlot / durationOfTrafficGenerating),
 						"Generating traffic (slot " + timeSlot + " over " + durationOfTrafficGenerating + ")");
 			} 
@@ -104,8 +104,8 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
-		assert(accumulationOfThroughput() == DTGFacade.getTotalReaffic())
-		: "throughput is not valid \n traffic in MAP:" +  DTGFacade.getTotalReaffic() + " Throughput =" + accumulationOfThroughput();
+		assert(accumulationOfThroughput() == DTGFacade.getTotalTraffic())
+		: "throughput is not valid \n traffic in MAP:" +  DTGFacade.getTotalTraffic() + " Throughput =" + accumulationOfThroughput();
 		return super.getResults();
 	}
 	

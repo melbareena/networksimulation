@@ -26,7 +26,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
-import launcher.Program;
+import luncher.Luncher;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -111,7 +111,7 @@ public class HistogramViewer extends JFrame {
 		FileGenerator.SchedulingResult(results);
 		this.self = this;		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle("AC:" + Program.getAvailableChannels()
+		setTitle("AC:" + Luncher.getAvailableChannels()
 				+ " - " + results.getSchedulingStrategy() + " - Traffic Generator: " + results.getTrafficGenerator() + " ");
 		 
 
@@ -487,7 +487,7 @@ public class HistogramViewer extends JFrame {
 		System.out.println("Finished, displaying...");
 		
 		String titleString = 
-				"Channels:"+Program.getAvailableChannels() + "," + "Topology: " + ApplicationSettingFacade.Nodes.getNodes().size()
+				"Channels:"+Luncher.getAvailableChannels() + "," + "Topology: " + ApplicationSettingFacade.Nodes.getNodes().size()
 				+ ",Power Control: " + ApplicationSettingFacade.PowerControl.isEnable() + ","				
 				+ "TC: " + ApplicationSettingFacade.TranmissionConfiguration.getStertegy().name() + "\n"
 				+ "Scheduling: " + results.getSchedulingStrategy()

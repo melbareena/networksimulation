@@ -55,7 +55,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import launcher.Program;
+import luncher.Luncher;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
 import trafficEstimating.TrafficEstimatingFacade;
@@ -311,7 +311,7 @@ public class GraphViewer extends JFrame {
 						colorViewerDialog.dispose();
 						histogramViewerFrame.dispose();
 						dispose();
-						Program.restartApplication();
+						Luncher.restartApplication();
 						break;
 					case JOptionPane.NO_OPTION:
 						System.exit(0);
@@ -323,7 +323,7 @@ public class GraphViewer extends JFrame {
 		});
 		
 		setVisible(true);
-		Program.loadingDialog.addProgress(instanceIndex, 100 - Program.loadingDialog.getProgress(instanceIndex),
+		Luncher.loadingDialog.addProgress(instanceIndex, 100 - Luncher.loadingDialog.getProgress(instanceIndex),
 				"Done!");
     }
 	
@@ -737,7 +737,7 @@ public class GraphViewer extends JFrame {
 				colorViewerDialog.dispose();
 				histogramViewerFrame.dispose();
 				dispose();
-				Program.restartApplication();
+				Luncher.restartApplication();
 			}
 		});
 		mnFile.add(mntmReset);

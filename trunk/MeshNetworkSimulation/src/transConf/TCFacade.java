@@ -5,7 +5,7 @@ import java.util.List;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.TCStrategy;
 import common.PrintConsole;
-import launcher.Program;
+import luncher.Luncher;
 import dataStructure.TCUnit;
 
 public class TCFacade
@@ -21,10 +21,10 @@ public class TCFacade
 	
 	public static List<TCUnit> getConfigurations()
 	{
-		if(configurations == null || multiExecIndex != Program.multiExecIndex)
+		if(configurations == null || multiExecIndex != Luncher.multiExecIndex)
 		{
 			PrintConsole.print("Tranmission Configuration Start.......");
-			multiExecIndex = Program.multiExecIndex;
+			multiExecIndex = Luncher.multiExecIndex;
 			
 			
 			if(ApplicationSettingFacade.TranmissionConfiguration.getStertegy() == TCStrategy.PatternBased) 

@@ -1,5 +1,6 @@
 package dataStructure;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -13,6 +14,28 @@ public final class DownlinkTraffic implements Cloneable
 	{
 	
 		downLinkTraffic.put(gateway, value);;
+	}
+	public void add(Vertex gateway, Vertex destination, double traffic)
+	{
+		if(!downLinkTraffic.containsKey(gateway))
+		{
+			TreeMap<Vertex, Double> trafficTO = new TreeMap<Vertex, Double>();
+			trafficTO.put(destination, traffic);
+			downLinkTraffic.put(gateway, trafficTO);
+		}
+		else
+		{
+			TreeMap<Vertex, Double> trafficTO = downLinkTraffic.get(gateway);
+			if(!trafficTO.containsKey(destination))
+				trafficTO.put(destination, traffic);
+			else
+			{
+				double preTraffic = trafficTO.get(destination);
+				double newTraffic = preTraffic+traffic;
+				trafficTO.put(destination, newTraffic);
+			}
+			downLinkTraffic.put(gateway, trafficTO);
+		}
 	}
 	public void addAll(Map<Vertex, TreeMap<Vertex, Double>> map)
 	{
@@ -45,6 +68,14 @@ public final class DownlinkTraffic implements Cloneable
 		
 	}
 	
+	/**
+	 * append new traffic to current traffic
+	 */
+	public void appendTraffic(Vertex source, Vertex destination, double traffic)
+	{
+		add(source, destination, traffic);			
+	}
+	
 	public  Map<Vertex, TreeMap<Vertex, Double>> getTraffic()
 	{
 		return downLinkTraffic;
@@ -60,6 +91,10 @@ public final class DownlinkTraffic implements Cloneable
 	{
 		return downLinkTraffic.containsKey(v);
 	}
+	/**
+	 * get the amount of traffic
+	 * @return amount of traffic
+	 */
 	public double size()
 	{
 		if(downLinkTraffic == null || downLinkTraffic.size() < 1 ) return 0;

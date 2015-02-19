@@ -224,6 +224,7 @@ public class TrafficEstimatingFacade
 	}
 	
 	
+	
 	private LinkTrafficMap Estimating()
 	{
 			

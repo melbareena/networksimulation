@@ -43,7 +43,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import launcher.Program;
+import luncher.Luncher;
 import net.miginfocom.swing.MigLayout;
 import setting.XMLParser;
 import setting.XMLWriter;
@@ -638,7 +638,7 @@ public class StartOptionsDialog extends JDialog {
 		    			    JOptionPane.INFORMATION_MESSAGE);
 					dispose();
 					XMLParser.CONFIGFILE = configFile;
-					Program.launch();
+					Luncher.launch();
 				}
 			});
 			buttonPane.add(defaultButton);
@@ -655,7 +655,7 @@ public class StartOptionsDialog extends JDialog {
 					configFile = blank.getToolTipText();
 					if(configFile != null) {
 						XMLParser.CONFIGFILE = configFile;
-						Program.launch();
+						Luncher.launch();
 						dispose();
 					}
 				}
@@ -673,7 +673,7 @@ public class StartOptionsDialog extends JDialog {
 					if(configFile != null) {
 						XMLParser.CONFIGFILE = configFile;
 						dispose();
-						Program.launch();
+						Luncher.launch();
 					}
 				}
 			});

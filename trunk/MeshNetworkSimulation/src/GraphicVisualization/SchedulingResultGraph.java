@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
-import launcher.Program;
+import luncher.Luncher;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -107,7 +107,7 @@ public class SchedulingResultGraph extends JFrame
 		
 		toolBar.add(Box.createHorizontalGlue());
 		
-		JLabel lblInfos = new JLabel("<html><u>Total Traffic: </u>" + DTGFacade.getTotalReaffic() + "Mb"
+		JLabel lblInfos = new JLabel("<html><u>Total Traffic: </u>" + DTGFacade.getTotalTraffic() + "Mb"
 				+ "     <u>Average Throughpu: </u>"+ _sResult.getAverageThorughput() + " Mbps"
 						+ "  <u>Delay: </u> "+ _sResult.getDelay() +"s, total packets delay: " +_sResult.getAveragePacketDelay() + " time slots</html>");
 		lblInfos.setHorizontalAlignment(JLabel.TRAILING);
@@ -126,7 +126,7 @@ public class SchedulingResultGraph extends JFrame
 
 	private JFreeChart createChart(XYDataset dataSet)
 	{
-		String title = "Channels:"+Program.getAvailableChannels() +  ",Topology: " + ApplicationSettingFacade.Nodes.getNodes().size()
+		String title = "Channels:"+Luncher.getAvailableChannels() +  ",Topology: " + ApplicationSettingFacade.Nodes.getNodes().size()
 				+ ",Power Control: " + ApplicationSettingFacade.PowerControl.isEnable() 		
 				+ ",TC: " + ApplicationSettingFacade.TranmissionConfiguration.getStertegy().name()
 				+ ",Scheduling: " + _sResult.getSchedulingStrategy()
