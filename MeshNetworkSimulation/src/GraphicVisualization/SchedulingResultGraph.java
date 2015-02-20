@@ -209,7 +209,7 @@ public class SchedulingResultGraph extends JFrame
 		        offerLoad.setPaint(Color.BLACK);
 		        offerLoad.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 		        		10.0F, new float[] {10, 10}, 0.0F));
-		        offerLoad.setLabel("Offered Load");
+		        offerLoad.setLabel("Offered Load:" + DTGFacade.offeredLoad + " Mbps");
 		        offerLoad.setLabelAnchor(RectangleAnchor.BOTTOM_LEFT);
 		        offerLoad.setLabelTextAnchor(TextAnchor.TOP_LEFT);
 		        offerLoad.setLabelFont(offerLoad.getLabelFont().deriveFont(Font.BOLD, 12));
@@ -251,9 +251,7 @@ public class SchedulingResultGraph extends JFrame
 				maxThroughput = t;
 			throughputSeries.add(timeIndex,t);
 			timeIndex++;
-		}
-
-		
+		}	
 		
 	/*	*/
 		

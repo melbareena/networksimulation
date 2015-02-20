@@ -10,7 +10,6 @@ import java.util.Vector;
 
 import luncher.Luncher;
 import common.FileGenerator;
-import common.PrintConsole;
 import trafficEstimating.TrafficEstimatingFacade;
 import transConf.TCFacade;
 import dataStructure.Buffer;
@@ -22,36 +21,20 @@ import dataStructure.SchedulingResult;
 import dataStructure.TCUnit;
 import dataStructure.Vertex;
 
-public class DynamicBP 
+public class DynamicBP extends DynamicAbstract
 {
 	public DynamicBP(int instanceIndex)
 	{
-		PrintConsole.printErr("Intiate Scheduling..........");
-		this.transmitBuffers = new BufferMap();
-		this.throughput = new Vector<Double>();
-		this.trafficSource = new Vector<Double>();
-		this.trafficTransit = new Vector<Double>();
-		this.packetsDelay = new Vector<Integer>();
-		this.maxTrafficSource = -1.0;
-		this.maxTrafficTransmit = -1.0;
-		this.instanceIndex = instanceIndex;
+		super.transmitBuffers = new BufferMap();
+		super.throughput = new Vector<Double>();
+		super.trafficSource = new Vector<Double>();
+		super.trafficTransit = new Vector<Double>();
+		super.packetsDelay = new Vector<Integer>();
+		super.maxTrafficSource = -1.0;
+		super.maxTrafficTransmit = -1.0;
+		super.instanceIndex = instanceIndex;
 	}
-	private int instanceIndex;
-	protected int k = 3;
-	protected BufferMap sourceBuffers;
-	protected BufferMap transmitBuffers;
-	protected List<TCUnit> configurations;
-
 	
-	/* For collecting results */
-	protected Vector<Double> throughput;
-	protected Vector<Double> trafficSource;
-	protected Vector<Double> trafficTransit;
-	protected Vector<Integer> packetsDelay;
-	protected double totalTrafficGenerated;
-	protected String trafficGenerator;
-	protected double maxTrafficSource;
-	protected double maxTrafficTransmit;
 
 	
 	private Set<Link> getAllLinksWithTraffic() 
@@ -61,9 +44,9 @@ public class DynamicBP
 		linkSet.addAll(this.transmitBuffers.keySet());
 		return linkSet;
 	}
-	public SchedulingResult dynamicScheduling(long durationOfTrafficGenerating) 
+	public SchedulingResult doDeliveryPackets(long durationOfTrafficGenerating) 
 	{
-		this.configurations = TCFacade.getConfigurations(0, 10 , sourceBuffers, transmitBuffers);
+		this.configurations = TCFacade.getConfigurations(0, _redoTimeSlot , sourceBuffers, transmitBuffers);
 
 		trafficGenerator = "Dynamic";
 
@@ -83,8 +66,8 @@ public class DynamicBP
 		while (sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0	|| timeSlot < durationOfTrafficGenerating) 
 		{	
 			
-			if(timeSlot!= 0 && timeSlot % 10 == 0)
-				this.configurations = TCFacade.getConfigurations(timeSlot + 1, timeSlot + 10 , sourceBuffers, transmitBuffers);
+			if(timeSlot!= 0 && timeSlot % _redoTimeSlot == 0)
+				this.configurations = TCFacade.getConfigurations(timeSlot + 1, timeSlot + _redoTimeSlot , sourceBuffers, transmitBuffers);
 			
 		
 			disposeOfTraffic(timeSlot);
@@ -107,33 +90,7 @@ public class DynamicBP
 	}
 	
 	
-	protected void updateProgress(int timeSlot)
-	{
-		if (maxTrafficSource < 0) 
-		{
-			maxTrafficSource = sourceBuffers.trafficSize();
-			Luncher.loadingDialog.setProgress(this.instanceIndex, 0);
-		}
-		if (sourceBuffers.trafficSize() == 0) 
-		{
-			if (maxTrafficTransmit < 0) 
-			{
-				maxTrafficTransmit = transmitBuffers.trafficSize();
-				Luncher.loadingDialog.setProgress(this.instanceIndex, 0);
-			}
-			Luncher.loadingDialog.setProgress(this.instanceIndex,
-					(int) (100 - (99 * transmitBuffers.trafficSize() / maxTrafficTransmit)),
-					"Disposing of transmit traffic ("+ transmitBuffers.trafficSize()
-							+ " remaining, timeslot " + timeSlot + ")");
-		} 
-		else 
-		{
-			Luncher.loadingDialog.setProgress(this.instanceIndex,
-					(int) (100 - (99 * sourceBuffers.trafficSize() / maxTrafficSource)),
-					"Disposing of source traffic (" + sourceBuffers.trafficSize()
-							+ " remaining, timeslot " + timeSlot + ")");
-		}
-	}
+	
 	
 	
 	
@@ -286,68 +243,8 @@ public class DynamicBP
 		}
 		return nodeBuffersMap;
 	}
-	private void calcWeight(boolean isSourceBufferTraffic)
-	{
-		BufferMap targetMap;		
-		if(isSourceBufferTraffic)
-			targetMap = this.sourceBuffers;
-		else
-			targetMap = this.transmitBuffers;
-		
-		for(TCUnit tc : configurations)
-		{
-			Map<Link, Double> linksTraffic = new HashMap<Link, Double>();
-			for (Link l : tc.getLinks())
-			{
-				double traffic = 0;
-					
-				if(targetMap.containsKey(l))
-				{
-					Buffer bs = targetMap.get(l);
-					traffic = bs.size();
-					linksTraffic.put(l, traffic);
-				}
-			}
-			tc.calcLinkWeight(linksTraffic);
-		}
-		
-	}
-	private double updateTraffic(int currentTimeSlot)
-	{
-		double currentTrafficAmount = 0.0;
-		if(sourceBuffers != null) {
-			currentTrafficAmount = sourceBuffers.trafficSize();
-		}
-		
 	
-		BufferMap timesoltBuffer = TrafficEstimatingFacade.getDynamicSourceBuffers(currentTimeSlot);
-		if(timesoltBuffer != null && timesoltBuffer.size() > 0)
-		{
-			if(sourceBuffers == null) sourceBuffers = new BufferMap();
-			sourceBuffers.Append(timesoltBuffer);
-			return sourceBuffers.trafficSize() - currentTrafficAmount;
-		}
-		
-		return 0;
-		
-	}
-	protected SchedulingResult getResults() 
-	{
-		SchedulingResult results = new SchedulingResult();
-		results.setSchedulingStrategy(getName());
-		results.setTrafficGenerator(trafficGenerator);
-		results.setThroughputData(throughput);
-		results.setSourceBufferData(trafficSource);
-		results.setTransmitBufferData(trafficTransit);
-		results.setTotalTrafficGenerated(totalTrafficGenerated);
-		double sum = 0;
-		for(int i = 0; i < packetsDelay.size(); i++) {
-			sum += packetsDelay.get(i);
-		}
-		results.setAveragePacketDelay(sum );
-		return results;
-	}
 	protected String getName() {
-		return "BPSS";
+		return "BPPD";
 	}
 }

@@ -12,30 +12,6 @@ public class TCConfig extends BaseConfiguration
 	private static final  String TAG = "TranmissionConfiguration";
 	private static final String ATTSTERATEGY = "Strategy";
 	private static final String ATTDOUR = "downOverUpRatio";
-	private static final String ATTPTO = "priotityToOrthogonal";
-	private static final String ATTRLTRR = "repeatLinksToRespectRatio";
-	private static final String ATTEBG = "enlargeByGateways";
-	
-	
-	private boolean _ebg;
-	
-	public boolean isEBG()
-	{
-		return _ebg;
-	}
-
-	private boolean _rltrr;
-	
-	public boolean isRLTRR()
-	{
-		return _rltrr;
-	}
-
-	private boolean _pto;
-	public boolean isPTO()
-	{
-		return _pto;
-	}
 	
 	private int _dour;
 	public int getDOUR()
@@ -78,12 +54,8 @@ public class TCConfig extends BaseConfiguration
 				
 					_sterategyName = TCStrategy.valueOf(eElement.getAttribute(ATTSTERATEGY));
 					if(_sterategyName == TCStrategy.PatternBased)
-					{
 						_dour = Integer.valueOf(eElement.getAttribute(ATTDOUR));
-						_pto = Boolean.valueOf(eElement.getAttribute(ATTPTO));
-						_rltrr = Boolean.valueOf(eElement.getAttribute(ATTRLTRR));
-						_ebg = Boolean.valueOf(eElement.getAttribute(ATTEBG));
-					}
+				
 					
 				}
 			} 

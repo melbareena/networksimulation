@@ -88,16 +88,12 @@ public class XMLWriter {
 		rootElement.appendChild(e);
 		e.setAttribute("Strategy", TCStrategy.Greedy.name());
 	}
-	public static void writePatternBasedSterategy(int downOverUpRatio, 
-			boolean priotityToOrthogonal, boolean repeatLinksToRespectRatio, boolean enlargeByGateways)
+	public static void writePatternBasedSterategy(int downOverUpRatio)
 			{
 				Element e = doc.createElement("TranmissionConfiguration");
 				rootElement.appendChild(e);
 				e.setAttribute("Strategy", TCStrategy.PatternBased.name());
 				e.setAttribute("downOverUpRatio", downOverUpRatio + "");
-				e.setAttribute("priotityToOrthogonal", priotityToOrthogonal + "");
-				e.setAttribute("repeatLinksToRespectRatio", repeatLinksToRespectRatio + "");
-				e.setAttribute("enlargeByGateways", enlargeByGateways + "");
 			}
 	
 	public static void writeTraffic(boolean dynamic, String generator, String addrUp, String addrDown,

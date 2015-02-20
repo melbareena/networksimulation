@@ -257,19 +257,6 @@ public class ApplicationSettingFacade
 		{
 			return _tcConfig.getDOUR();
 		}
-		public static boolean isPriotityToOrthogonal()
-		{
-			return _tcConfig.isPTO();
-		}
-		
-		public static boolean isRepeatLinksToRespectRatio()
-		{
-			return _tcConfig.isRLTRR();
-		}
-		public static boolean isEnlargeByGateways()
-		{
-			return _tcConfig.isEBG();
-		}
 	}
 	
 	

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<AppConfiguration Mode="Single">
+<AppConfiguration Mode="Single" AlgorithmMode="Dynamic">
     <ChannelAssignment Strategy="OriginalSterategy"/>
     <Channels Mode="All"/>
     <DataRate>
@@ -36,7 +36,7 @@
    <Routers MinDistance="50" Number="65" Radio="2" SaftyTest="500" Seed="3381882580838882816" TransmissionRate="200" TypeOfGeneration="Random"/>
   <Scheduling Strategy="BackPressureSchedulingStrategy"/>
     <SINR Alpha="2" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
-    <Traffic Duration="1000" Lambda_max="0.5" Lambda_min="0.01" Ratio="2" Seed="2736792807018831587" Type="Dynamic"/>
+    <Traffic Duration="500" Lambda_max="0.5" Lambda_min="0.01" Ratio="2" Seed="2736792807018831587" Type="Dynamic"/>
     <PowerControl Enable="true"/>
     <TranmissionConfiguration Strategy="Greedy" downOverUpRatio="2" enlargeByGateways="false" priotityToOrthogonal="false" repeatLinksToRespectRatio="false"/>
 </AppConfiguration>
