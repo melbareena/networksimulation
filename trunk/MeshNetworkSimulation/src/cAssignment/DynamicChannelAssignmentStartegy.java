@@ -1,16 +1,16 @@
 package cAssignment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import common.FileGenerator;
-import common.IntermediateOutput;
 import setting.ApplicationSettingFacade;
 import topology.TopologyFacade;
 import trafficEstimating.TrafficEstimatingFacade;
+import common.FileGenerator;
 import dataStructure.BufferMap;
 import dataStructure.Channel;
 import dataStructure.ChannelOccuranceMap;
@@ -21,14 +21,9 @@ import dataStructure.LinksAmbienNoiseMap;
 import dataStructure.LinksChannelMap;
 import dataStructure.Vertex;
 
-/**
- * 
- * @author Mahdi Negahi
- * 
- */
-public class AssigningSterategy {
+public class DynamicChannelAssignmentStartegy
+{
 	protected static LinksChannelMap linksChannel;
-	protected static LinkTrafficMap linksTraffics;
 	protected static LinksAmbienNoiseMap linksAmbientNoise;
 	protected static Map<Vertex, Map<Vertex, Double>> nodesDistances;
 	protected static final float ALPHA = ApplicationSettingFacade.SINR.getAlpha();
@@ -43,24 +38,15 @@ public class AssigningSterategy {
 		return ChannelOccurance;
 	}
 
-	protected void InitiateVriables() 
+	private void InitiateVriables()
 	{
-		if (nodesDistances == null && linksChannel == null) {
+		if (nodesDistances == null) 
 			nodesDistances = TopologyFacade.getDistanceForEachNode();
-			linksChannel = new LinksChannelMap();
-
-			linksTraffics = new LinkTrafficMap(TrafficEstimatingFacade.getLinksTraffic().Sort());
-			for (Entry<Link, Double> tLink : linksTraffics.entrySet())
-				linksChannel.put(tLink.getKey(), new Channel(0));
-
-			linksAmbientNoise = calcLinksAmbienNoise();
-		}
+			
 	}
 
-	protected LinksAmbienNoiseMap calcLinksAmbienNoise()
+	private LinksAmbienNoiseMap calcLinksAmbienNoise(LinkTrafficMap linksTraffics)
 	{
-		
-		if(linksAmbientNoise != null) return linksAmbientNoise;
 		LinksAmbienNoiseMap result = new LinksAmbienNoiseMap();
 		
 		for (Entry<Link, Double> tLink : linksTraffics.entrySet()) 
@@ -91,7 +77,10 @@ public class AssigningSterategy {
 	public LinksChannelMap assigningDynamic(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
 	{
 		List<Link> linkSet = new ArrayList<>();
-		 LinkTrafficMap periodicTraffic = new LinkTrafficMap(TrafficEstimatingFacade.getLinksTraffic( startTime, stopTime, sourceBuffer, transmitBuffer).Sort());
+		linksChannel = new LinksChannelMap();
+		LinkTrafficMap periodicTraffic = new LinkTrafficMap(TrafficEstimatingFacade.getLinksTraffic( startTime, stopTime, sourceBuffer, transmitBuffer).Sort());
+		InitiateVriables();
+		linksAmbientNoise = this.calcLinksAmbienNoise(periodicTraffic);
 		
 		for (Entry<Link, Double> tLink : periodicTraffic.entrySet())
 		{
@@ -117,33 +106,6 @@ public class AssigningSterategy {
 		//FileGenerator.ChannelOccurance(ChannelOccurance);
 		return linksChannel;
 	}
-	
-	
-	
-	public LinksChannelMap assigning() 	
-	{
-		List<Link> linkSet = new ArrayList<>();
-
-		for (Entry<Link, Double> tLink : linksTraffics.entrySet()) {
-			Link currentLink = tLink.getKey();
-			if (linkSet.size() == 0) {
-				linkSet.add(currentLink);
-				Channel channel = availableChannels.get(0);
-				linksChannel.put(currentLink, channel);
-				ChannelOccurance.Increase(channel);
-			} else {
-				Channel channel = calc(linkSet, currentLink);
-				ChannelOccurance.Increase(channel);
-				linksChannel.put(currentLink, channel);
-				linkSet.add(currentLink);
-			}
-		}
-
-		IntermediateOutput.ChannelAssignment(linksChannel);
-		FileGenerator.ChannelsInFile(linksChannel);
-		FileGenerator.ChannelOccurance(ChannelOccurance);
-		return linksChannel;
-	}
 
 	// performing the mathematical
 	protected Channel calc(List<Link> linkSet, Link currentLink) {
@@ -151,11 +113,13 @@ public class AssigningSterategy {
 		double distance = getDistance(currentLink);
 		Map<Channel, Double> channelAffectSet = new TreeMap<Channel, Double>();
 		double affect = 0;
-		for (Channel chan : availableChannels) {
+		for (Channel chan : availableChannels) 
+		{
 			affect = 0;
 			int currentChannel = chan.getChannel();
 			// ∑ RI_l(l')
-			for (Link l : linkSet) {
+			for (Link l : linkSet)
+			{
 
 				int chn_sep = Math.abs(currentChannel - linksChannel.get(l).getChannel());
 				double overlap = iFactor.get(chn_sep);
@@ -173,7 +137,33 @@ public class AssigningSterategy {
 		return actualChannel;
 	}
 
-	protected Channel getActualChannel(Map<Channel, Double> channelAffectSet) {
-		return null;
+	private Channel getActualChannel(Map<Channel, Double> channelAffectSet)
+	{
+		Channel min = getMinAffectance(channelAffectSet);
+		return min;
 	}
+	private Channel getMinAffectance(Map<Channel, Double> channelAffectSet)
+	{
+		
+		double affectanceValue = Collections.max(channelAffectSet.values());
+		Channel min = null;
+		
+	
+		for (Entry<Channel, Double> channelAff : channelAffectSet.entrySet())
+		{
+			if(channelAff.getValue() >= 0 && affectanceValue > channelAff.getValue())
+			{
+				affectanceValue  = channelAff.getValue();
+				min = channelAff.getKey();
+			}
+		}
+		if(min == null)
+		{
+			Channel[] chA = new Channel[channelAffectSet.size()];
+			chA = channelAffectSet.keySet().toArray(chA);
+			min = chA[0];
+		}
+		return min;
+	}
+
 }

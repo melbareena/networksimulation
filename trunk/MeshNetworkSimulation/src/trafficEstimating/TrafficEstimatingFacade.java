@@ -53,7 +53,7 @@ public class TrafficEstimatingFacade
 		if(!ApplicationSettingFacade.Traffic.isDynamicType())
 			downlinkTraffic = trafficGenerator.StaticTraffic.getDownlinkTraffic(downlinkPaths);
 		else
-			downlinkTraffic = dyTraffic.getDownlink(downlinkPaths); 
+			downlinkTraffic = dyTraffic.getDownlink(); 
 		
 		
 		for (Entry<Integer, Vertex> vertexList : ApplicationSettingFacade.Nodes.getNodes().entrySet())
@@ -88,15 +88,7 @@ public class TrafficEstimatingFacade
 		
 	}
 
-	/**Update the <code>currentBufferMap</code> by adding some new traffic, using
-	 * the <code>trafficGenerator</code>.
-	 * @param currentBufferMap The <code>BufferMap</code> to be updated.
-	 * @param trafficGenerator The traffic generator used to add new traffic.
-	 * @return The updated <code>BufferMap</code>.
-	 */
 	
-	
-
 	public static BufferMap getDynamicSourceBuffers(int currentTimeslot) 
 	{
 		
@@ -162,18 +154,7 @@ public class TrafficEstimatingFacade
 		return bfMap;
 	}
 	
-	/*private static void summation(BufferMap bfMap)
-	{
-		double allTraffic = 0;
-		for (Entry<Link, Buffer> lb : bfMap.sort().entrySet())
-		{
-			allTraffic += lb.getValue().size();
-			System.out.println(lb.getKey().getId() + "--->" + lb.getValue().size());
-		}
-		
-		System.out.println(allTraffic + " ..... ");
-		
-	}*/
+
 	public static List<Link> getOptimalLinks()
 	{
 		if(self == null)
@@ -224,7 +205,32 @@ public class TrafficEstimatingFacade
 	}
 	
 	
+	private static int _startTime = -1;
+	public static LinkTrafficMap getLinksTraffic(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
+	{
+		if(_startTime != startTime)
+		{
+			self = new TrafficEstimatingFacade();
+			LinksTraffic = self.dynamicEstimating(startTime,stopTime,sourceBuffer,transmitBuffer);
+			_startTime = startTime;
+		}
+		return LinksTraffic;
+	}
+
+	private LinkTrafficMap dynamicEstimating(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
+	{
+		TopologyGraphFacade.buildGraphFromTopology();		
+		//create map for all links
+		
+		
 	
+		LinkTrafficMap dl_traffic_l  = DownlinkEstimating.dynamicEstimating(startTime,stopTime,sourceBuffer,transmitBuffer);
+		LinkTrafficMap traffic_l = UplinkEstimating.dynamicEstimating(startTime,stopTime,sourceBuffer,transmitBuffer,dl_traffic_l);
+		
+		traffic_l = this.filterZeroTraffic(traffic_l);
+		FileGenerator.TrafficOfLinksInFile(traffic_l, startTime);
+		return traffic_l;
+	}
 	private LinkTrafficMap Estimating()
 	{
 			
@@ -267,11 +273,9 @@ public class TrafficEstimatingFacade
 				optimalTrafficLinks.put(links.getKey(),links.getValue());
 			}
 		}
-		System.out.println("Size::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" + optimalLinks.size());
 		FileGenerator.optimalLinksInFile(optimalLinks);
 		return optimalTrafficLinks;
 	}
-	
 	private LinkTrafficMap Initialization(TopologyGraph gtd)
 	{
 		LinkTrafficMap TrafficOfLinks = new LinkTrafficMap();

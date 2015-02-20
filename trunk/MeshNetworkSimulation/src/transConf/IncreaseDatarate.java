@@ -50,7 +50,6 @@ public class IncreaseDatarate extends PowerControlUnit
 						double[] powers = super.getPowerValues(T_prime, T_prime.getLinks(), A, D);
 						if(isPowerFeasible(powers))
 						{
-							
 							int index = 0;
 							for (Link ll : T_prime.getLinks())
 							{

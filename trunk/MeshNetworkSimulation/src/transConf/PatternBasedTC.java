@@ -12,6 +12,7 @@ import java.util.TreeSet;
 
 import cAssignment.ChannelAssignmentFacade;
 import setting.ApplicationSettingFacade;
+import sinr.SINR;
 import trafficEstimating.TrafficEstimatingFacade;
 import common.FileGenerator;
 import dataStructure.Link;
@@ -27,9 +28,11 @@ import dataStructure.Vertex;
  */
 public class PatternBasedTC extends TCBasic
 {
-	
+
 	protected PatternBasedTC()
 	{
+		super._sinr = new SINR();
+		super.LinksTraffic = TrafficEstimatingFacade.getLinksTraffic();
 		super._powerUnit = new PowerControlUnit(this);
 		resetMARK();
 	}
@@ -420,5 +423,49 @@ public class PatternBasedTC extends TCBasic
 		return DeleteAction.NotNecessary;
 		//return true;
 		
+	}
+
+
+
+
+	@Override
+	protected TCUnit checkAdd(Link newLink, TCUnit tConfig)
+	{
+		boolean add = true;
+		double sinr = 0;
+		TCUnit tPrime = tConfig.Clone();
+		
+		if(this.checkRadio(newLink))
+		{
+			//if(!balanceGatewayLinks(newLink,tConfig)) return null;
+			tPrime.putRate(newLink, 0);
+			tPrime.setTCAPZero();
+			
+		
+			for (Link currentLink : tPrime.getLinks())
+			{
+				List<Link> linkSet = tPrime.getLinks();
+				linkSet.remove(currentLink);
+				
+ 				sinr = _sinr.calc(currentLink,linkSet );
+				
+				if(sinr >= BETA)
+					tPrime.setSinrRate(currentLink,  _sinr.calcDataRate(sinr).getRate(), sinr);
+				else
+				{
+					add = false;
+					break;
+				}
+			}
+		
+			if(add && tPrime.getTCAP() >= tConfig.getTCAP())
+			{
+				ConsiderLinks.put(newLink,true);
+				setMark(newLink.getDestination());
+				setMark(newLink.getSource());
+				return tPrime;
+			}
+		} 
+		return null;
 	}
 }

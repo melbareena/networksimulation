@@ -4,23 +4,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cAssignment.ChannelAssignmentFacade;
 import setting.ApplicationSettingFacade;
+import cAssignment.ChannelAssignmentFacade;
+import dataStructure.BufferMap;
 import dataStructure.DataRate;
 import dataStructure.IFactorMap;
 import dataStructure.Link;
 import dataStructure.LinksChannelMap;
 import dataStructure.TCUnit;
 
-public class SINR extends SINRAbstract
+public class DynamicSINR extends SINRAbstract
 {
 	
-
+	public DynamicSINR(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
+	{
+		channels = ChannelAssignmentFacade.getChannels(startTime,stopTime,sourceBuffer,transmitBuffer);		
+	}
+	
 	private final float ALPHA = ApplicationSettingFacade.SINR.getAlpha();
 	private final double MUE = ApplicationSettingFacade.SINR.getMue();
 	private final float POWER = ApplicationSettingFacade.SINR.getPower();
 	private static final IFactorMap iFactor = ApplicationSettingFacade.IFactor.getIFactorMap();
-	private final LinksChannelMap channels = ChannelAssignmentFacade.getChannels();
+	private final LinksChannelMap channels;
 	
 	/**
 	 * calculate the SINR with maximum power
@@ -58,7 +63,7 @@ public class SINR extends SINRAbstract
 			return l.getCrossDistance(currentLink);
 	}
 	
-	double I_l_lprime(Link l , List<Link> L)
+	 double I_l_lprime(Link l , List<Link> L)
 	{
 		
 		double i_l_lprime = 0;

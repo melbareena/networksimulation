@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<AppConfiguration Mode="Single">
+    <ChannelAssignment Strategy="OriginalSterategy"/>
+    <Channels Mode="All"/>
+    <DataRate>
+        <Add Rate="24" SINR="53.7"/>
+        <Add Rate="48" SINR="269.15"/>
+        <Add Rate="54" SINR="426.57"/>
+        <Add Rate="12" SINR="13.48"/>
+        <Add Rate="9" SINR="10.71"/>
+        <Add Rate="18" SINR="21.37"/>
+        <Add Rate="36" SINR="134.89"/>
+        <Add Rate="6" SINR="8.51"/>
+    </DataRate>
+    <Environment X="1000" Y="1000"/>
+    <Gateways Number="4" Radio="4" TypeOfGeneration="Static">
+        <Add x="250" y="250"/>
+        <Add x="750" y="250"/>
+        <Add x="250" y="750"/>
+        <Add x="750" y="750"/>
+    </Gateways>
+    <IFactor>
+        <Add Key="0" Value="1.0"/>
+        <Add Key="1" Value="0.7272"/>
+        <Add Key="2" Value="0.2714"/>
+        <Add Key="3" Value="0.0375"/>
+        <Add Key="4" Value="0.0054"/>
+        <Add Key="5" Value="8.0E-4"/>
+        <Add Key="6" Value="2.0E-4"/>
+        <Add Key="7" Value="0.0"/>
+        <Add Key="8" Value="0.0"/>
+        <Add Key="9" Value="0.0"/>
+        <Add Key="10" Value="0.0"/>
+    </IFactor>
+   <OutputFolder GenerateFileAsOutput="false" IntermidiateConsoleOutput="false" Path="bin\output\"/>
+   <Routers MinDistance="50" Number="65" Radio="2" SaftyTest="500" Seed="3381882580838882816" TransmissionRate="200" TypeOfGeneration="Random"/>
+  <Scheduling Strategy="BackPressureSchedulingStrategy"/>
+    <SINR Alpha="2" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
+    <Traffic Duration="1000" Lambda_max="0.5" Lambda_min="0.01" Ratio="2" Seed="2736792807018831587" Type="Dynamic"/>
+    <PowerControl Enable="true"/>
+    <TranmissionConfiguration Strategy="Greedy" downOverUpRatio="2" enlargeByGateways="false" priotityToOrthogonal="false" repeatLinksToRespectRatio="false"/>
+</AppConfiguration>

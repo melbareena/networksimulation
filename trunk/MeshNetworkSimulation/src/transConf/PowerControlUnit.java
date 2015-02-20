@@ -9,7 +9,6 @@ import org.jblas.DoubleMatrix;
 import org.jblas.Eigen;
 import org.jblas.Solve;
 import setting.ApplicationSettingFacade;
-import sinr.SINR;
 import transConf.TCBasic.DeleteAction;
 import dataStructure.DataRate;
 import dataStructure.Link;
@@ -22,7 +21,7 @@ import dataStructure.TCUnit;
 class PowerControlUnit
 {
 	private TCBasic _performer;
-	private SINR _sinr = new SINR();
+	
 	
 	PowerControlUnit ( TCBasic performer)
 	{
@@ -58,7 +57,7 @@ class PowerControlUnit
 				{
 					double d =  (Math.pow(links.get(j).getCrossDistance(links.get(i)),-ApplicationSettingFacade.SINR.getAlpha()) /
 							Math.pow(ell_i.getDistance(), -ApplicationSettingFacade.SINR.getAlpha()));
-					double IfactorValue = _sinr.getIFactorValue(ell_i, ell_j);
+					double IfactorValue = _performer._sinr.getIFactorValue(ell_i, ell_j);
 					d = d * IfactorValue;
 					double rounded = (double) Math.round(d * 10000000) / 10000000;
 					arr_G[i][j] = rounded;
@@ -104,7 +103,7 @@ class PowerControlUnit
 			if(powerAllocationIsOk)
 			{
 				//calculate data rate with the powers------------------------------------------
-				Map<Link, Double> newRates = _sinr.calcDataRate(unit,unit.getPower());
+				Map<Link, Double> newRates = _performer._sinr.calcDataRate(unit,unit.getPower());
 				unit.setRates(newRates);
 				
 				
@@ -223,7 +222,7 @@ class PowerControlUnit
 				System.err.println("Action: " + act.toString());
 				unit.setNeedAdjusmentpower(false);	
 				unit.setDead(true);
-				unit = _sinr.calcDataRate(unit);
+				unit = _performer._sinr.calcDataRate(unit);
 				return powerControl(unit);
 			}
 		}

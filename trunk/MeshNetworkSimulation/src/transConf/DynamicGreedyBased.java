@@ -1,43 +1,40 @@
 package transConf;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import setting.ApplicationSettingFacade;
-import sinr.SINR;
+import sinr.DynamicSINR;
 import trafficEstimating.TrafficEstimatingFacade;
 import common.FileGenerator;
+import dataStructure.BufferMap;
 import dataStructure.Link;
 import dataStructure.LinkType;
 import dataStructure.TCUnit;
 import dataStructure.Triple;
 import dataStructure.Vertex;
 
-
-/**
- * 
- * @author Mahdi
- *
- */
-public class GreedyTC extends TCBasic
+class DynamicGreedyBased extends TCBasic
 {
-	
-	protected GreedyTC() 
+
+	DynamicGreedyBased() 
 	{
 		super._powerUnit = new PowerControlUnit(this);
-		super._sinr = new SINR();
-		super.LinksTraffic = TrafficEstimatingFacade.getLinksTraffic();
 		resetMARK();
 	}
-	protected List<TCUnit> originalConfiguring()
+	
+	
+	List<TCUnit> createConfigurations(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
 	{
-		
+		super._sinr = new DynamicSINR(startTime, stopTime, sourceBuffer, transmitBuffer);
+		super.LinksTraffic = TrafficEstimatingFacade.getLinksTraffic(startTime, stopTime, sourceBuffer, transmitBuffer);
 		TCUnit tConfUnit;
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
-		
+		numberOfLinks = LinksTraffic.size();
 	
 		while(ConsiderLinks.size() < numberOfLinks)
 		{	
@@ -106,9 +103,7 @@ public class GreedyTC extends TCBasic
 		//*******************************************SETP 3****************************************************
 		Enlarge();	
 		
-		
-		System.out.println("Number of TC: " + _TT.size() + ", Summation of Capacity:" + getTotalCapacity() + ", Average Capacity: " + getAverageCapacity());
-		FileGenerator.TransmissionConfige(_TT);
+		FileGenerator.TransmissionConfige(_TT, startTime);
 		FileGenerator.DataRate(_TT);
 		return _TT;
 	}
@@ -168,7 +163,8 @@ public class GreedyTC extends TCBasic
 	
 	
 
-	private Triple<Link, Link, Double> maxmizing(ArrayList<Triple<Link, Link, Double>> tripleLists)
+	private Triple<Link, Link, Double> maxmizing(
+			ArrayList<Triple<Link, Link, Double>> tripleLists)
 	{
 		double max = Double.MIN_VALUE;
 		Triple<Link, Link, Double> maxTriple = null;
@@ -212,10 +208,15 @@ public class GreedyTC extends TCBasic
 		}
 		return tConfUnit;
 	}
+	
+	
+	
+	
+	
 
 	@Override
 	protected DeleteAction removeFromConsiderList(Link deletedLink)
-	{		
+	{
 		for (TCUnit unit : _TT)
 		{
 			if(unit.containsKey(deletedLink))
@@ -226,9 +227,8 @@ public class GreedyTC extends TCBasic
 		ConsiderLinks.remove(deletedLink);
 		//return true;
 		return DeleteAction.True;
-			
 	}
-	
+
 	@Override
 	protected TCUnit checkAdd(Link newLink, TCUnit tConfig)
 	{
@@ -269,7 +269,7 @@ public class GreedyTC extends TCBasic
 		} 
 		return null;
 	}
-	protected void Enlarge()
+	private void Enlarge()
 	{
 		IncreaseDatarate increaser = new IncreaseDatarate(this);
 		List<TCUnit> updateTT = new ArrayList<TCUnit>();
@@ -294,4 +294,5 @@ public class GreedyTC extends TCBasic
 		_TT = updateTT;
 
 	}
+	
 }
