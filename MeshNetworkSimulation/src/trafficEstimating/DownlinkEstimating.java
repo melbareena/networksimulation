@@ -1,20 +1,25 @@
 package trafficEstimating;
 
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
 import common.IntermediateOutput;
 import common.PrintConsole;
 import setting.ApplicationSettingFacade;
 import topology2graph.TopologyGraphFacade;
 import trafficGenerator.DTGFacade;
 import trafficGenerator.StaticTraffic;
+import dataStructure.BufferMap;
+import dataStructure.DownlinkTraffic;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
 import dataStructure.Path;
 import dataStructure.PathMap;
+import dataStructure.Traffic;
 import dataStructure.Vertex;
 
 class DownlinkEstimating
@@ -68,7 +73,7 @@ class DownlinkEstimating
 		DTGFacade dyTraffic = DTGFacade.Initilization();
 		DownlinkPaths = TopologyGraphFacade.getOptimalDownLinkPath();
 			
-		Map<Vertex, TreeMap<Vertex, Double>> dynamicTraffic = dyTraffic.getDownlink(DownlinkPaths).getTraffic();
+		Map<Vertex, TreeMap<Vertex, Double>> dynamicTraffic = dyTraffic.getDownlink().getTraffic();
 		for (Entry<Vertex, List<Path>> dlPaths : DownlinkPaths.entrySet())
 		{
 			for (Path path : dlPaths.getValue())
@@ -93,5 +98,51 @@ class DownlinkEstimating
 		PrintConsole.print("Estimating downlink traffic is done successfully.");
 		
 		return dl_Traffic_l;
+	}
+
+
+	static LinkTrafficMap dynamicEstimating(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
+	{
+		
+		LinkTrafficMap downlink_tarffic = new LinkTrafficMap();
+		
+		
+		DTGFacade dyTraffic = DTGFacade.Initilization();
+		PathMap dlPaths = TopologyGraphFacade.getOptimalDownLinkPath();
+		
+		Map<Integer, Traffic> traffic = dyTraffic.getDynamicTraffic(startTime,stopTime,sourceBuffer,transmitBuffer);
+			
+		Map<Vertex, TreeMap<Vertex, Double>> dynamicTraffic = getDownTraffic(traffic.values()).getTraffic();
+		
+		for (Entry<Vertex, List<Path>> path : dlPaths.entrySet())
+		{
+			for (Path p : path.getValue())
+			{	
+				Vertex source = p.getSource();
+				Vertex  destination = p.getDestination();			
+				if(dynamicTraffic.containsKey(source) && dynamicTraffic.get(source).containsKey(destination))
+				{
+					Double trafficValue  = dynamicTraffic.get(p.getSource()).get(p.getDestination());
+						
+					//Double trafficValue = dyTraffic.NodesRates.get(source);
+					
+						for (Link edge : p.getEdgePath())	
+							downlink_tarffic.put(edge, trafficValue);	
+				}
+				
+			}
+			
+		}
+		
+		return downlink_tarffic;
+	}
+
+
+	private static DownlinkTraffic getDownTraffic(Collection<Traffic> traffics)
+	{
+		DownlinkTraffic dt = new DownlinkTraffic();
+		for (Traffic traffic : traffics)	
+			dt.addAll(traffic.clone().getDownlinkTraffic().getTraffic());
+		return dt;
 	}
 }

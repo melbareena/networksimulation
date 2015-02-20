@@ -11,6 +11,12 @@ public class Traffic implements Cloneable {
 		this.downlinkTraffic = downlinkTraffic;
 	}
 
+	public Traffic()
+	{
+		uplinkTraffic = new UplinkTraffic();
+		downlinkTraffic = new DownlinkTraffic();
+	}
+
 	public UplinkTraffic getUplinkTraffic() {
 		return uplinkTraffic;
 	}

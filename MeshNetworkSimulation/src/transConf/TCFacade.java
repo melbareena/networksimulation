@@ -6,6 +6,7 @@ import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.TCStrategy;
 import common.PrintConsole;
 import luncher.Luncher;
+import dataStructure.BufferMap;
 import dataStructure.TCUnit;
 
 public class TCFacade
@@ -42,4 +43,20 @@ public class TCFacade
 		}
 		return configurations;
 	}
+	
+	
+	private static int _startTime = -1;
+	public static List<TCUnit> getConfigurations(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
+	{
+		if(startTime != _startTime)
+		{
+
+			DynamicGreedyBased gBased = new DynamicGreedyBased();
+			configurations = gBased.createConfigurations(startTime, stopTime, sourceBuffer, transmitBuffer);
+			_startTime = startTime;
+		}
+		return configurations;
+	}
+	
+	
 }

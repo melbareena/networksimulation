@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import setting.ApplicationSettingFacade;
-import sinr.SINR;
+import sinr.SINRAbstract;
 import trafficEstimating.TrafficEstimatingFacade;
 import dataStructure.Link;
 import dataStructure.LinkTrafficMap;
@@ -29,18 +29,19 @@ public abstract class TCBasic
 	protected Map<Integer, Vertex> nodes = ApplicationSettingFacade.Nodes.getNodes();
 	protected Map<Vertex, Integer> MARK = new HashMap<Vertex, Integer>();
 	protected LinkType forceGatewayLinks = LinkType.Outgoing;
-	protected LinkTrafficMap LinksTraffic = TrafficEstimatingFacade.getLinksTraffic();
+	protected LinkTrafficMap LinksTraffic;
 	protected final float BETA = ApplicationSettingFacade.SINR.getBeta();
 	protected int numberOfLinks = TrafficEstimatingFacade.getOptimalLinks().size(); 
 	protected Map<Link, Boolean> ConsiderLinks;
 	protected List<TCUnit> _TT = new ArrayList<>();
 	protected PowerControlUnit _powerUnit;
-	protected SINR _sinr = new SINR();
+	public SINRAbstract _sinr;
+
 	
 	
 	protected abstract DeleteAction removeFromConsiderList(Link deletedLink);
 	
-	
+	protected abstract TCUnit checkAdd(Link newLink, TCUnit tConfig);
 	
 	
 	
@@ -98,120 +99,7 @@ public abstract class TCBasic
 		return false;
 	}
 	
-	protected void computeDataRate()
-	{
-		List<TCUnit> updateTT = new ArrayList<TCUnit>();
-		TCUnit updateTUnit = null;
-		for (TCUnit tcUnit : _TT)
-		{
-			updateTUnit = _sinr.calcDataRate(tcUnit);
-			updateTT.add(updateTUnit);
-		}
-		_TT = updateTT;
-		
-	}
 	
-	TCUnit checkAdd(Link newLink, TCUnit tConfig)
-	{
-		boolean add = true;
-		double sinr = 0;
-		TCUnit tPrime = tConfig.Clone();
-		
-		if(this.checkRadio(newLink))
-		{
-			//if(!balanceGatewayLinks(newLink,tConfig)) return null;
-			tPrime.putRate(newLink, 0);
-			tPrime.setTCAPZero();
-			
-		
-			for (Link currentLink : tPrime.getLinks())
-			{
-				List<Link> linkSet = tPrime.getLinks();
-				linkSet.remove(currentLink);
-				
- 				sinr = _sinr.calc(currentLink,linkSet );
-				
-				if(sinr >= BETA)
-					tPrime.setSinrRate(currentLink,  _sinr.calcDataRate(sinr).getRate(), sinr);
-				else
-				{
-					add = false;
-					break;
-				}
-			}
-		
-			if(add && tPrime.getTCAP() >= tConfig.getTCAP())
-			{
-				ConsiderLinks.put(newLink,true);
-				setMark(newLink.getDestination());
-				setMark(newLink.getSource());
-				return tPrime;
-			}
-		} 
-		return null;
-	}
-
- 	/**
- 	 * this method check if the new link is incoming or outgoing link to a gateway , the gateway do not have any IN or OUT
- 	 * link to the gateway
- 	 * @param tConfig 
- 	 * @param a new link which wants to add the TC.
- 	 * @return can be added or not
- 	
-	private boolean balanceGatewayLinks(Link newLink, TCUnit tConfig)
-	{
-	
-		for (Vertex gateway : 	ApplicationSettingFacade.Gateway.getGateway().values())
-		{
-			if(newLink.getDestination() != gateway && newLink.getSource() != gateway)
-				continue;
-			else 
-			{
-				if(newLink.getDestination() == gateway)
-				{
-					if(tConfig.getCounter_g(gateway, LinkType.Incoming) > 0)
-						return false;
-					else
-						return true;
-				}
-				else if(newLink.getSource() == gateway)
-				{
-					if(tConfig.getCounter_g(gateway, LinkType.Outgoing) > 0)
-						return false;
-					else
-						return true;
-				}
-			}
-				
-		}
-		return true;
-	} */
-	
-	protected void Enlarge()
-	{
-		IncreaseDatarate increaser = new IncreaseDatarate(this);
-		List<TCUnit> updateTT = new ArrayList<TCUnit>();
-		TCUnit updateTUnit = null;
-		for (TCUnit tcUnit : _TT)
-		{
-			tcUnit = _sinr.calcDataRate(tcUnit);
-			calcOccupiedRadio(tcUnit);
-			updateTUnit = this.Enlarge(tcUnit);
-			updateTUnit = _sinr.calcDataRate(updateTUnit);
-			if(ApplicationSettingFacade.PowerControl.isEnable())
-			{
-				
-				updateTUnit = _powerUnit.powerControl(updateTUnit);	
-				TCUnit improve = increaser.increaser(updateTUnit);
-				if(improve != null)
-					updateTUnit = improve;
-			}
-			updateTT.add(updateTUnit);
-			resetMARK();
-		}
-		_TT = updateTT;
-
-	}
 	
 	
 

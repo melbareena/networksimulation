@@ -49,4 +49,6 @@ public class OriginalSterategy extends AssigningSterategy
 		return min;
 	}
 
+	
+
 }

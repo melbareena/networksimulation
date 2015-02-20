@@ -315,7 +315,26 @@ public class FileGenerator
 		}
 		
 	}
-
+	public static void TrafficOfLinksInFile(LinkTrafficMap traffic_l,int startTime)
+	{
+		if(!ISFILEENABLE) return;
+		try
+		{		
+			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "link_weights_"+startTime+".txt"));
+			for (Entry<Link, Double> links : traffic_l.Sort().entrySet())
+			{
+				writer.write(links.getKey().getId() + " " + links.getValue());
+				writer.newLine();
+				
+			}	
+			writer.close();
+			PrintConsole.print("Traffic estimation added in a file sucessfully.");
+		} catch (Exception ex)
+		{
+			System.err.println("TrafficOfLinksInFile/FileGenerator/Message:" + ex.getMessage());
+		}
+		
+	}
 
 	public static void LinksAmbienNoiseInFile(LinksAmbienNoiseMap noiseSet)
 	{
@@ -340,7 +359,29 @@ public class FileGenerator
 		
 	}
 
+	public static void ChannelsInFile(LinksChannelMap linksChannel,	int startTime)
+	{
+		if(!ISFILEENABLE) return;
+		try
+		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "channels_assignment_"+startTime+".txt"));
+			for(Entry<Link, Channel> LC : linksChannel.entrySet())
+			{
+				writer.write(LC.getKey().getId() + " " + LC.getValue().getChannel());
+				writer.newLine();
+			}
 
+			writer.close();
+			PrintConsole.print("Channel for each link added in a file sucessfully.");
+		} 
+		catch (Exception ex)
+		{
+			System.err.println("ChannelsInFile/FileGenerator/Message:" + ex.getMessage());
+		}
+		
+	}
+	
+	
 	public static void ChannelsInFile(LinksChannelMap linksChannel)
 	{
 		if(!ISFILEENABLE) return;
@@ -386,7 +427,28 @@ public class FileGenerator
 		
 		
 	}
+	public static void TransmissionConfige(List<TCUnit> tT, int startTime)
+	{
+		if(!ISFILEENABLE) return;
+		try
+		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "transmission_configuration_"+ startTime +".txt"));
+			for(TCUnit tcu : tT)
+			{
+				for (Entry<Link, Double> linkDataRate : tcu.entrySetRate() )
+					writer.write(linkDataRate.getKey().getId() + " ");
+				writer.newLine();
+			}
 
+			writer.close();
+			PrintConsole.print("Transmission Configuration inserted in file successfully.");
+		} 
+		catch (Exception ex)
+		{
+			System.err.println("TransmissionConfigStepOne/FileGenerator/Message:" + ex.getMessage());
+		}
+		
+	}
 
 	public static void TransmissionConfige(List<TCUnit> tT)
 	{
@@ -620,9 +682,6 @@ public class FileGenerator
 
 	public static void seceduleResult(SchedulingResult[] results)
 	{
-		
-			
-
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(2);
 		StringBuilder throughputBuilder = new StringBuilder();
@@ -658,8 +717,7 @@ public class FileGenerator
 
 	public static void SchedulingResult(SchedulingResult results)
 	{
-		
-		
+			
 		try
 		{
 			BufferedWriter THwriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "schedulingResult_throughput_mbps.txt" ));
@@ -752,4 +810,8 @@ public class FileGenerator
 	}
 
 
+
+
+
+	
 }

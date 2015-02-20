@@ -45,45 +45,50 @@ public class DTGFacade
 	 */
 	public Map<Integer,Traffic> getDynamicTraffic(int startTimeSlot, int endTimeSlot, BufferMap sourceBuffer, BufferMap transmitBuffer)
 	{
+		if(endTimeSlot == ApplicationSettingFacade.Traffic.getDuration())  
+			endTimeSlot--;
 		Map<Integer,Traffic> periodTraffic = new HashMap<Integer, Traffic>();
-		for(int i = startTimeSlot + 1 ; i <= endTimeSlot; i++)
-			periodTraffic.put(i, getDynamicTraffic(i));
+		if(startTimeSlot < ApplicationSettingFacade.Traffic.getDuration())
+		{
+			
+			for(int i = startTimeSlot + 1 ; i <= endTimeSlot; i++)
+				periodTraffic.put(i, getDynamicTraffic(i));
+		}
 		 
+		Traffic startTraffic = new Traffic();
 		
-		Traffic startTraffic = getDynamicTraffic(startTimeSlot);
+		if(startTimeSlot < ApplicationSettingFacade.Traffic.getDuration())
+			startTraffic = getDynamicTraffic(startTimeSlot);
 		
 		DownlinkTraffic downT = startTraffic.getDownlinkTraffic();
 		UplinkTraffic upT = startTraffic.getUplinkTraffic();
-		if(sourceBuffer.trafficSize() > 0)
+		if(sourceBuffer != null && sourceBuffer.trafficSize() > 0)
 		{
 			for (Entry<Link, Buffer> lb : sourceBuffer.entrySet())
-			{
-				Vertex source = lb.getKey().getSource();
-				
-				
-				// source is gateways , traffic should be added on downlink traffic
-				if(ApplicationSettingFacade.Gateway.isGateway(source))
-					for (Packet p : lb.getValue().getPackets())
-						downT.appendTraffic(source, p.getDestination(), p.getTraffic());
-				else
-					for (Packet p : lb.getValue().getPackets())
-						upT.appendTraffic(source, p.getTraffic());
+			{				
+				for (Packet p : lb.getValue().getPackets())
+				{
+					if(ApplicationSettingFacade.Gateway.isGateway(p.getDestination()))
+						upT.appendTraffic(p.getSource(), p.getTraffic());
+					else
+						downT.appendTraffic(p.getSource(), p.getDestination() , p.getTraffic());					
+				}				
+
 			}
 		}
-		if(transmitBuffer.size() > 0 )
+		if(transmitBuffer != null && transmitBuffer.size() > 0 )
 		{
 			for (Entry<Link, Buffer> lb : transmitBuffer.entrySet())
 			{
-				Vertex source = lb.getKey().getSource();
 				
-				
-				// source is gateways , traffic should be added on downlink traffic
-				if(ApplicationSettingFacade.Gateway.isGateway(source))
-					for (Packet p : lb.getValue().getPackets())
-						downT.appendTraffic(source, p.getDestination(), p.getTraffic());
-				else
-					for (Packet p : lb.getValue().getPackets())
-						upT.appendTraffic(source, p.getTraffic());
+				for (Packet p : lb.getValue().getPackets())
+				{
+					if(ApplicationSettingFacade.Gateway.isGateway(p.getDestination()))
+						upT.appendTraffic(p.getSource(), p.getTraffic());
+					else
+						downT.appendTraffic(p.getSource(), p.getDestination() , p.getTraffic());
+						
+				}
 			}
 		}
 		periodTraffic.put(0, startTraffic);
@@ -135,7 +140,7 @@ public class DTGFacade
 	private DownlinkTraffic _downlinkTraffic;
 	private UplinkTraffic _uplinkTraffic;
 	
-	public DownlinkTraffic getDownlink(PathMap downlinkPaths)
+	public DownlinkTraffic getDownlink()
 	{
        
 		if(_downlinkTraffic != null) return _downlinkTraffic;

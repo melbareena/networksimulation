@@ -1,4 +1,4 @@
-package launcher;
+package luncher;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -8,19 +8,24 @@ import java.util.List;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
+import cAssignment.ChannelAssignmentFacade;
 import common.FileGenerator;
 import common.PrintConsole;
+import scheduling.DynamicBP;
 import scheduling.SchedulingFacade;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.AppExecMode;
+import trafficEstimating.TrafficEstimatingFacade;
+import transConf.TCFacade;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.SchedulingResultGraph;
 import GraphicVisualization.StartOptionsDialog;
+import dataStructure.BufferMap;
 import dataStructure.Channel;
 import dataStructure.SchedulingResult;
 
-public class Program {
+public class Luncher {
 
 	public static LoadingDialog loadingDialog;
 	
@@ -69,7 +74,7 @@ public class Program {
 			cmd.append("-cp ")
 					.append(ManagementFactory.getRuntimeMXBean().getClassPath())
 					.append(" ");
-			cmd.append(Program.class.getName()).append(" ");
+			cmd.append(Luncher.class.getName()).append(" ");
 			Runtime.getRuntime().exec(cmd.toString());
 			System.exit(0);
 		} catch (Exception e) {
@@ -81,7 +86,17 @@ public class Program {
 	 * @param args -
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception 
+	{
+		/*
+		DynamicBP dp = new DynamicBP(0);
+		SchedulingResult sr =	dp.dynamicScheduling(ApplicationSettingFacade.Traffic.getDuration());
+		FileGenerator.SchedulingResult(sr);
+		SchedulingResultGraph g = new SchedulingResultGraph(sr);
+		g.createDiagram();
+		//TrafficEstimatingFacade.getLinksTraffic(0, 500, new BufferMap(), new BufferMap());
+		//TrafficEstimatingFacade.getLinksTraffic(501, 1, new BufferMap(), new BufferMap());
+		*/
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -118,7 +133,7 @@ public class Program {
 		int nbBars = numberOfExecution;
 		
 		for(int i = 1; i < nbBars; i++) {
-			Program.loadingDialog.addBar();
+			Luncher.loadingDialog.addBar();
 		}
 		
 		try {
@@ -146,13 +161,13 @@ public class Program {
 						PrintConsole.print("Exceute Number : " + index);
 						SchedulingResult result = SchedulingFacade.getScheduling(index-1);
 						_finalResults.add(result);
-						Program.loadingDialog.setIndeterminate(index-1, true);
-						Program.loadingDialog.setLabel(index-1, "Building user interface...");
+						Luncher.loadingDialog.setIndeterminate(index-1, true);
+						Luncher.loadingDialog.setLabel(index-1, "Building user interface...");
 						int step = result.getThroughputData().size()/100;
 						if(step == 0 ) step = 1;
 						SchedulingResultGraph g = new SchedulingResultGraph(result);
 						g.createDiagram();
-						Program.loadingDialog.setProgress(index-1, 100, "Done!");
+						Luncher.loadingDialog.setProgress(index-1, 100, "Done!");
 						
 						samplesList.add(result.getThroughputData().size());
 						throughputList.add(result.getAverageThroughputInSteadyState());
@@ -163,20 +178,27 @@ public class Program {
 				private void singleMode() {
 					PrintConsole.print("********************** Application is in single execution mode ************************");
 					long startTime = System.currentTimeMillis();
-					SchedulingResult result = SchedulingFacade.getScheduling(0);
+					//SchedulingResult result = SchedulingFacade.getScheduling(0);
+					
+					DynamicBP dp = new DynamicBP(0);
+					SchedulingResult result =	dp.dynamicScheduling(ApplicationSettingFacade.Traffic.getDuration());
+					FileGenerator.SchedulingResult(result);
+					
+					
+					
 					long stopTime = System.currentTimeMillis();
 				    long elapsedTime = stopTime - startTime;
 				    System.out.println("---------------------------Execution Time:" + elapsedTime);
-					Program.loadingDialog.setIndeterminate(0, true);
-					Program.loadingDialog.setLabel(0, "Building user interface...");
+					Luncher.loadingDialog.setIndeterminate(0, true);
+					Luncher.loadingDialog.setLabel(0, "Building user interface...");
 					new GraphViewer(result, getAvailableChannels(), 0);
 				}
 				
 				@Override
 				protected void done() {
 					super.done();
-					Program.loadingDialog.dispose();
-					Program.loadingDialog.setVisible(false);
+					Luncher.loadingDialog.dispose();
+					Luncher.loadingDialog.setVisible(false);
 					if(_finalResults.size() > 0)
 					{
 						
