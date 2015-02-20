@@ -52,6 +52,8 @@ import GraphicVisualization.editDialog.GatewaysEditOptionDialog;
 import GraphicVisualization.editDialog.IFactorEditOptionDialog;
 import GraphicVisualization.editDialog.RoutersEditOptionDialog;
 import GraphicVisualization.editDialog.SINREditOptionDialog;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 /**
  * @author Benjamin
@@ -66,9 +68,6 @@ public class StartOptionsDialog extends JDialog {
 	private final JPanel	contentPanel	= new JPanel();
 	private final JPanel chckbxPanel = new JPanel();
 	private final JSpinner spinnerRatio = new JSpinner();
-	private final JCheckBox chckbxPriorityToOrthogonal = new JCheckBox("Priority to orthogonal");
-	private final JCheckBox chckbxRepeatLinksTo = new JCheckBox("Repeat links to ensure ratio");
-	private final JCheckBox chckbxEnlargeByGateways = new JCheckBox("Enlarge by gateways");
 	private final JRadioButton rdbtnNewAlgorithm = new JRadioButton("Pattern Based");
 	private final JLabel lblAlgorithm = new JLabel("TC Algorithms:");
 	private final JLabel lblEnvironment = new JLabel("Environment:");
@@ -77,7 +76,7 @@ public class StartOptionsDialog extends JDialog {
 	private final JSpinner envYSpinner = new JSpinner();
 	private final JLabel lblX = new JLabel(" X: ");
 	private final JLabel lblY = new JLabel(" Y: ");
-	private final JLabel lblNewLabel = new JLabel("Other parameters:");
+	private final JLabel lblNewLabel = new JLabel("Mode of Algorithm:");
 	private final JPanel ratioLabelsPanel = new JPanel();
 	private final JLabel lblOverUplinks = new JLabel("over Uplinks:");
 	private final JPanel newAlgoPanel = new JPanel();
@@ -162,6 +161,8 @@ public class StartOptionsDialog extends JDialog {
 	private DatarateEditOptionDialog datarateDialog;
 	private SINREditOptionDialog sinrDialog;
 	private final JCheckBox chkPowerControl = new JCheckBox("Power Control");
+	private final JCheckBox chkDynamicAlgroithm = new JCheckBox("Enable Dynamic Algroithm");
+	private final JPanel panel = new JPanel();
 
 	/**
 	 * Create the dialog.
@@ -492,9 +493,6 @@ public class StartOptionsDialog extends JDialog {
 				public void itemStateChanged(ItemEvent e) {
 					chckbxPanel.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 					spinnerRatio.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-					chckbxPriorityToOrthogonal.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-					chckbxRepeatLinksTo.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-					chckbxEnlargeByGateways.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 				}
 			});
 			chkPowerControl.setSelected(true);
@@ -533,12 +531,19 @@ public class StartOptionsDialog extends JDialog {
 			lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			newAlgoPanel.add(chckbxPanel, "cell 1 1,grow");
 			chckbxPanel.setLayout(new GridLayout(3, 0, 0, 0));
-	
-			chckbxPanel.add(chckbxPriorityToOrthogonal);
-	
-			chckbxPanel.add(chckbxRepeatLinksTo);
-	
-			chckbxPanel.add(chckbxEnlargeByGateways);
+			
+			chckbxPanel.add(panel);
+			chkDynamicAlgroithm.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent arg0) 
+				{
+					if(chkDynamicAlgroithm.isSelected())
+						rdbtnStatic.setEnabled(false);
+					else
+						rdbtnStatic.setEnabled(true);
+				}
+			});
+			
+			chckbxPanel.add(chkDynamicAlgroithm, "cell 2 1,alignx right,aligny center");
 			lblChannels.setHorizontalAlignment(SwingConstants.TRAILING);
 		}
 		
@@ -609,9 +614,8 @@ public class StartOptionsDialog extends JDialog {
 			
 			channelsPanel.add(lblStrategy, "cell 0 2,growx");
 			channelStrategyComboBox.setModel(new DefaultComboBoxModel(
-					new String[] {"All Balancing", "Orthogonal Balancing", "Non Orthogonal Blancing", "Original",
-							"Select Min Randomly", "SINR"}));
-			channelStrategyComboBox.setSelectedIndex(3);
+					new String[] {"Affectance"}));
+			//channelStrategyComboBox.setSelectedIndex(0);
 			
 			channelsPanel.add(channelStrategyComboBox, "cell 1 2,grow");
 		}
@@ -820,24 +824,11 @@ public class StartOptionsDialog extends JDialog {
 		
 		String channelAssignment = "";
 		switch(channelStrategyComboBox.getSelectedItem().toString()) {
-		case "All Balancing" :
-			channelAssignment = "AllBalancingSterategy";
-			break;
-		case "Orthogonal Balancing" :
-			channelAssignment = "OrthogonalBalancingSterategy";
-			break;
-		case "Non Orthogonal Blancing" :
-			channelAssignment = "NonOrthogonalBalancingSterategy";
-			break;
-		case "Original" :
+	
+		case "Affectance" :
 			channelAssignment = "OriginalSterategy";
 			break;
-		case "Select Min Randomly" :
-			channelAssignment = "SelectMinRandomlySterategy";
-			break;
-		case "SINR" :
-			channelAssignment = "SINRSterategy";
-			break;
+		
 		}
 		XMLWriter.writeChannelAssignment(channelAssignment);
 		
@@ -902,8 +893,7 @@ public class StartOptionsDialog extends JDialog {
 		XMLWriter.writePowerControl(chkPowerControl.isSelected());
 
 		if(rdbtnNewAlgorithm.isSelected())
-			XMLWriter.writePatternBasedSterategy((int) spinnerRatio.getValue(), chckbxPriorityToOrthogonal.isSelected(),
-					chckbxRepeatLinksTo.isSelected(),  chckbxEnlargeByGateways.isSelected());
+			XMLWriter.writePatternBasedSterategy((int) spinnerRatio.getValue());
 		else
 			XMLWriter.writeOriginalTCSterategy();
 		

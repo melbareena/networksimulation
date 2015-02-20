@@ -11,10 +11,7 @@ import dataStructure.TCUnit;
 
 public class TCFacade
 {
-	public static int downOverUpRatio = ApplicationSettingFacade.TranmissionConfiguration.getDownOverUpRatio();
-	public static boolean priotityToOrthogonal = ApplicationSettingFacade.TranmissionConfiguration.isPriotityToOrthogonal();
-	public static boolean repeatLinksToRespectRatio = ApplicationSettingFacade.TranmissionConfiguration.isRepeatLinksToRespectRatio();
-	public static boolean enlargeByGateways = ApplicationSettingFacade.TranmissionConfiguration.isEnlargeByGateways();
+	
 	
 	
 	private static int multiExecIndex = 0;
@@ -30,9 +27,9 @@ public class TCFacade
 			
 			if(ApplicationSettingFacade.TranmissionConfiguration.getStertegy() == TCStrategy.PatternBased) 
 			{
+				int downOverUpRatio = ApplicationSettingFacade.TranmissionConfiguration.getDownOverUpRatio();
 				PatternBasedTC pTC = new PatternBasedTC();
-				configurations = pTC.patternBasedConfiguration(downOverUpRatio, priotityToOrthogonal,
-						repeatLinksToRespectRatio, enlargeByGateways);
+				configurations = pTC.patternBasedConfiguration(downOverUpRatio);
 			}
 			else 
 			{

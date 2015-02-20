@@ -63,7 +63,7 @@ public class SchedulingResult {
 		
 		Vector<Double> mbps = new Vector<Double>();
 		
-		mbps.add(0d);
+		mbps.add(throughputData.get(0));
 		
 		int slotCounter = 0;
 		double throughputAccumulation = 0;
