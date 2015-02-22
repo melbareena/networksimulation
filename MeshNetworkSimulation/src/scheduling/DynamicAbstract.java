@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import setting.ApplicationSettingFacade;
 import trafficEstimating.TrafficEstimatingFacade;
 import luncher.Luncher;
 import dataStructure.Buffer;
@@ -20,7 +21,7 @@ public abstract class DynamicAbstract
 	protected BufferMap sourceBuffers;
 	protected BufferMap transmitBuffers;
 	protected List<TCUnit> configurations;
-
+	protected final int durationOfTrafficGenerating = (int)ApplicationSettingFacade.Traffic.getDuration();
 	
 	/* For collecting results */
 	protected Vector<Double> throughput;
@@ -32,7 +33,7 @@ public abstract class DynamicAbstract
 	protected double maxTrafficSource;
 	protected double maxTrafficTransmit;
 	
-	protected int _redoTimeSlot = 10;
+	protected int _redoTimeSlot = ApplicationSettingFacade.getInterval();
 	
 	
 	protected void updateProgress(int timeSlot)
@@ -110,6 +111,7 @@ public abstract class DynamicAbstract
 		}
 		
 	}
+	
 	protected double updateTraffic(int currentTimeSlot)
 	{
 		double currentTrafficAmount = 0.0;
@@ -129,6 +131,7 @@ public abstract class DynamicAbstract
 		return 0;
 		
 	}
+	
 	protected double accumulationOfThroughput()
 	{
 		double accu = 0;
@@ -140,7 +143,7 @@ public abstract class DynamicAbstract
 		return  (double)Math.round(accu * 100000) / 100000;	
 	}
 	
+	public abstract SchedulingResult doDeliveryPackets() ;
 	
-	public abstract SchedulingResult doDeliveryPackets(long durationOfTrafficGenerating) ;
 	protected abstract String getName();
 }

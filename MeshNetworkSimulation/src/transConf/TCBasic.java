@@ -31,7 +31,7 @@ public abstract class TCBasic
 	protected LinkType forceGatewayLinks = LinkType.Outgoing;
 	protected LinkTrafficMap LinksTraffic;
 	protected final float BETA = ApplicationSettingFacade.SINR.getBeta();
-	protected int numberOfLinks = TrafficEstimatingFacade.getOptimalLinks().size(); 
+	protected int numberOfLinks = 0;
 	protected Map<Link, Boolean> ConsiderLinks;
 	protected List<TCUnit> _TT = new ArrayList<>();
 	protected PowerControlUnit _powerUnit;

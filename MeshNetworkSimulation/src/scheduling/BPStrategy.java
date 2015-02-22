@@ -27,21 +27,21 @@ import dataStructure.Vertex;
  * @see <a href="http://en.wikipedia.org/wiki/Backpressure_routing">BackpressureRouting</a>
  * @author Benjamin
  */
-public class BackPressureSchedulingStrategy extends SchedulingStrategy {
+public class BPStrategy extends SchedulingBase {
 
 	/**Creates a new BackPressureSchedulingStrategy.
 	 * @param instanceIndex The instance index of the scheduling strategy.
 	 * Used when various scheduling strategy are run in a single instance of the program.
-	 * @see SchedulingStrategy#SchedulingStrategy(int)
+	 * @see SchedulingBase#SchedulingStrategy(int)
 	 */
-	public BackPressureSchedulingStrategy(int instanceIndex) {
+	public BPStrategy(int instanceIndex) {
 		super(instanceIndex);
 	}
 
 	/**Returns null (not used in this strategy)
 	 * @param isSourceBuffer
 	 * @return Null
-	 * @see scheduling.SchedulingStrategy#getBufferStrategy(boolean)
+	 * @see scheduling.SchedulingBase#getBufferStrategy(boolean)
 	 */
 	@Override
 	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) {
@@ -49,7 +49,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	}
 
 	/* (non-Javadoc)
-	 * @see scheduling.SchedulingStrategy#staticScheduling()
+	 * @see scheduling.SchedulingBase#staticScheduling()
 	 */
 	@Override
 	public SchedulingResult staticScheduling() {
@@ -68,7 +68,7 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	}
 
 	/* (non-Javadoc)
-	 * @see scheduling.SchedulingStrategy#dynamicScheduling(long)
+	 * @see scheduling.SchedulingBase#dynamicScheduling(long)
 	 */
 	@Override
 	public SchedulingResult dynamicScheduling(long durationOfTrafficGenerating) {
@@ -271,11 +271,11 @@ public class BackPressureSchedulingStrategy extends SchedulingStrategy {
 	}
 
 	/* (non-Javadoc)
-	 * @see scheduling.SchedulingStrategy#getName()
+	 * @see scheduling.SchedulingBase#getName()
 	 */
 	@Override
 	protected String getName() {
-		return "BPSS";
+		return "BP";
 	}
 
 }

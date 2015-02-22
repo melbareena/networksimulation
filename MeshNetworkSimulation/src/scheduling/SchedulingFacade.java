@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import setting.ApplicationSettingFacade;
+import setting.BaseConfiguration.AlgorithmMode;
 import dataStructure.SchedulingResult;
 
 public class SchedulingFacade
@@ -12,19 +13,32 @@ public class SchedulingFacade
 	public static SchedulingResult getScheduling(int instanceIndex)
 	{
 		
+		String postFix = "";
 		String className = "";
 		try
 		{
-			className = ApplicationSettingFacade.Scheduling.getSterategyClassName();
+			
+			postFix = ApplicationSettingFacade.Scheduling.getSterategyClassName();
+			if(ApplicationSettingFacade.getAlgorithmMode() == AlgorithmMode.Dynamic)
+				className = "Dynamic" + postFix;
+			else
+				className = postFix;
+			
 			Class<?> myClass = Class.forName("scheduling." + className);
 			Constructor<?> myConstructor = myClass.getConstructor(int.class);
 			
 			String methodName = "";
 			
-			if(ApplicationSettingFacade.Traffic.isDynamicType())
-				methodName = "dynamicScheduling";
+			
+			if(ApplicationSettingFacade.getAlgorithmMode() == AlgorithmMode.Static)
+			{
+				if(ApplicationSettingFacade.Traffic.isDynamicType())
+					methodName = "dynamicScheduling";
+				else
+					methodName = "staticScheduling";
+			}
 			else
-				methodName = "staticScheduling";
+				methodName = "doDeliveryPackets";
 					
 			
 			Method m = myClass.getMethod(methodName);

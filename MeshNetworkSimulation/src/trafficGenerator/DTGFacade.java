@@ -110,9 +110,8 @@ public class DTGFacade
 			_self.NodesRates = DynamicTrafficGenerator._nodesRates;
 			offeredLoad = DynamicTrafficGenerator._offerloadTraffic;
 			totalPackets = DynamicTrafficGenerator._numPackets;
-			System.out.println("Number Of Packets: " + totalPackets);
-			System.out.println("Total Traffic: " + DynamicTrafficGenerator.totalTraffic());
-			System.out.println("Total Traffic in TrafficMAP: " + getTotalTraffic());
+			System.out.println("Total Traffic: " + DynamicTrafficGenerator.totalTraffic() + " Mb");
+			System.out.println("Offered Load: " + offeredLoad + " Mbps");
 		}
 	
 		return _self;

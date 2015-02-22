@@ -22,7 +22,7 @@ import dataStructure.SchedulingResult;
 import dataStructure.TCUnit;
 
 
-public abstract class SchedulingStrategy
+public abstract class SchedulingBase
 {
 
 	protected int k = 3;
@@ -43,11 +43,11 @@ public abstract class SchedulingStrategy
 	
 	protected int instanceIndex;
 
-	/**Creates a new SchedulingStrategy. Initiates all the buffers in the network.
+	/**Creates a new SchedulingBase. Initiates all the buffers in the network.
 	 * @param instanceIndex The instance index of the scheduling strategy.
 	 * Used when various scheduling strategy are run in a single instance of the program.
 	 */
-	public SchedulingStrategy(int instanceIndex) {
+	public SchedulingBase(int instanceIndex) {
 		PrintConsole.printErr("Intiate Scheduling..........");
 		if(!ApplicationSettingFacade.Traffic.isDynamicType())
 			this.sourceBuffers = TrafficEstimatingFacade.getSourceBuffers(0);

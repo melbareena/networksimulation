@@ -18,12 +18,12 @@ import dataStructure.Packet;
 import dataStructure.SchedulingResult;
 import dataStructure.TCUnit;
 
-public class DynamicRR extends DynamicAbstract
+public class DynamicRRStrategy extends DynamicAbstract
 {
 	private int sourcePositionIndex;
 	private int tranmissionPositionIndex;
 
-	public DynamicRR(int instanceIndex)
+	public DynamicRRStrategy(int instanceIndex)
 	{
 		sourcePositionIndex = 0;
 		tranmissionPositionIndex = 0;
@@ -39,7 +39,7 @@ public class DynamicRR extends DynamicAbstract
 	
 	
 	@Override
-	public SchedulingResult doDeliveryPackets(long durationOfTrafficGenerating)
+	public SchedulingResult doDeliveryPackets()
 	{
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfigurations = null;
@@ -294,7 +294,7 @@ public class DynamicRR extends DynamicAbstract
 	@Override
 	protected String getName()
 	{
-		return "RRPD";
+		return "DynamicRR";
 	}
 
 

@@ -10,13 +10,25 @@ public class AppConfig extends BaseConfiguration
 {
 	private static final  String TAG = "AppConfiguration";
 	private static final String ATTMODE = "Mode";
+	private static final String ATTALGMODE = "AlgorithmMode";
+	private static final String ATTINTERVAL = "Interval";
 	
 	private AppExecMode _appExcMode;
 	public AppExecMode getAppExceMode()
 	{
 		return _appExcMode;
 	}
+	private AlgorithmMode _algMode;
+	public AlgorithmMode getAlgorithmMode()
+	{
+		return _algMode;
+	}
 	
+	private int _interval;
+	public int getInterval()
+	{
+		return _interval;
+	}
 	private static AppConfig _selfObject;
 	public static AppConfig Initiating()
 	{
@@ -44,7 +56,9 @@ public class AppConfig extends BaseConfiguration
 				{
 				
 					_appExcMode =AppExecMode.valueOf(eElement.getAttribute(ATTMODE));
-					
+					_algMode = AlgorithmMode.valueOf(eElement.getAttribute(ATTALGMODE));
+					if(_algMode == AlgorithmMode.Dynamic)
+						_interval = Integer.parseInt(eElement.getAttribute(ATTINTERVAL));					
 				}
 			} 
 			catch (Exception e)
@@ -59,10 +73,10 @@ public class AppConfig extends BaseConfiguration
 	@Override
 	protected boolean ValidateXMLDocument(Element eElement) throws Exception
 	{
-		if(!eElement.hasAttribute(ATTMODE))
+		if(!eElement.hasAttribute(ATTMODE) || !eElement.hasAttribute(ATTALGMODE))
 		{
 			PrintConsole.printErr(TAG + " must have an attribute. the following template may help you " +
-					"\n	<AppConfiguration Mode=\"AllCombination, Single or ApartCombination  \"> " );
+					"\n	<AppConfiguration Mode=\"AllCombination, Single or ApartCombination  \"   AlgorithmMode= \" Dynamic or Static \" /> " );
 			System.exit(0);
 		}
 		return true;
