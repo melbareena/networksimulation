@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import luncher.Luncher;
+import setting.BaseConfiguration.AlgorithmMode;
 import setting.BaseConfiguration.AppExecMode;
 import setting.BaseConfiguration.ChannelMode;
 import setting.BaseConfiguration.TCStrategy;
@@ -42,7 +43,14 @@ public class ApplicationSettingFacade
 	{
 		return _appConf.getAppExceMode();
 	}
-	
+	public static AlgorithmMode getAlgorithmMode()
+	{
+		return _appConf.getAlgorithmMode();
+	}
+	public static int getInterval()
+	{
+		return _appConf.getInterval();
+	}
 	public static class PowerControl
 	{
 		public static boolean isEnable()

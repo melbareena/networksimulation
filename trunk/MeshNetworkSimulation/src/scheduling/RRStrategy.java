@@ -8,13 +8,13 @@ import dataStructure.Buffer;
 import dataStructure.BufferMap;
 import dataStructure.Link;
 
-public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
+public class RRStrategy  extends SchedulingBase
 {
 	
 	private int sourcePositionIndex;
 	private int tranmissionPositionIndex;
 
-	public RoundRobinSchedulingStrategy(int instanceIndex) {
+	public RRStrategy(int instanceIndex) {
 		super(instanceIndex);
 		sourcePositionIndex = 0;
 		tranmissionPositionIndex = 0;
@@ -68,7 +68,7 @@ public class RoundRobinSchedulingStrategy  extends SchedulingStrategy
 	
 	@Override
 	protected String getName() {
-		return "RRSS";
+		return "RR";
 	}
 	
 }

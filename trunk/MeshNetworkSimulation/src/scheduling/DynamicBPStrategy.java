@@ -21,9 +21,9 @@ import dataStructure.SchedulingResult;
 import dataStructure.TCUnit;
 import dataStructure.Vertex;
 
-public class DynamicBP extends DynamicAbstract
+public class DynamicBPStrategy extends DynamicAbstract
 {
-	public DynamicBP(int instanceIndex)
+	public DynamicBPStrategy(int instanceIndex)
 	{
 		super.transmitBuffers = new BufferMap();
 		super.throughput = new Vector<Double>();
@@ -44,7 +44,9 @@ public class DynamicBP extends DynamicAbstract
 		linkSet.addAll(this.transmitBuffers.keySet());
 		return linkSet;
 	}
-	public SchedulingResult doDeliveryPackets(long durationOfTrafficGenerating) 
+	
+	@Override
+	public SchedulingResult doDeliveryPackets() 
 	{
 		this.configurations = TCFacade.getConfigurations(0, _redoTimeSlot , sourceBuffers, transmitBuffers);
 
@@ -245,6 +247,6 @@ public class DynamicBP extends DynamicAbstract
 	}
 	
 	protected String getName() {
-		return "BPPD";
+		return "DynamicBP";
 	}
 }

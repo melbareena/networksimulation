@@ -32,12 +32,12 @@ public class GreedyTC extends TCBasic
 		super.LinksTraffic = TrafficEstimatingFacade.getLinksTraffic();
 		resetMARK();
 	}
-	protected List<TCUnit> originalConfiguring()
+	protected List<TCUnit> createConfigurations()
 	{
 		
 		TCUnit tConfUnit;
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
-		
+		numberOfLinks = TrafficEstimatingFacade.getOptimalLinks().size(); 
 	
 		while(ConsiderLinks.size() < numberOfLinks)
 		{	

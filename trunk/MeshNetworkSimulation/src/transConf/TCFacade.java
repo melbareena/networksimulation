@@ -4,7 +4,6 @@ import java.util.List;
 
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.TCStrategy;
-import common.PrintConsole;
 import luncher.Luncher;
 import dataStructure.BufferMap;
 import dataStructure.TCUnit;
@@ -21,20 +20,16 @@ public class TCFacade
 	{
 		if(configurations == null || multiExecIndex != Luncher.multiExecIndex)
 		{
-			PrintConsole.print("Tranmission Configuration Start.......");
-			multiExecIndex = Luncher.multiExecIndex;
-			
-			
+			multiExecIndex = Luncher.multiExecIndex;	
 			if(ApplicationSettingFacade.TranmissionConfiguration.getStertegy() == TCStrategy.PatternBased) 
 			{
-				int downOverUpRatio = ApplicationSettingFacade.TranmissionConfiguration.getDownOverUpRatio();
 				PatternBasedTC pTC = new PatternBasedTC();
-				configurations = pTC.patternBasedConfiguration(downOverUpRatio);
+				configurations = pTC.createConfigurations();
 			}
 			else 
 			{
 				GreedyTC gtc = new GreedyTC();
-				configurations = gtc.originalConfiguring();
+				configurations = gtc.createConfigurations();
 			}
 
 		}
@@ -45,11 +40,20 @@ public class TCFacade
 	private static int _startTime = -1;
 	public static List<TCUnit> getConfigurations(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
 	{
-		if(startTime != _startTime)
+		if(startTime != _startTime ||  multiExecIndex != Luncher.multiExecIndex)
 		{
-
-			DynamicGreedyBased gBased = new DynamicGreedyBased();
-			configurations = gBased.createConfigurations(startTime, stopTime, sourceBuffer, transmitBuffer);
+			if(ApplicationSettingFacade.TranmissionConfiguration.getStertegy() == TCStrategy.Greedy) 
+			{
+				DynamicGreedyBased gBased = new DynamicGreedyBased();
+				configurations = gBased.createConfigurations(startTime, stopTime, sourceBuffer, transmitBuffer);
+			}
+			else
+			{
+				DynamicPatternBased pBased = new DynamicPatternBased();
+				configurations = pBased.createConfigurations(startTime, stopTime, sourceBuffer, transmitBuffer);
+			}
+			
+			multiExecIndex = Luncher.multiExecIndex;
 			_startTime = startTime;
 		}
 		return configurations;

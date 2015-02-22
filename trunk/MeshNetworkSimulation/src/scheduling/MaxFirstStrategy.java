@@ -8,11 +8,11 @@ import dataStructure.Buffer;
 import dataStructure.BufferMap;
 import dataStructure.Link;
 
-public class NormalSchedulingStrategy extends SchedulingStrategy
+public class MaxFirstStrategy extends SchedulingBase
 {
 
 
-	public NormalSchedulingStrategy(int instanceIndex) {
+	public MaxFirstStrategy(int instanceIndex) {
 		super(instanceIndex);
 	}
 
@@ -51,7 +51,7 @@ public class NormalSchedulingStrategy extends SchedulingStrategy
 
 	@Override
 	protected String getName() {
-		return "NSS";
+		return "MaxFirst";
 	}
 
 }

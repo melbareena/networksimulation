@@ -4,26 +4,17 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-
-import cAssignment.ChannelAssignmentFacade;
 import common.FileGenerator;
 import common.PrintConsole;
-import scheduling.DynamicAbstract;
-import scheduling.DynamicBP;
-import scheduling.DynamicRR;
 import scheduling.SchedulingFacade;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.AppExecMode;
-import trafficEstimating.TrafficEstimatingFacade;
-import transConf.TCFacade;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.SchedulingResultGraph;
 import GraphicVisualization.StartOptionsDialog;
-import dataStructure.BufferMap;
 import dataStructure.Channel;
 import dataStructure.SchedulingResult;
 
@@ -161,9 +152,7 @@ public class Luncher {
 					for (multiExecIndex = 1; multiExecIndex <= numberOfExecution; multiExecIndex++) {
 						final int index = multiExecIndex;
 						PrintConsole.print("Exceute Number : " + index);
-						DynamicBP dp = new DynamicBP(index-1);
-						SchedulingResult result =	dp.doDeliveryPackets(ApplicationSettingFacade.Traffic.getDuration());
-						//SchedulingResult result = SchedulingFacade.getScheduling(index-1);
+						SchedulingResult result = SchedulingFacade.getScheduling(index-1);
 						_finalResults.add(result);
 						Luncher.loadingDialog.setIndeterminate(index-1, true);
 						Luncher.loadingDialog.setLabel(index-1, "Building user interface...");
@@ -184,8 +173,10 @@ public class Luncher {
 					long startTime = System.currentTimeMillis();
 					//SchedulingResult result = SchedulingFacade.getScheduling(0);
 					
-					DynamicAbstract dp = new DynamicRR(0);
-					SchedulingResult result =	dp.doDeliveryPackets(ApplicationSettingFacade.Traffic.getDuration());
+					SchedulingResult result = null;
+					result = SchedulingFacade.getScheduling(0);
+					
+					
 					FileGenerator.SchedulingResult(result);
 					
 					

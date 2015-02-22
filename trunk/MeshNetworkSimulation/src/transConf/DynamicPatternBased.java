@@ -1,36 +1,26 @@
-
 package transConf;
 
 import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import setting.ApplicationSettingFacade;
-import sinr.SINR;
+import sinr.DynamicSINR;
 import trafficEstimating.TrafficEstimatingFacade;
 import common.FileGenerator;
+import dataStructure.BufferMap;
 import dataStructure.Link;
 import dataStructure.LinkType;
 import dataStructure.TCUnit;
 import dataStructure.Vertex;
 
-/**
- * 
- * @author Benjamin
- *
- */
-public class PatternBasedTC extends TCBasic
+public class DynamicPatternBased extends TCBasic
 {
-
-	protected PatternBasedTC()
+	protected DynamicPatternBased()
 	{
-		super._sinr = new SINR();
-		super.LinksTraffic = TrafficEstimatingFacade.getLinksTraffic();
 		super._powerUnit = new PowerControlUnit(this);
 		resetMARK();
 	}
@@ -57,11 +47,13 @@ public class PatternBasedTC extends TCBasic
 	 * on gateways links
 	 * @return the list of transmission configurations created
 	 */
-	protected List<TCUnit> createConfigurations() 
+	protected List<TCUnit> createConfigurations( int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer) 
 	{
 		
 		final int downOverUpRatio = ApplicationSettingFacade.Traffic.getRatio();
 		
+		super._sinr = new DynamicSINR(startTime, stopTime, sourceBuffer, transmitBuffer);
+		super.LinksTraffic = TrafficEstimatingFacade.getLinksTraffic(startTime, stopTime, sourceBuffer, transmitBuffer);
 		ConsiderLinks = new HashMap<>(); // Lc <- Nil;
 		
 		List<Vertex> gateways = new ArrayList<Vertex>(ApplicationSettingFacade.Gateway.getGateway().values());
@@ -70,7 +62,7 @@ public class PatternBasedTC extends TCBasic
 		
 		List<TCUnit> finalList = remainingLinksStep(_patterns, _selectedLinksSet, gateways, downOverUpRatio);
 		_TT = finalList;
-		System.out.println("Number of TC: " + _TT.size() + ", Summation of Capacity:" + getTotalCapacity() + ", Average Capacity: " + getAverageCapacity());
+		
 		FileGenerator.TransmissionConfige(_TT);
 		FileGenerator.DataRate(_TT);
 		return finalList;
@@ -223,7 +215,7 @@ public class PatternBasedTC extends TCBasic
 		List<TCUnit> listTCU = new ArrayList<TCUnit>(patterns);
 		// Try adding links using generated patterns
 		boolean newLinkAdded = true;
-		numberOfLinks = TrafficEstimatingFacade.getOptimalLinks().size(); 
+		numberOfLinks = LinksTraffic.size();
 		while((selectedLinksSet.size() < numberOfLinks) && newLinkAdded)
 		{
 			newLinkAdded = false;

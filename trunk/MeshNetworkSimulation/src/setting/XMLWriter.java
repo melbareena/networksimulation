@@ -25,7 +25,7 @@ public class XMLWriter {
 	
 	private static Element rootElement;
 	
-	public static void Initialize(String mode) {
+	public static void Initialize(String runningMode, String algorithmMode, int interval) {
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -33,7 +33,9 @@ public class XMLWriter {
 			// root elements
 			doc = docBuilder.newDocument();
 			rootElement = doc.createElement("AppConfiguration");
-			rootElement.setAttribute("Mode", mode);
+			rootElement.setAttribute("Mode", runningMode);
+			rootElement.setAttribute("AlgorithmMode", algorithmMode);
+			rootElement.setAttribute("Interval", interval+"");
 			doc.appendChild(rootElement);
 		} catch (Exception e) {}
 	}

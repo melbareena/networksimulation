@@ -38,9 +38,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import luncher.Luncher;
@@ -66,7 +64,6 @@ public class StartOptionsDialog extends JDialog {
 	public static final int MaxChannelNumber = 11;
 	
 	private final JPanel	contentPanel	= new JPanel();
-	private final JPanel chckbxPanel = new JPanel();
 	private final JSpinner spinnerRatio = new JSpinner();
 	private final JRadioButton rdbtnNewAlgorithm = new JRadioButton("Pattern Based");
 	private final JLabel lblAlgorithm = new JLabel("TC Algorithms:");
@@ -76,10 +73,6 @@ public class StartOptionsDialog extends JDialog {
 	private final JSpinner envYSpinner = new JSpinner();
 	private final JLabel lblX = new JLabel(" X: ");
 	private final JLabel lblY = new JLabel(" Y: ");
-	private final JLabel lblNewLabel = new JLabel("Mode of Algorithm:");
-	private final JPanel ratioLabelsPanel = new JPanel();
-	private final JLabel lblOverUplinks = new JLabel("over Uplinks:");
-	private final JPanel newAlgoPanel = new JPanel();
 	private final JLabel lblOutput = new JLabel("Output:");
 	private final JButton btnOutput = new JButton("...");
 	private final JPanel outputPanel = new JPanel();
@@ -135,7 +128,6 @@ public class StartOptionsDialog extends JDialog {
 	private final JButton SINRButton = new JButton("Edit");
 	private final JTextField SINRTextField = new JTextField("SINR set...");
 	private final JPanel channelsPanel = new JPanel();
-	private final JLabel lblMode = new JLabel("Mode:");
 	private final JComboBox channelModeComboBox = new JComboBox();
 	private final JList channelList = new JList();
 	private final JLabel lblChannels_1 = new JLabel("Channels:");
@@ -161,8 +153,13 @@ public class StartOptionsDialog extends JDialog {
 	private DatarateEditOptionDialog datarateDialog;
 	private SINREditOptionDialog sinrDialog;
 	private final JCheckBox chkPowerControl = new JCheckBox("Power Control");
-	private final JCheckBox chkDynamicAlgroithm = new JCheckBox("Enable Dynamic Algroithm");
+	private final JLabel lblSystemModes = new JLabel("System Modes");
 	private final JPanel panel = new JPanel();
+	private final JLabel lblRunningMode = new JLabel("Running Mode:");
+	private final JLabel lblAlgMode = new JLabel("Alg Dynamic:");
+	private final JCheckBox chkDynamicAlgroithm = new JCheckBox("");
+	private final JLabel lblInterval = new JLabel("Interval:");
+	private final JSpinner spinnerInterval = new JSpinner();
 
 	/**
 	 * Create the dialog.
@@ -262,7 +259,7 @@ public class StartOptionsDialog extends JDialog {
 			schedulingPanel.setLayout(new MigLayout("", "[grow]", "[grow]"));
 			
 			schedulingComboBox.setMaximumRowCount(3);
-			schedulingComboBox.setModel(new DefaultComboBoxModel(new String[] {"Normal", "Round Robin", "Back Pressure"}));
+			schedulingComboBox.setModel(new DefaultComboBoxModel(new String[] {"Max First", "Round Robin", "Back Pressure"}));
 			schedulingComboBox.setSelectedIndex(2);
 			
 			schedulingPanel.add(schedulingComboBox, "cell 0 0,growx,aligny center");
@@ -408,7 +405,7 @@ public class StartOptionsDialog extends JDialog {
 			lblSetDefaults.setForeground(new Color(0, 0, 255));
 			lblSetDefaults.setFont(new Font("Tahoma", Font.ITALIC, 11));
 			
-			durationSpinner.setModel(new SpinnerNumberModel(new Long(10000), new Long(1), null, new Long(100)));
+			durationSpinner.setModel(new SpinnerNumberModel(new Long(5000), new Long(1), null, new Long(100)));
 			lambdaMaxSpinner.setModel(new SpinnerNumberModel(new Float(0.5), new Float(0.001), new Float(1.0), new Float(0.01)));
 			lambdaMinSpinner.setModel(new SpinnerNumberModel(new Float(0.1), new Float(0.001), new Float(1.0), new Float(0.01)));
 			seedSpinner.setModel(new SpinnerNumberModel(Math.abs(new Random().nextLong()), new Long(1), null, new Long(1)));
@@ -485,13 +482,12 @@ public class StartOptionsDialog extends JDialog {
 			contentPanel.add(rdbtnPanel, "cell 1 5,alignx left,growy");
 			rdbtnPanel.setLayout(new GridLayout(2, 0, 0, 0));
 			
-			JRadioButton rdbtnOriginal = new JRadioButton("Original");
+			JRadioButton rdbtnOriginal = new JRadioButton("Greedy Based");
 			rdbtnPanel.add(rdbtnOriginal);
 	
 			rdbtnNewAlgorithm.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
-					chckbxPanel.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 					spinnerRatio.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 				}
 			});
@@ -504,46 +500,10 @@ public class StartOptionsDialog extends JDialog {
 			groupAlgo.add(rdbtnNewAlgorithm);
 			groupAlgo.add(rdbtnOriginal);
 			rdbtnNewAlgorithm.setSelected(true);
-			lblSinr.setHorizontalAlignment(SwingConstants.TRAILING);
-			
-			newAlgoPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Pattern based algorithm parameters", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-			
-			contentPanel.add(newAlgoPanel, "cell 0 6 2 1,alignx center,aligny center");
-			newAlgoPanel.setLayout(new MigLayout("insets 5 0 0 0", "[min!]10[157px]", "[83px][83px]"));
-			newAlgoPanel.add(ratioLabelsPanel, "cell 0 0,alignx trailing,aligny center");
-			ratioLabelsPanel.setLayout(new MigLayout("insets 0 0 0 0", "[157px]", "[min!][min!]"));
-			
-			JLabel spinnerLabel = new JLabel("Ratio Downlinks");
-			ratioLabelsPanel.add(spinnerLabel, "cell 0 0,alignx right,growy");
-			spinnerLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			spinnerLabel.setAlignmentX(CENTER_ALIGNMENT);
-			lblOverUplinks.setHorizontalAlignment(SwingConstants.CENTER);
-			
-			ratioLabelsPanel.add(lblOverUplinks, "cell 0 1,alignx right,growy");
+			rdbtnPanel.add(spinnerRatio);
 			
 			spinnerRatio.setModel(new SpinnerNumberModel(2, 1, 4, 1));
-			JPanel spinnerPanel = new JPanel();
-			newAlgoPanel.add(spinnerPanel, "cell 1 0,growx,aligny center");
-			spinnerPanel.setAlignmentX(CENTER_ALIGNMENT);
-			spinnerPanel.setLayout(new MigLayout("insets 0 5 0 0", "[157px]", "[27px]"));
-			spinnerPanel.add(spinnerRatio, "cell 0 0,growx,aligny center");
-			newAlgoPanel.add(lblNewLabel, "cell 0 1,alignx right,aligny center");
-			lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			newAlgoPanel.add(chckbxPanel, "cell 1 1,grow");
-			chckbxPanel.setLayout(new GridLayout(3, 0, 0, 0));
-			
-			chckbxPanel.add(panel);
-			chkDynamicAlgroithm.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent arg0) 
-				{
-					if(chkDynamicAlgroithm.isSelected())
-						rdbtnStatic.setEnabled(false);
-					else
-						rdbtnStatic.setEnabled(true);
-				}
-			});
-			
-			chckbxPanel.add(chkDynamicAlgroithm, "cell 2 1,alignx right,aligny center");
+			lblSinr.setHorizontalAlignment(SwingConstants.TRAILING);
 			lblChannels.setHorizontalAlignment(SwingConstants.TRAILING);
 		}
 		
@@ -568,23 +528,44 @@ public class StartOptionsDialog extends JDialog {
 		/*----------*/
 		/* Channels */
 		/*----------*/
+		
+		contentPanel.add(lblSystemModes, "cell 0 6");
+		
+		contentPanel.add(panel, "cell 1 6,grow");
+		panel.setLayout(new MigLayout("", "[][grow]", "[][][]"));
+		
+		panel.add(lblRunningMode, "cell 0 0");
+		panel.add(channelModeComboBox, "cell 1 0");
+		channelModeComboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				channelList.setEnabled(channelModeComboBox.getSelectedIndex() == 1);
+				lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() == 1);
+			}
+		});
+		channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"1..11", "Some channels", "All combinations", "Apart combinations"}));
+		channelModeComboBox.setSelectedIndex(0);
+		
+		panel.add(lblAlgMode, "cell 0 1,alignx right");
+		chkDynamicAlgroithm.setSelected(true);
+		chkDynamicAlgroithm.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) 
+			{
+				spinnerInterval.setEnabled(chkDynamicAlgroithm.isSelected());
+				rdbtnStatic.setEnabled(chkDynamicAlgroithm.isSelected());
+			}
+		});
+		
+		panel.add(chkDynamicAlgroithm, "cell 1 1");
+		
+		panel.add(lblInterval, "cell 0 2,alignx right");
+		spinnerInterval.setModel(new SpinnerNumberModel(new Integer(10), null, null, new Integer(10)));
+		
+		panel.add(spinnerInterval, "cell 1 2,growx");
 		{
 			contentPanel.add(lblChannels, "cell 2 6,growx,aligny center");
 			
 			contentPanel.add(channelsPanel, "cell 3 6,grow");
 			channelsPanel.setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
-			
-			channelsPanel.add(lblMode, "cell 0 0,alignx trailing");
-			channelModeComboBox.addItemListener(new ItemListener() {
-				public void itemStateChanged(ItemEvent e) {
-					channelList.setEnabled(channelModeComboBox.getSelectedIndex() == 1);
-					lbluseCtrlTo.setVisible(channelModeComboBox.getSelectedIndex() == 1);
-				}
-			});
-			channelModeComboBox.setModel(new DefaultComboBoxModel(new String[] {"All Channels", "Some channels", "All combinations", "Apart combinations"}));
-			channelModeComboBox.setSelectedIndex(3);
-			
-			channelsPanel.add(channelModeComboBox, "cell 1 0,grow");
 			lblSelected.setHorizontalAlignment(SwingConstants.TRAILING);
 			
 			channelsPanel.add(lblSelected, "flowy,cell 0 1,growx");
@@ -704,7 +685,11 @@ public class StartOptionsDialog extends JDialog {
 	private void updateTrafficPanel(boolean dynamic, boolean random) {
 		contentPanel.remove(trafficPanel);
 		trafficPanel = new JPanel();
-		if(dynamic) {
+		if(dynamic) 
+		{
+			chkDynamicAlgroithm.setSelected(true);
+			chkDynamicAlgroithm.setEnabled(true);
+			spinnerInterval.setEnabled(true);
 			trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[min!][grow]", "[grow][grow][grow][grow][grow]"));
 			trafficPanel.add(lblDuration, "cell 0 0,alignx trailing");
 			trafficPanel.add(durationSpinner, "cell 1 0, grow");
@@ -727,7 +712,12 @@ public class StartOptionsDialog extends JDialog {
 			
 			*/
 			
-		} else {
+		} 
+		else 
+		{
+			chkDynamicAlgroithm.setSelected(false);
+			chkDynamicAlgroithm.setEnabled(false);
+			spinnerInterval.setEnabled(false);
 			trafficPanel.setLayout(new MigLayout("insets 5 3 0 0", "[][grow][min!][grow][min!]", "[grow][grow][grow][][grow]"));
 			trafficPanel.add(lblGenerator, "cell 0 0 2 1,alignx trailing");
 			trafficPanel.add(trafficComboBox, "cell 3 0 3 1,grow");
@@ -816,11 +806,13 @@ public class StartOptionsDialog extends JDialog {
 	
 	private void writeConfiguration() {
 
-		
+		String AlgorithmMode = "Static";
+		if(chkDynamicAlgroithm.isSelected()) AlgorithmMode = "Dynamic";
+				
 		String mode = "Single";
 		if(channelModeComboBox.getSelectedIndex() == 2) mode = "AllCombination"; 
 		else if (channelModeComboBox.getSelectedIndex() == 3) mode = "ApartCombination"; 
-		XMLWriter.Initialize(mode);
+		XMLWriter.Initialize(mode,AlgorithmMode,(int)spinnerInterval.getValue());
 		
 		String channelAssignment = "";
 		switch(channelStrategyComboBox.getSelectedItem().toString()) {
@@ -874,9 +866,20 @@ public class StartOptionsDialog extends JDialog {
 					"", null, (int) routersResult.get("nbOfRouters"), (int) routersResult.get("safetyTest"),
 					(long) routersResult.get("seed"));
 		}
-		
-		XMLWriter.writeSchedulingStrategy(((String) this.schedulingComboBox.getSelectedItem()).replaceAll("\\s+","")
-				+ "SchedulingStrategy");
+		String schedulingName = "";
+		switch (schedulingComboBox.getSelectedIndex()) 
+		{
+			case 0:
+				schedulingName = "MaxFirst";
+			break;
+			case 1:
+				schedulingName = "RRStrategy";
+			break;
+			case 2:
+				schedulingName = "BPStrategy";
+			break;
+		} 
+		XMLWriter.writeSchedulingStrategy(schedulingName);
 		
 		HashMap<String, Object> sinrResult = sinrDialog.getResults();
 		XMLWriter.writeSINR((int) sinrResult.get("alpha"), (int) sinrResult.get("w"),
