@@ -685,14 +685,17 @@ public class FileGenerator
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(2);
 		StringBuilder throughputBuilder = new StringBuilder();
-		StringBuilder delayBuilder = new StringBuilder();
+		StringBuilder networkDelayBuilder = new StringBuilder();
+		StringBuilder AverageDelayBuilder = new StringBuilder();
 		for (int i = results.length - 1 ; i >= 0 ; i--)
 		{
 			SchedulingResult sr = results[i];
 			throughputBuilder.append(df.format(sr.getAverageThorughput())  );
 			throughputBuilder.append(System.lineSeparator());
-			delayBuilder.append(((double)sr.getDelay()));
-			delayBuilder.append(System.lineSeparator());
+			networkDelayBuilder.append(((double)sr.getDelay()));
+			networkDelayBuilder.append(System.lineSeparator());
+			AverageDelayBuilder.append(sr.getAveragePacketDelay());
+			AverageDelayBuilder.append(System.lineSeparator());
 			
 		}
 			try
@@ -703,7 +706,10 @@ public class FileGenerator
 				writer.write(throughputBuilder.toString());
 				writer.newLine();
 				writer.newLine();
-				writer.write(delayBuilder.toString());
+				writer.write(networkDelayBuilder.toString());
+				writer.newLine();
+				writer.newLine();
+				writer.write(AverageDelayBuilder.toString());
 				writer.close();
 			
 		} 

@@ -74,7 +74,7 @@ public abstract class DynamicAbstract
 		results.setTransmitBufferData(trafficTransit);
 		results.setTotalTrafficGenerated(totalTrafficGenerated);
 		double sum = 0;
-		for(int i = 0; i < packetsDelay.size(); i++) {
+		for(int i = 0; i < packetsDelay.size() && i < ApplicationSettingFacade.Traffic.getDuration(); i++) {
 			sum += packetsDelay.get(i);
 		}
 		results.setAveragePacketDelay(sum );
