@@ -2,6 +2,8 @@ package transConf;
 
 import java.util.List;
 
+import javax.print.attribute.SetOfIntegerSyntax;
+
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.TCStrategy;
 import luncher.Luncher;
@@ -25,18 +27,30 @@ public class TCFacade
 			{
 				PatternBasedTC pTC = new PatternBasedTC();
 				configurations = pTC.createConfigurations();
+				System.out.println("Average of Transmission Configuration: " + getAverageCapacity() );
+				
 			}
 			else 
 			{
 				GreedyTC gtc = new GreedyTC();
 				configurations = gtc.createConfigurations();
+				System.out.println("Average of Transmission Configuration: " + getAverageCapacity() );
 			}
 
 		}
 		return configurations;
 	}
 	
-	
+	private static double getAverageCapacity()
+	{
+		double sum = 0d;
+		for (TCUnit tcUnit : configurations)
+		{
+			sum += tcUnit.getTCAP();
+		}
+		return (double) sum / configurations.size();
+	}
+
 	private static int _startTime = -1;
 	public static List<TCUnit> getConfigurations(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
 	{
@@ -52,6 +66,7 @@ public class TCFacade
 				DynamicPatternBased pBased = new DynamicPatternBased();
 				configurations = pBased.createConfigurations(startTime, stopTime, sourceBuffer, transmitBuffer);
 			}
+			
 			
 			multiExecIndex = Luncher.multiExecIndex;
 			_startTime = startTime;

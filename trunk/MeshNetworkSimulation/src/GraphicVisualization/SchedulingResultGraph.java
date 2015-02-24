@@ -45,6 +45,7 @@ import org.jfree.ui.VerticalAlignment;
 import org.jfree.util.ShapeUtilities;
 
 import setting.ApplicationSettingFacade;
+import setting.BaseConfiguration.AlgorithmMode;
 import trafficGenerator.DTGFacade;
 import dataStructure.SchedulingResult;
 
@@ -108,8 +109,10 @@ public class SchedulingResultGraph extends JFrame
 		toolBar.add(Box.createHorizontalGlue());
 		
 		JLabel lblInfos = new JLabel("<html><u>Total Traffic: </u>" + DTGFacade.getTotalTraffic() + "Mb"
-				+ "     <u>Average Throughpu: </u>"+ _sResult.getAverageThorughput() + " Mbps"
-						+ "  <u>Delay: </u> "+ _sResult.getDelay() +"s, total packets delay: " +_sResult.getAveragePacketDelay() + " time slots</html>");
+				+ ",	<u>Average Throughpu: </u>"+ _sResult.getAverageThorughput() + " Mbps"
+				+ ",	<u>Network Delay: </u> "+ _sResult.getDelay() +"s"
+				+ ",	<u>Packets Delay: </u>" +_sResult.getAveragePacketDelay() + "ts</html>");
+		lblInfos.setFont( new Font("Tahoma", 3 , 16));
 		lblInfos.setHorizontalAlignment(JLabel.TRAILING);
 		toolBar.add(lblInfos);
 	}
@@ -126,12 +129,17 @@ public class SchedulingResultGraph extends JFrame
 
 	private JFreeChart createChart(XYDataset dataSet)
 	{
-		String title = "Channels:"+Luncher.getAvailableChannels() +  ",Topology: " + ApplicationSettingFacade.Nodes.getNodes().size()
-				+ ",Power Control: " + ApplicationSettingFacade.PowerControl.isEnable() 		
-				+ ",TC: " + ApplicationSettingFacade.TranmissionConfiguration.getStertegy().name()
-				+ ",Scheduling: " + _sResult.getSchedulingStrategy()
+		String title = "Channels:" +Luncher.getAvailableChannels() +  
+						",Routers: " + ApplicationSettingFacade.Router.getSize() +
+						",Gateways:" + ApplicationSettingFacade.Gateway.getSize() + 
+						",Power Control: " + ApplicationSettingFacade.PowerControl.isEnable() +  		
+						",TC:" + ApplicationSettingFacade.TranmissionConfiguration.getStertegy().name() + 
+						",Scheduling: " + _sResult.getSchedulingStrategy() + 
+						",Lambda(Min): " + ApplicationSettingFacade.Traffic.getLambdaMin() + 
+						",Lambda(Max): " + ApplicationSettingFacade.Traffic.getLambdaMax()
 				;
-		
+		if(ApplicationSettingFacade.getAlgorithmMode() == AlgorithmMode.Dynamic)
+			title += ", Interval: " + ApplicationSettingFacade.getInterval() + "ts";
 		
 		
 		  chart = ChartFactory.createXYLineChart(
@@ -146,7 +154,7 @@ public class SchedulingResultGraph extends JFrame
 		            false                     // urls
 		        );
 
-		  TextTitle titleT = new TextTitle(title, new Font("Tahoma", 0, 12),Color.BLACK,RectangleEdge.TOP,HorizontalAlignment.CENTER,VerticalAlignment.CENTER, new RectangleInsets(15, .45, .25, .45));
+		  TextTitle titleT = new TextTitle(title, new Font("Tahoma", 0, 14),Color.BLACK,RectangleEdge.TOP,HorizontalAlignment.CENTER,VerticalAlignment.CENTER, new RectangleInsets(15, .45, .25, .45));
 		 
 		  chart.setTitle(titleT);
 		        // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
@@ -199,8 +207,8 @@ public class SchedulingResultGraph extends JFrame
 		        endTraffic.setLabel("End Traffic");
 		        endTraffic.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 		        		10.0F, new float[] {10, 10}, 0.0F));
-		        endTraffic.setLabelAnchor(RectangleAnchor.BOTTOM_RIGHT);
-		        endTraffic.setLabelTextAnchor(TextAnchor.BOTTOM_LEFT);
+		        endTraffic.setLabelAnchor(RectangleAnchor.BOTTOM_LEFT);
+		        endTraffic.setLabelTextAnchor(TextAnchor.BOTTOM_RIGHT);
 		        endTraffic.setLabelFont(endTraffic.getLabelFont().deriveFont(Font.BOLD, 12));
 		        endTraffic.setPaint(Color.MAGENTA);
 		        plot.addDomainMarker(endTraffic);

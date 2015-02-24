@@ -119,7 +119,8 @@ class DynamicTrafficGenerator {
 	}
 	
 
-	private UplinkTraffic generateTimeSlotUplinkTraffic(List<Vertex> routers) {
+	private UplinkTraffic generateTimeSlotUplinkTraffic(List<Vertex> routers) 
+	{
 		UplinkTraffic uplinkTraffic = new UplinkTraffic();
 		if(routers != null) 
 		{
