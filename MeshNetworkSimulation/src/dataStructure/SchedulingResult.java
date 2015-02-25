@@ -103,7 +103,8 @@ public class SchedulingResult {
 		Vector<Double> th = getThroughputData();
 		double sum = 0;
 		int index = 0;
-		int limit = (int) (ApplicationSettingFacade.Traffic.getDuration() / 50);
+		//int limit = (int) (ApplicationSettingFacade.Traffic.getDuration() / 50);
+		int limit = th.size();
 		for(index = 0; index < limit ; index++)
 			sum += th.get(index);
 		double average = (double) sum / (limit);
