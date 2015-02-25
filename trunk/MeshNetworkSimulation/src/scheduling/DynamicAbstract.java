@@ -66,7 +66,7 @@ public abstract class DynamicAbstract
 	
 	protected SchedulingResult getResults() 
 	{
-		SchedulingResult results = new SchedulingResult();
+		SchedulingResult results = new SchedulingResult(ApplicationSettingFacade.Channel.getChannel().size() == 11);
 		results.setSchedulingStrategy(getName());
 		results.setTrafficGenerator(trafficGenerator);
 		results.setThroughputData(throughput);
