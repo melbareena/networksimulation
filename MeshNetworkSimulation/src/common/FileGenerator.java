@@ -724,6 +724,7 @@ public class FileGenerator
 	public static void SchedulingResult(SchedulingResult results)
 	{
 			
+		Throughput(results.getThroughputPerTimeSlot());
 		try
 		{
 			BufferedWriter THwriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "schedulingResult_throughput_mbps.txt" ));

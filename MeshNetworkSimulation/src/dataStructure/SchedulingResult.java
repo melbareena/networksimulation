@@ -4,7 +4,13 @@ import java.util.Vector;
 
 import setting.ApplicationSettingFacade;
 
-public class SchedulingResult {
+public class SchedulingResult
+{
+	public SchedulingResult(boolean isAllChannelsAvailable)
+	{
+		allChannelsAvailable = isAllChannelsAvailable;
+	}
+	private boolean allChannelsAvailable;
 	
 	private Vector<Double> throughputData;
 	
@@ -100,14 +106,17 @@ public class SchedulingResult {
 	}
 	public double getAverageThorughput() 
 	{
-		Vector<Double> th = getThroughputData();
+		Vector<Double> th = getThroughputPerTimeSlot();
 		double sum = 0;
 		int index = 0;
 		//int limit = (int) (ApplicationSettingFacade.Traffic.getDuration() / 50);
-		int limit = th.size();
-		for(index = 0; index < limit ; index++)
+		int limit = allChannelsAvailable ? (int) (ApplicationSettingFacade.Traffic.getDuration()) - 50 :  (int) (ApplicationSettingFacade.Traffic.getDuration());
+		int start = allChannelsAvailable ? 250 : 0;
+		for(index = start; index < limit ; index++)
 			sum += th.get(index);
-		double average = (double) sum / (limit);
+		double average = (double) sum / (limit - start);
+		
+		average *= 50;
 		return  (double) Math.round( average * 1000 ) / 1000 ;
 		
 		
