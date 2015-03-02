@@ -109,6 +109,7 @@ public class SchedulingResultGraph extends JFrame
 		toolBar.add(Box.createHorizontalGlue());
 		
 		JLabel lblInfos = new JLabel("<html><u>Total Traffic: </u>" + DTGFacade.getTotalTraffic() + "Mb"
+				+ ",    <u>Offered Load: </u>" + DTGFacade.offeredLoad
 				+ ",	<u>Average Throughpu: </u>"+ _sResult.getAverageThorughput() + " Mbps"
 				+ ",	<u>Network Delay: </u> "+ _sResult.getDelay() +"s"
 				+ ",	<u>Packets Delay: </u>" +_sResult.getAveragePacketDelay() + "ts</html>");
