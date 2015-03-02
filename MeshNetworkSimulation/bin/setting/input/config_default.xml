@@ -46,7 +46,7 @@
   <Routers MinDistance="50" Number="80" Radio="2" SaftyTest="500" Seed="2680932533302035868" TransmissionRate="200" TypeOfGeneration="Random"/>
   <Scheduling Strategy="BPStrategy"/>
   <SINR Alpha="2" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
-  <Traffic Duration="15000" Lambda_max="1" Lambda_min="0.05" Ratio="2" Seed="7556842943631078075" Type="Dynamic"/>
+  <Traffic Duration="50" Lambda_max=".4" Lambda_min="0.05" Ratio="2" Seed="7556842943631078075" Type="Dynamic"/>
   <PowerControl Enable="true"/>
   <TranmissionConfiguration Strategy="Greedy" downOverUpRatio="2"/>
 </AppConfiguration>

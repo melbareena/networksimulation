@@ -82,7 +82,7 @@ public class SchedulingResultGraph extends JFrame
 		final XYDataset dataSet = createDataSet();
         chart = createChart(dataSet);
         chartPanel = new ChartPanel(chart);
-        //chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
+        chartPanel.setPreferredSize(new java.awt.Dimension(1670	, 1045));
         contentPane.add(chartPanel, BorderLayout.CENTER);
         
         
