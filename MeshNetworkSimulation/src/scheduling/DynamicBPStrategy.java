@@ -33,6 +33,7 @@ public class DynamicBPStrategy extends DynamicAbstract
 		super.maxTrafficSource = -1.0;
 		super.maxTrafficTransmit = -1.0;
 		super.instanceIndex = instanceIndex;
+		super.averageDelayPerTimeSlot = new Vector<Double>();
 	}
 	
 
@@ -93,7 +94,7 @@ public class DynamicBPStrategy extends DynamicAbstract
 	
 	
 	
-	
+	public static int _totalpacketNumber = 0;
 	
 	
 	/**Tries to dispose of as much traffic as it can in a given timeslot.
@@ -102,7 +103,11 @@ public class DynamicBPStrategy extends DynamicAbstract
 	 * transmit buffers).
 	 * @param timeSlot The current timeslot.
 	 */
-	private void disposeOfTraffic(int timeSlot) {
+	private void disposeOfTraffic(int timeSlot)
+	{
+		
+		int packetNumber = 0;
+		double delayTS = 0;
 		double slotThroughtput = 0;
 		TCUnit tcu = getMatchingTC(getOptimalWeightMap());
 		for (Link link : tcu.getLinks()) {
@@ -114,6 +119,9 @@ public class DynamicBPStrategy extends DynamicAbstract
 				List<Packet> movedPackets = sourceBuffers.sendPacket(link, dataRate,	transmitBuffers, timeSlot);
 				for (Packet moved : movedPackets)
 				{
+					_totalpacketNumber++;
+					packetNumber++;
+					delayTS += moved.getDelay();
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
@@ -133,6 +141,9 @@ public class DynamicBPStrategy extends DynamicAbstract
 				List<Packet> movedPackets = transmitBuffers.sendPacket(link, dataRate, transmitBuffers, timeSlot);
 				for (Packet moved : movedPackets)
 				{
+					_totalpacketNumber++;
+					packetNumber++;
+					delayTS += moved.getDelay();
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
@@ -147,6 +158,7 @@ public class DynamicBPStrategy extends DynamicAbstract
 		}
 		throughput.add(slotThroughtput);
 		trafficSource.add(sourceBuffers.trafficSize());
+		averageDelayPerTimeSlot.add(delayTS / packetNumber);
 		trafficTransit.add(transmitBuffers.trafficSize());
 	}
 

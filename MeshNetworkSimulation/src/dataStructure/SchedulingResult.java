@@ -18,6 +18,9 @@ public class SchedulingResult
 	
 	private Vector<Double> transmitData;
 	
+	private Vector<Double> averageDelayPerTimeSlot;
+	
+	
 	private String schedulingStrategy;
 	
 	private String trafficGenerator;
@@ -26,6 +29,17 @@ public class SchedulingResult
 	
 	private double averagePacketDelay;
 
+	
+	public Vector<Double> getAverageDelayPerTimeSlot()
+	{
+		return averageDelayPerTimeSlot;
+	}
+
+	public void setAverageDelayPerTimeSlot(Vector<Double> averageDelayPerTimeSlot)
+	{
+		this.averageDelayPerTimeSlot = averageDelayPerTimeSlot;
+	}
+	
 	public void setThroughputData(Vector<Double> throughputData) 
 	
 	{
