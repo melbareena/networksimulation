@@ -752,6 +752,14 @@ public class FileGenerator
 			}
 			Twriter.close();
 			
+			BufferedWriter delayTSWriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "AveragedelayPerTimeSlot.txt" ));
+			for(Double delay : results.getAverageDelayPerTimeSlot())
+			{
+				delayTSWriter.write(delay + "");
+				delayTSWriter.newLine();
+			}
+			delayTSWriter.close();
+			
 			PrintConsole.print("Schdeuling Result In File..........................");
 		}
 		catch(Exception ex)

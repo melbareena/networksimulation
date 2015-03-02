@@ -33,6 +33,8 @@ public abstract class DynamicAbstract
 	protected double maxTrafficSource;
 	protected double maxTrafficTransmit;
 	
+	protected Vector<Double> averageDelayPerTimeSlot;
+	
 	protected int _redoTimeSlot = ApplicationSettingFacade.getInterval();
 	
 	
@@ -73,6 +75,7 @@ public abstract class DynamicAbstract
 		results.setSourceBufferData(trafficSource);
 		results.setTransmitBufferData(trafficTransit);
 		results.setTotalTrafficGenerated(totalTrafficGenerated);
+		results.setAverageDelayPerTimeSlot(averageDelayPerTimeSlot);
 		double sum = 0;
 		for(int i = 0; i < packetsDelay.size() && i < ApplicationSettingFacade.Traffic.getDuration(); i++) {
 			sum += packetsDelay.get(i);
