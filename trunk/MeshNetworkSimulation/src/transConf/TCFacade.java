@@ -2,8 +2,6 @@ package transConf;
 
 import java.util.List;
 
-import javax.print.attribute.SetOfIntegerSyntax;
-
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.TCStrategy;
 import luncher.Luncher;
