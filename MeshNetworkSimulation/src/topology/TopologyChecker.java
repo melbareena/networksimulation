@@ -28,8 +28,8 @@ public class TopologyChecker
 		{
 			if(gateway.containsKey(item.getKey()))
 			{
-				if(ApplicationSettingFacade.AppOutput.showIntermediateOutput())
-					PrintConsole.printErr("FAIL: Duplicated Point (X:" + item.getValue().x + " Y:" +  item.getValue().y + ")");
+				
+				PrintConsole.printErr("FAIL: Duplicated Point (X:" + item.getValue().x + " Y:" +  item.getValue().y + ")");
 				return true;
 			}
 		}

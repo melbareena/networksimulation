@@ -113,6 +113,7 @@ public class DynamicChannelAssignmentStartegy
 		double distance = getDistance(currentLink);
 		Map<Channel, Double> channelAffectSet = new TreeMap<Channel, Double>();
 		double affect = 0;
+		assert(availableChannels.size() == ApplicationSettingFacade.Channel.getChannel().size() ) : " Error in number of channels";
 		for (Channel chan : availableChannels) 
 		{
 			affect = 0;

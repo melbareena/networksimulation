@@ -110,8 +110,8 @@ public class SchedulingResult
 		double sum = 0;
 		int index = 0;
 		//int limit = (int) (ApplicationSettingFacade.Traffic.getDuration() / 50);
-		int limit = allChannelsAvailable ? (int) (ApplicationSettingFacade.Traffic.getDuration()) - 50 :  (int) (ApplicationSettingFacade.Traffic.getDuration());
-		int start = allChannelsAvailable ? 250 : 0;
+		int limit = allChannelsAvailable ? (int) (ApplicationSettingFacade.Traffic.getDuration()) - 50 :  th.size();
+		int start = allChannelsAvailable ? 500 : 0;
 		for(index = start; index < limit ; index++)
 			sum += th.get(index);
 		double average = (double) sum / (limit - start);
