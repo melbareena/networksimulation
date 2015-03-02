@@ -217,9 +217,12 @@ class RouterConfig extends BaseConfiguration
 			String var = "";
 			String[] Pos;
 			Vector<Point> staticRouters = new Vector<Point>();
+			String sperator = "[ ]";
 			while((var = reader.readLine()) != null)
 			{
-				Pos = var.split("[ ]");
+				if(var.indexOf(",") > -1)
+					sperator = ",";
+				Pos = var.split(sperator);
 				staticRouters.add(new Point ( Integer.valueOf(Pos[0]),
 						Integer.valueOf(Pos[1])));
 				size++;
