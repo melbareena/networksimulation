@@ -166,8 +166,8 @@ public class GraphViewer extends JFrame {
 	/* ColorViewer dialog */
 	private final ColorViewer colorViewerDialog = new ColorViewer(this, ColorViewer.ColorType.Links);
 	
-	/* HistogramViewer frame */
-	private final HistogramViewer histogramViewerFrame;
+	
+	private final SchedulingResultGraph _resultGraph;
 	
 	public static String _availableChannels; 
 	
@@ -202,14 +202,12 @@ public class GraphViewer extends JFrame {
 		int step = results.getThroughputData().size()/10;
 		
 		if(step == 0) step =1;
-		histogramViewerFrame = new HistogramViewer(results, step);
+		_resultGraph = new SchedulingResultGraph(results);
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() 
 			{
-				SchedulingResultGraph g = new SchedulingResultGraph(results);
-				g.createDiagram();
-				histogramViewerFrame.showGraph();
+				_resultGraph.createDiagram();
 			}
 		});
 		t.run();
@@ -309,7 +307,7 @@ public class GraphViewer extends JFrame {
 				switch(confirmed) {
 					case JOptionPane.YES_OPTION:
 						colorViewerDialog.dispose();
-						histogramViewerFrame.dispose();
+						_resultGraph.dispose();
 						dispose();
 						Luncher.restartApplication();
 						break;
@@ -695,7 +693,7 @@ public class GraphViewer extends JFrame {
 		throughputViewer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				histogramViewerFrame.setVisible(true);
+				_resultGraph.setVisible(true);
 			}
 		});
 		mnFile.add(throughputViewer);
@@ -735,7 +733,7 @@ public class GraphViewer extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				colorViewerDialog.dispose();
-				histogramViewerFrame.dispose();
+				_resultGraph.dispose();
 				dispose();
 				Luncher.restartApplication();
 			}
