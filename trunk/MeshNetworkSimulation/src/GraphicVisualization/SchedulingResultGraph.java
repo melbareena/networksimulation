@@ -312,8 +312,13 @@ public class SchedulingResultGraph extends JFrame
 	}
 	private double getMaxRange()
 	{
-		return getMax() + (getMax() / 10);
-		//return 141.0134;
+		double maxSeries =  getMax() + (getMax() / 10);
+		System.err.println("Max: " + maxSeries);
+		return maxSeries;
+		
+		
+		
+		//return 8000;
 	}
 	private double getMax()
 	{
