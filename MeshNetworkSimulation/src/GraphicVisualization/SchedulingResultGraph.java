@@ -315,6 +315,8 @@ public class SchedulingResultGraph extends JFrame
 		double maxSeries =  getMax() + (getMax() / 10);
 		System.err.println("Max: " + maxSeries);
 		return maxSeries;
+		/*
+		return 673.5454;*/
 		
 		
 		

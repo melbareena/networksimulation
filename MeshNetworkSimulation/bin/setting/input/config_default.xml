@@ -17,7 +17,11 @@
     <Add Rate="6" SINR="8.51"/>
   </DataRate>
   <Environment X="1000" Y="1000"/>
-  <Gateways Number="5" Radio="4" TypeOfGeneration="Static">
+  <Gateways Number="9" Radio="4" TypeOfGeneration="Static">
+    <Add x="0" y="0"/>
+    <Add x="1000" y="1000"/>
+    <Add x="0" y="1000"/>
+    <Add x="1000" y="0"/>
     <Add x="250" y="250"/>
     <Add x="250" y="750"/>
     <Add x="750" y="250"/>
@@ -42,7 +46,7 @@
   <Routers MinDistance="50" Number="65" Radio="2" SaftyTest="500" Seed="3381882580838882816" TransmissionRate="200" TypeOfGeneration="Random"/>
   <Scheduling Strategy="BPStrategy"/>
   <SINR Alpha="2" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
-  <Traffic Duration="25000" Lambda_max="1" Lambda_min="0.05" Ratio="2" Seed="7556842943631078075" Type="Dynamic"/>
+  <Traffic Duration="25000" Lambda_max=".8" Lambda_min="0.05" Ratio="2" Seed="7556842943631078075" Type="Dynamic"/>
   <PowerControl Enable="true"/>
   <TranmissionConfiguration Strategy="Greedy" downOverUpRatio="2"/>
 </AppConfiguration>
