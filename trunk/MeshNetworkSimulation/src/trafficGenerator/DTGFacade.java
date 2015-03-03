@@ -26,6 +26,8 @@ public class DTGFacade
 	public static double offeredLoad = 0;
 	public static int totalPackets = 0;
 	
+
+	
 	
 	
 	public Traffic getDynamicTraffic(int timeSlot)

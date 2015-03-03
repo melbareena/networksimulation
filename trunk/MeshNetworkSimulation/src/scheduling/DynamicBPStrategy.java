@@ -11,6 +11,7 @@ import java.util.Vector;
 import luncher.Luncher;
 import common.FileGenerator;
 import trafficEstimating.TrafficEstimatingFacade;
+import trafficGenerator.DTGFacade;
 import transConf.TCFacade;
 import dataStructure.Buffer;
 import dataStructure.BufferMap;
@@ -88,6 +89,8 @@ public class DynamicBPStrategy extends DynamicAbstract
 		}
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
+		
+		//assert(_totalpacketNumber == DTGFacade.totalPackets ) : "Error: packets is not same, here:" + _totalpacketNumber + " but in orginal we have " + DTGFacade.totalPackets ;
 	
 		return getResults();
 	}
@@ -119,14 +122,18 @@ public class DynamicBPStrategy extends DynamicAbstract
 				List<Packet> movedPackets = sourceBuffers.sendPacket(link, dataRate,	transmitBuffers, timeSlot);
 				for (Packet moved : movedPackets)
 				{
-					_totalpacketNumber++;
-					packetNumber++;
-					delayTS += moved.getDelay();
+					
+				
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
-						if(!moved.isFragment()) 
+						if(!moved.isFragment())
+						{
+							_totalpacketNumber++;
+							packetNumber++;
+							delayTS += moved.getDelay();
 							packetsDelay.add(moved.getDelay());
+						}
 						slotThroughtput += movedTraffic;
 						tcu.addThroughput(movedTraffic);
 					}
@@ -141,14 +148,17 @@ public class DynamicBPStrategy extends DynamicAbstract
 				List<Packet> movedPackets = transmitBuffers.sendPacket(link, dataRate, transmitBuffers, timeSlot);
 				for (Packet moved : movedPackets)
 				{
-					_totalpacketNumber++;
-					packetNumber++;
-					delayTS += moved.getDelay();
+					
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
 						if(!moved.isFragment())
+						{
 							packetsDelay.add(moved.getDelay());
+							_totalpacketNumber++;
+							packetNumber++;
+							delayTS += moved.getDelay();
+						}
 						slotThroughtput += movedTraffic;
 						tcu.addThroughput(movedTraffic);
 					}

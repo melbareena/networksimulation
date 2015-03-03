@@ -33,6 +33,14 @@ public class Packet implements Comparable<Packet>
 		this.dateOfDeath = 0;
 	}
 	
+	/**
+	 * create a packet which is a part of a bigger packet
+	 * @param path
+	 * @param currentNode
+	 * @param packetPathLinks
+	 * @param traffic
+	 * @param currentTimeSlot
+	 */
 	public Packet(Path path,Vertex currentNode, LinkedList<Link> packetPathLinks, double traffic,
 			int currentTimeSlot)
 	{
@@ -126,12 +134,12 @@ public class Packet implements Comparable<Packet>
 			}
 			this.traffic -= dataRate;
 			
+	
 			@SuppressWarnings("unchecked")
 			LinkedList<Link> sentPacketPath = (LinkedList<Link>) this.packetPath.clone();
 			Link l = sentPacketPath.remove();
 			
-			Packet sentPacket = new Packet(this.orginalPath ,l.getDestination(), sentPacketPath, dataRate,
-					currentTimeSlot);
+			Packet sentPacket = new Packet(this.orginalPath ,l.getDestination(), sentPacketPath, dataRate, currentTimeSlot);
 			return sentPacket;
 				
 		}
