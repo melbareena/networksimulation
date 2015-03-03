@@ -35,7 +35,7 @@ public class Buffer {
 		 else 
 			this.packets.add(newP);
 		
-		Collections.sort(packets, Collections.reverseOrder());
+	Collections.sort(packets, Collections.reverseOrder());
 	}
 	
 	
