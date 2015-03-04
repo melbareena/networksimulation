@@ -168,7 +168,10 @@ public class DynamicBPStrategy extends DynamicAbstract
 		}
 		throughput.add(slotThroughtput);
 		trafficSource.add(sourceBuffers.trafficSize());
-		averageDelayPerTimeSlot.add(delayTS / packetNumber);
+		if(packetNumber > 0)
+			averageDelayPerTimeSlot.add(delayTS / packetNumber);
+		else
+			averageDelayPerTimeSlot.add(0d);
 		trafficTransit.add(transmitBuffers.trafficSize());
 	}
 
