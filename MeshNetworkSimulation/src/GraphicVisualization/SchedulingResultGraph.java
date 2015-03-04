@@ -316,7 +316,7 @@ public class SchedulingResultGraph extends JFrame
 		System.err.println("Max: " + maxSeries);
 		return maxSeries;
 		/*
-		return 673.5454;*/
+		return 3883.5594;*/
 		
 		
 		
