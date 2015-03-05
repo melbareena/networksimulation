@@ -170,30 +170,27 @@ public class DelayGraph extends JFrame
 		        
 		       	
 		       
+
 		        
-		       	
-	
-		        
-		        delayAxis.setRange(0, maxDelay);
+		        delayAxis.setRange(0, maxDelay + (maxDelay / 100)*10 );
+		        System.out.println("Delay Max Range:" + maxDelay + (maxDelay / 100)*10);
 		        plot.setRangeAxis(0,delayAxis);
-		        
-		        
-	              
-		        
+		              
 
 		        plot.mapDatasetToRangeAxis(1, 1);
-		        plot.setBackgroundPaint(Color.DARK_GRAY);
-		        plot.setDomainGridlinePaint(Color.BLACK);
-		        plot.setRangeGridlinePaint(Color.BLACK);
+		        plot.setBackgroundPaint(Color.LIGHT_GRAY);
+		        plot.setDomainGridlinePaint(Color.WHITE);
+		        plot.setRangeGridlinePaint(Color.WHITE);
 		        plot.setRangeGridlinesVisible(true);
 		        
 
 			     
 			    XYLineAndShapeRenderer render = new XYLineAndShapeRenderer();
 			    render.setSeriesShape(0, ShapeUtilities.createRegularCross(5F, 1F));
+			    render.setSeriesShapesVisible(0, false);
 			    plot.setRenderer(0,render);
 		        
-		        changeColor(0, Color.WHITE);
+		        changeColor(0, Color.BLACK);
 		      
 		        
 		        endTraffic.setPaint(Color.MAGENTA);
