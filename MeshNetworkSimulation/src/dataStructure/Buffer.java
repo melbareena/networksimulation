@@ -1,6 +1,5 @@
 package dataStructure;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -26,16 +25,16 @@ public class Buffer {
 	
 	public void add(Packet newP) 
 	{
-		Packet mergedPacket = null;
+		/*Packet mergedPacket = null;
 		for (Packet p : packets) 
 			if(p.equals(newP))
 				mergedPacket = p;
 		if(mergedPacket != null) 
 			mergedPacket.addTarffic(newP.getTraffic());
-		 else 
+		 else */
 			this.packets.add(newP);
 		
-	Collections.sort(packets, Collections.reverseOrder());
+	//Collections.sort(packets, Collections.reverseOrder());
 	}
 	
 	

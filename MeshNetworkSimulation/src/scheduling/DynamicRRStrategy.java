@@ -31,7 +31,6 @@ public class DynamicRRStrategy extends DynamicAbstract
 		super.throughput = new Vector<Double>();
 		super.trafficSource = new Vector<Double>();
 		super.trafficTransit = new Vector<Double>();
-		super.packetsDelay = new Vector<Integer>();
 		super.maxTrafficSource = -1.0;
 		super.maxTrafficTransmit = -1.0;
 		super.instanceIndex = instanceIndex;
@@ -63,15 +62,16 @@ public class DynamicRRStrategy extends DynamicAbstract
 				this.configurations = TCFacade.getConfigurations(timeSlot + 1, timeSlot + _redoTimeSlot , sourceBuffers, transmitBuffers);
 			
 			
-			
+			int numberOfOriginalReceivedPacket = 0;
+			double delayTS = 0;
 			double slotThroughtput = 0;
-			int slotDelay = 0;
+
 			//both of buffers are empty 
 			if(sourceBuffers.trafficSize() == 0 && transmitBuffers.trafficSize() == 0)
 			{
 				timeSlot++;
 				throughput.add(0d);
-				packetsDelay.add(0);
+				averageDelayPerTimeSlot.add(0d);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
 				if(timeSlot < durationOfTrafficGenerating)
@@ -90,6 +90,8 @@ public class DynamicRRStrategy extends DynamicAbstract
 		 			transmissionConfigurations = matching(selectedBuffers);
 		 			for (TCUnit tcunit : transmissionConfigurations) 
 		 			{
+		 				numberOfOriginalReceivedPacket = 0;
+		 				delayTS = 0;
 						slotThroughtput = 0;
 						for (Link link : tcunit.getLinks()) 
 						{
@@ -101,15 +103,19 @@ public class DynamicRRStrategy extends DynamicAbstract
 									if(moved.isReceived())
 									{
 										double movedTraffic = moved.getTraffic();
-										if(!moved.isFragment())
-											slotDelay += moved.getDelay();
+										if(moved.isOrginalPacket())
+										{
+											_totalpacketNumber++;
+											numberOfOriginalReceivedPacket++;
+											delayTS += moved.getDelay();
+										}
 										slotThroughtput += movedTraffic;
 										tcunit.addThroughput(movedTraffic);
 									}						
 							}
 						}
 						throughput.add(slotThroughtput);
-						packetsDelay.add(slotDelay);
+						AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
 						trafficSource.add(sourceBuffers.trafficSize());
 						trafficTransit.add(transmitBuffers.trafficSize());
 						timeSlot++;
@@ -134,7 +140,8 @@ public class DynamicRRStrategy extends DynamicAbstract
 		 			for (TCUnit tcunit : transmissionConfigurations)
 		 			{
 						slotThroughtput = 0;
-						slotDelay = 0;
+						numberOfOriginalReceivedPacket = 0;
+		 				delayTS = 0;
 						for (Link link : tcunit.getLinks())
 						{
 							if(transmitBuffers.containsKey(link)) 
@@ -147,8 +154,12 @@ public class DynamicRRStrategy extends DynamicAbstract
 									if(moved.isReceived()) 
 									{
 										double movedTraffic = moved.getTraffic();
-										if(!moved.isFragment()) 
-											slotDelay +=moved.getDelay();
+										if(moved.isOrginalPacket())
+										{
+											_totalpacketNumber++;
+											numberOfOriginalReceivedPacket++;
+											delayTS += moved.getDelay();
+										}
 										slotThroughtput += movedTraffic;
 										tcunit.addThroughput(movedTraffic);
 									}
@@ -157,7 +168,7 @@ public class DynamicRRStrategy extends DynamicAbstract
 							}
 						}
 						throughput.add(slotThroughtput);
-						packetsDelay.add(slotDelay);
+						AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
 						trafficSource.add(sourceBuffers.trafficSize());
 						trafficTransit.add(transmitBuffers.trafficSize());
 						timeSlot++;

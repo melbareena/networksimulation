@@ -30,11 +30,9 @@ public class DynamicBPStrategy extends DynamicAbstract
 		super.throughput = new Vector<Double>();
 		super.trafficSource = new Vector<Double>();
 		super.trafficTransit = new Vector<Double>();
-		super.packetsDelay = new Vector<Integer>();
 		super.maxTrafficSource = -1.0;
 		super.maxTrafficTransmit = -1.0;
 		super.instanceIndex = instanceIndex;
-		super.averageDelayPerTimeSlot = new Vector<Double>();
 	}
 	
 
@@ -90,14 +88,15 @@ public class DynamicBPStrategy extends DynamicAbstract
 		FileGenerator.TCThroughput(configurations);
 		FileGenerator.Throughput(throughput);
 		
-		//assert(_totalpacketNumber == DTGFacade.totalPackets ) : "Error: packets is not same, here:" + _totalpacketNumber + " but in orginal we have " + DTGFacade.totalPackets ;
+		assert(accumulationOfThroughput() == DTGFacade.getTotalTraffic()) : "\n\n Error: flow-in != flow-out,  flow-in:" +  DTGFacade.getTotalTraffic() 
+		+ " but flow-out " + accumulationOfThroughput()  + "\n\n" ;
 	
 		return getResults();
 	}
 	
 	
 	
-	public static int _totalpacketNumber = 0;
+	
 	
 	
 	/**Tries to dispose of as much traffic as it can in a given timeslot.
@@ -109,8 +108,8 @@ public class DynamicBPStrategy extends DynamicAbstract
 	private void disposeOfTraffic(int timeSlot)
 	{
 		
-		int packetNumber = 0;
-		double delayTS = 0;
+		int numberOfOriginalReceivedPacket = 0;
+		double totalDelayInTS = 0;
 		double slotThroughtput = 0;
 		TCUnit tcu = getMatchingTC(getOptimalWeightMap());
 		for (Link link : tcu.getLinks()) {
@@ -127,12 +126,11 @@ public class DynamicBPStrategy extends DynamicAbstract
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
-						if(!moved.isFragment())
+						if(moved.isOrginalPacket())
 						{
 							_totalpacketNumber++;
-							packetNumber++;
-							delayTS += moved.getDelay();
-							packetsDelay.add(moved.getDelay());
+							numberOfOriginalReceivedPacket++;
+							totalDelayInTS += moved.getDelay();
 						}
 						slotThroughtput += movedTraffic;
 						tcu.addThroughput(movedTraffic);
@@ -152,12 +150,11 @@ public class DynamicBPStrategy extends DynamicAbstract
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
-						if(!moved.isFragment())
+						if(moved.isOrginalPacket())
 						{
-							packetsDelay.add(moved.getDelay());
 							_totalpacketNumber++;
-							packetNumber++;
-							delayTS += moved.getDelay();
+							numberOfOriginalReceivedPacket++;
+							totalDelayInTS += moved.getDelay();
 						}
 						slotThroughtput += movedTraffic;
 						tcu.addThroughput(movedTraffic);
@@ -168,12 +165,14 @@ public class DynamicBPStrategy extends DynamicAbstract
 		}
 		throughput.add(slotThroughtput);
 		trafficSource.add(sourceBuffers.trafficSize());
-		if(packetNumber > 0)
-			averageDelayPerTimeSlot.add(delayTS / packetNumber);
-		else
-			averageDelayPerTimeSlot.add(0d);
+		AddAverageDelay(numberOfOriginalReceivedPacket, totalDelayInTS);
+		super.totalDelayPerTimeSlot.add(totalDelayInTS);
 		trafficTransit.add(transmitBuffers.trafficSize());
 	}
+
+
+
+	
 
 	/** 1st phase: Selecting the optimal commodity and computing the weight map.<br/>
 	 * Note: A "commodity c data" is considered to be the data destined to node c.

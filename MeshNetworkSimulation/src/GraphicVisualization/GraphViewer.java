@@ -168,6 +168,7 @@ public class GraphViewer extends JFrame {
 	
 	
 	private final SchedulingResultGraph _resultGraph;
+	private final DelayGraph _delayGraph;
 	
 	public static String _availableChannels; 
 	
@@ -203,11 +204,13 @@ public class GraphViewer extends JFrame {
 		
 		if(step == 0) step =1;
 		_resultGraph = new SchedulingResultGraph(results);
+		_delayGraph = new DelayGraph(results);
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() 
 			{
 				_resultGraph.createDiagram();
+				_delayGraph.createDiagram();
 			}
 		});
 		t.run();
@@ -308,6 +311,7 @@ public class GraphViewer extends JFrame {
 					case JOptionPane.YES_OPTION:
 						colorViewerDialog.dispose();
 						_resultGraph.dispose();
+						_delayGraph.dispose();
 						dispose();
 						Luncher.restartApplication();
 						break;
@@ -694,6 +698,7 @@ public class GraphViewer extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				_resultGraph.setVisible(true);
+				_delayGraph.setVisible(true);
 			}
 		});
 		mnFile.add(throughputViewer);
@@ -734,6 +739,7 @@ public class GraphViewer extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				colorViewerDialog.dispose();
 				_resultGraph.dispose();
+				_delayGraph.dispose();
 				dispose();
 				Luncher.restartApplication();
 			}

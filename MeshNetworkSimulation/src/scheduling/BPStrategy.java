@@ -115,7 +115,10 @@ public class BPStrategy extends SchedulingBase {
 	 * transmit buffers).
 	 * @param timeSlot The current timeslot.
 	 */
-	private void disposeOfTraffic(int timeSlot) {
+	private void disposeOfTraffic(int timeSlot) 
+	{
+		int numberOfOriginalReceivedPacket = 0;
+		double delayTS = 0;
 		double slotThroughtput = 0;
 		TCUnit tcu = getMatchingTC(getOptimalWeightMap());
 		for (Link link : tcu.getLinks()) {
@@ -130,8 +133,12 @@ public class BPStrategy extends SchedulingBase {
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
-						if(!moved.isFragment()) 
-							packetsDelay.add(moved.getDelay());
+						if(moved.isOrginalPacket())
+						{
+							_totalpacketNumber++;
+							numberOfOriginalReceivedPacket++;
+							delayTS += moved.getDelay();
+						}
 						slotThroughtput += movedTraffic;
 						tcu.addThroughput(movedTraffic);
 					}
@@ -149,8 +156,12 @@ public class BPStrategy extends SchedulingBase {
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
-						if(!moved.isFragment())
-							packetsDelay.add(moved.getDelay());
+						if(moved.isOrginalPacket())
+						{
+							_totalpacketNumber++;
+							numberOfOriginalReceivedPacket++;
+							delayTS += moved.getDelay();
+						}
 						slotThroughtput += movedTraffic;
 						tcu.addThroughput(movedTraffic);
 					}
@@ -158,6 +169,7 @@ public class BPStrategy extends SchedulingBase {
 				
 			}
 		}
+		AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
 		throughput.add(slotThroughtput);
 		trafficSource.add(sourceBuffers.trafficSize());
 		trafficTransit.add(transmitBuffers.trafficSize());

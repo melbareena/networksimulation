@@ -4,13 +4,16 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+
 import common.FileGenerator;
 import common.PrintConsole;
 import scheduling.SchedulingFacade;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.AppExecMode;
+import GraphicVisualization.DelayGraph;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.LoadingDialog;
 import GraphicVisualization.SchedulingResultGraph;
@@ -158,15 +161,15 @@ public class Luncher {
 						Luncher.loadingDialog.setLabel(index-1, "Building user interface...");
 						int step = result.getThroughputData().size()/100;
 						if(step == 0 ) step = 1;
-						SchedulingResultGraph g = new SchedulingResultGraph(result);
-						g.createDiagram();
+						createDiagrams(result);
 						Luncher.loadingDialog.setProgress(index-1, 100, "Done!");
 						
 						samplesList.add(result.getThroughputData().size());
-						throughputList.add(result.getAverageThroughputInSteadyState());
-						delaysList.add((int) Math.round(result.getAveragePacketDelay()));
+						delaysList.add((int) Math.round(result.getAverageDelayOfPacket()));
 					}
 				}
+
+				
 
 				private void singleMode() {
 					PrintConsole.print("********************** Application is in single execution mode ************************");
@@ -213,6 +216,13 @@ public class Luncher {
 			System.exit(0);
 		}
 
+	}
+	private static void createDiagrams(SchedulingResult result)
+	{
+		SchedulingResultGraph g = new SchedulingResultGraph(result);
+		g.createDiagram();
+		DelayGraph delayG = new DelayGraph(result);
+		delayG.createDiagram();
 	}
 
 }

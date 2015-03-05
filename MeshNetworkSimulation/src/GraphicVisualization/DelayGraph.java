@@ -8,9 +8,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -32,9 +29,7 @@ import org.jfree.chart.plot.Marker;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
@@ -53,7 +48,7 @@ import setting.BaseConfiguration.AlgorithmMode;
 import trafficGenerator.DTGFacade;
 import dataStructure.SchedulingResult;
 
-public class SchedulingResultGraph extends JFrame
+public class DelayGraph extends JFrame
 {
 
 	/**
@@ -64,13 +59,12 @@ public class SchedulingResultGraph extends JFrame
 	private static final long	serialVersionUID	= 1L;
 	public   Paint white = Color.black;
 	public  Marker endTraffic = new ValueMarker(ApplicationSettingFacade.Traffic.getDuration() / 50);
-	public  ValueMarker offerLoad = new ValueMarker(DTGFacade.offeredLoad);
 	private  ChartPanel chartPanel;
 	private  JPanel contentPane;
 	private JFreeChart chart;
-	public SchedulingResultGraph(SchedulingResult result)
+	public DelayGraph(SchedulingResult result)
 	{
-		super("Scheduling Result");
+		super("Delay");
 		_sResult = result;
 	}
 
@@ -84,14 +78,14 @@ public class SchedulingResultGraph extends JFrame
 		
 		
 		final XYDataset dataSet = createDataSet();
-        chart = createChart(dataSet);
-        chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(1670	, 1045));
-        contentPane.add(chartPanel, BorderLayout.CENTER);
-        
-        
-        buildToolBar();
-        showDiagram();
+       chart = createChart(dataSet);
+       chartPanel = new ChartPanel(chart);
+       chartPanel.setPreferredSize(new java.awt.Dimension(1670	, 1045));
+       contentPane.add(chartPanel, BorderLayout.CENTER);
+       
+       
+       buildToolBar();
+       showDiagram();
 	}
 
 	private void buildToolBar() {
@@ -125,16 +119,16 @@ public class SchedulingResultGraph extends JFrame
 	private void showDiagram()
 	{ 
 		
-        this.pack();
-        RefineryUtilities.centerFrameOnScreen(this);
-        this.setVisible(true);
+       this.pack();
+       RefineryUtilities.centerFrameOnScreen(this);
+       this.setVisible(true);
 		
 	}
 
 
 	private JFreeChart createChart(XYDataset dataSet)
 	{
-		String title = "Channels:" +Luncher.getAvailableChannels() +  
+		String title = "Channels:" + Luncher.getAvailableChannels() +  
 						",Routers: " + ApplicationSettingFacade.Router.getSize() +
 						",Gateways:" + ApplicationSettingFacade.Gateway.getSize() + 
 						",Power Control: " + ApplicationSettingFacade.PowerControl.isEnable() +  		
@@ -163,69 +157,44 @@ public class SchedulingResultGraph extends JFrame
 		 
 		  chart.setTitle(titleT);
 		        // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
-		        chart.setBackgroundPaint(Color.white);
+		        chart.setBackgroundPaint(Color.GRAY);
 
 		        final XYPlot plot = chart.getXYPlot();
 		        
-		        plot.setDataset(1,createSourceDataSet());
-		        plot.setDataset(2,createTransmitDataSet());
-		       // plot.setDataset(3, createDelayAverage());
+
 		       
 		        
 		        
-		        final NumberAxis transmitAxis = new NumberAxis("Mega bits");  
-		        final NumberAxis sourceAxis = new NumberAxis("Mega bits");
-		       // final NumberAxis delayAxis = new NumberAxis("ms/ts");
+
+		        final NumberAxis delayAxis = new NumberAxis("ms/ts");
 		        
 		       	
 		       
 		        
 		       	
-		       	
-		       	ValueAxis thAxis = plot.getRangeAxis(0);
-		        thAxis.setRange(0, getMaxRange());
+	
 		        
-		        
-		        sourceAxis.setRange(0, getMaxRange());
-		        plot.setRangeAxis(1, sourceAxis);
-		        
-		        transmitAxis.setRange(0, getMaxRange());
-		        plot.setRangeAxis(2, transmitAxis);
-		        
-		      //  delayAxis.setRange(0, getMaxRange());
-		       // plot.setRangeAxis(3,delayAxis);
+		        delayAxis.setRange(0, maxDelay);
+		        plot.setRangeAxis(0,delayAxis);
 		        
 		        
 	              
 		        
-		       // plot.setRangeAxis(2, bufferAxis);
+
 		        plot.mapDatasetToRangeAxis(1, 1);
-		        plot.setBackgroundPaint(Color.lightGray);
-		        plot.setDomainGridlinePaint(Color.white);
-		        plot.setRangeGridlinePaint(Color.white);
+		        plot.setBackgroundPaint(Color.DARK_GRAY);
+		        plot.setDomainGridlinePaint(Color.BLACK);
+		        plot.setRangeGridlinePaint(Color.BLACK);
 		        plot.setRangeGridlinesVisible(true);
 		        
-		        XYLineAndShapeRenderer rendererTh = new XYLineAndShapeRenderer();		
-		        rendererTh.setSeriesShape(0, ShapeUtilities.createDiagonalCross(3.0F, 0.5F));
-				plot.setRenderer(0, rendererTh);
-		        
-				XYLineAndShapeRenderer rendererSou = new XYLineAndShapeRenderer();		
-		        rendererSou.setSeriesShape(1, ShapeUtilities.createUpTriangle(3.0F));
-				plot.setRenderer(1, rendererSou);
-				
-				XYLineAndShapeRenderer rendererTrans = new XYLineAndShapeRenderer();		
-				 rendererTrans.setSeriesShape(2, ShapeUtilities.createDownTriangle(3.0F));
-			     plot.setRenderer(2, rendererTrans);
+
 			     
-			  //   XYSplineRenderer dotRender = new XYSplineRenderer();
-			  //   dotRender.setSeriesShape(3, ShapeUtilities.createUpTriangle(5F));
-			 //    dotRender.setSeriesLinesVisible(3, false);
-			 //    plot.setRenderer(3,dotRender);
+			    XYLineAndShapeRenderer render = new XYLineAndShapeRenderer();
+			    render.setSeriesShape(0, ShapeUtilities.createRegularCross(5F, 1F));
+			    plot.setRenderer(0,render);
 		        
-		        changeColor(0, Color. BLUE);
-		        changeColor(1, Color.GREEN);
-		        changeColor(2, Color.RED);
-		    //    changeColor(3, Color.BLACK);
+		        changeColor(0, Color.WHITE);
+		      
 		        
 		        endTraffic.setPaint(Color.MAGENTA);
 		        endTraffic.setLabel("End Traffic");
@@ -238,14 +207,7 @@ public class SchedulingResultGraph extends JFrame
 		        plot.addDomainMarker(endTraffic);
 		        
 
-		        offerLoad.setPaint(Color.BLACK);
-		        offerLoad.setStroke(new BasicStroke(2.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-		        		10.0F, new float[] {10, 10}, 0.0F));
-		        offerLoad.setLabel("Offered Load:" + DTGFacade.offeredLoad + " Mbps");
-		        offerLoad.setLabelAnchor(RectangleAnchor.BOTTOM_LEFT);
-		        offerLoad.setLabelTextAnchor(TextAnchor.TOP_LEFT);
-		        offerLoad.setLabelFont(offerLoad.getLabelFont().deriveFont(Font.BOLD, 12));
-		        plot.addRangeMarker(offerLoad);
+		      
 		        
 		        
 		       
@@ -255,7 +217,7 @@ public class SchedulingResultGraph extends JFrame
 
 
 	private void changeColor(int index, Color c)
-	{
+	{	
 			XYPlot plot = chart.getXYPlot();
 			XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(index);
 			renderer.setSeriesPaint(0, c);
@@ -269,100 +231,19 @@ public class SchedulingResultGraph extends JFrame
 	}
 
 	
-	private double maxThroughput  = 0;
+	private double maxDelay  = 0;
 	private XYDataset createDataSet()
-	{
-		//first throughput
-		
-		int timeIndex = 0;
-		final XYSeries throughputSeries = new XYSeries("Average Throughput");
-		
-		for (Double t : _sResult.getThroughputData())
-		{
-			if(t> maxThroughput)
-				maxThroughput = t;
-			throughputSeries.add(timeIndex,t);
-			timeIndex++;
-		}	
-		
-	/*	*/
-		
-		final XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(throughputSeries);
-       // dataset.addSeries(sourceDataSeries);
-        //dataset.addSeries(transmitDataSeries);
-                
-        return dataset;
-		
-		
-	}
-	private double maxSource = 0;
-	private XYDataset createSourceDataSet()
-	{
-		final XYSeries sourceDataSeries = new XYSeries("Source Traffic");
-		int timeIndex = 0;
-		for (Double t : _sResult.getSourceData())
-		{
-			if(t > maxSource) maxSource = t;
-			sourceDataSeries.add(timeIndex,t);
-			timeIndex++;
-		}
-		final XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(sourceDataSeries);
-                
-        return dataset;
-	
-	
-	}
-	
-	private double maxTransmit  = 0 ;
-	private XYDataset createTransmitDataSet()
-	{
-
-		final XYSeries transmitDataSeries = new XYSeries("Transmit Traffic");
-		int timeIndex = 0;
-		for (Double t : _sResult.getTransmitData())
-		{
-			if(t> maxTransmit) maxTransmit = t;
-			transmitDataSeries.add(timeIndex,t);
-			timeIndex++;
-		}
-		final XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(transmitDataSeries);       
-        return dataset;
-	
-	
-	}
-	
-	/*private double maxDelay  = 0;
-	private XYDataset createDelayAverage()
 	{
 		final XYSeries delaySeries = new XYSeries("Delay");
 		int timeIndex = 0;
-		for (Double d : _sResult.delayPerSecond())
+		for (Double d : _sResult.averageDelayPerSecond())
 		{
 			if(d > maxDelay) maxDelay = d;
 			delaySeries.add(timeIndex++, d);
 		}
 		final XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(delaySeries);       
-        return dataset;
-	}*/
-	private double getMaxRange()
-	{
-		double maxSeries =  getMax() + (getMax() / 10);
-		System.err.println("Max: " + maxSeries);
-		return maxSeries;
-	}
-	private double getMax()
-	{
-		List<Double> list = new ArrayList<Double>();
-		//list.add(maxDelay);
-		list.add(maxSource);
-		list.add(maxThroughput);
-		list.add(maxTransmit);
-		return Collections.max(list );
+       dataset.addSeries(delaySeries);       
+       return dataset;	
 		
 	}
-
 }

@@ -692,9 +692,9 @@ public class FileGenerator
 			SchedulingResult sr = results[i];
 			throughputBuilder.append(df.format(sr.getAverageThorughput())  );
 			throughputBuilder.append(System.lineSeparator());
-			networkDelayBuilder.append(((double)sr.getDelay()));
+			networkDelayBuilder.append(((double)sr.getNetworkDelay()));
 			networkDelayBuilder.append(System.lineSeparator());
-			AverageDelayBuilder.append(sr.getAveragePacketDelay());
+			AverageDelayBuilder.append(sr.getAverageDelayOfPacket());
 			AverageDelayBuilder.append(System.lineSeparator());
 			
 		}
@@ -727,7 +727,7 @@ public class FileGenerator
 		Throughput(results.getThroughputPerTimeSlot());
 		try
 		{
-			BufferedWriter THwriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "schedulingResult_throughput_mbps.txt" ));
+			BufferedWriter THwriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "01-schedulingResult_throughput_mbps.txt" ));
 			
 			for(Double throughput : results.getThroughputData())
 			{
@@ -736,7 +736,7 @@ public class FileGenerator
 			}
 			THwriter.close();
 			
-			BufferedWriter Swriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "schedulingResult_SourceBuffer_mbps.txt" ));
+			BufferedWriter Swriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "02-schedulingResult_SourceBuffer_mbps.txt" ));
 			for(Double SBuffer : results.getSourceData())
 			{
 				Swriter.write(SBuffer + "");
@@ -744,7 +744,7 @@ public class FileGenerator
 			}
 			Swriter.close();
 			
-			BufferedWriter Twriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "schedulingResult_TransmitBuffer_mbps.txt" ));
+			BufferedWriter Twriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "03-schedulingResult_TransmitBuffer_mbps.txt" ));
 			for(Double TBuffer : results.getTransmitData())
 			{
 				Twriter.write(TBuffer + "");
@@ -752,25 +752,16 @@ public class FileGenerator
 			}
 			Twriter.close();
 			
-			BufferedWriter delayTSWriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "AveragedelayPerTimeSlot.txt" ));
+			BufferedWriter delayPerSecondWriter = new BufferedWriter(new FileWriter(FILEOUTPUTPATH + "04-AveragedelayPerSecond.txt" ));
 			
-			int index = 0;
-			int counter = 0;
-			do
+			
+			for (Double d1 : results.averageDelayPerSecond())
 			{
-				double delay = 0;
-				index = 50 * counter;
-				if(index <= results.getAverageDelayPerTimeSlot().size())
-					delay = results.getAverageDelayPerTimeSlot().get(index);
-				else
-					delay = results.getAverageDelayPerTimeSlot().get(results.getAverageDelayPerTimeSlot().size() - 1);
-				delayTSWriter.write(delay + "");
-				delayTSWriter.newLine();
-				counter++;
-				
-			}while(index <= results.getAverageDelayPerTimeSlot().size());
+				delayPerSecondWriter.write(d1 + "");
+				delayPerSecondWriter.newLine();
+			}
 		
-			delayTSWriter.close();
+			delayPerSecondWriter.close();
 			
 			PrintConsole.print("Schdeuling Result In File..........................");
 		}

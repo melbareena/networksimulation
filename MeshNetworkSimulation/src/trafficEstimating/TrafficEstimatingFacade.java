@@ -88,7 +88,7 @@ public class TrafficEstimatingFacade
 		
 	}
 
-	
+	public static int totalGeneratedPackets = 0;
 	public static BufferMap getDynamicSourceBuffers(int currentTimeslot) 
 	{
 		
@@ -127,7 +127,8 @@ public class TrafficEstimatingFacade
 					for (Path p : pathList) 
 					{
 						Packet newPacket = new Packet(p, upTraffic, currentTimeslot);
-						bfMap.put( p.getEdgePath().getFirst(), newPacket);		
+						bfMap.put( p.getEdgePath().getFirst(), newPacket);	
+						totalGeneratedPackets++;
 					}
 				}
 			}
@@ -145,6 +146,7 @@ public class TrafficEstimatingFacade
 	
 							Packet newPacket = new Packet(p, downTraffic, currentTimeslot);
 							bfMap.put( p.getEdgePath().getFirst(), newPacket);
+							totalGeneratedPackets++;
 						}
 					}
 				}
