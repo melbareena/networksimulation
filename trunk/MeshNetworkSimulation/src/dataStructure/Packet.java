@@ -12,7 +12,7 @@ public class Packet implements Comparable<Packet>
 	private int dateOfBirth;
 	private int dateOfDeath;
 	
-	private boolean isFragment;
+	private boolean isOriginal;
 	
 	private boolean isReceived;
 	private Path orginalPath;
@@ -24,7 +24,7 @@ public class Packet implements Comparable<Packet>
 		this.packetPath = path.Clone().getEdgePath();
 		this.currentNode = source;
 		this.isReceived = false;
-		this.isFragment = false;
+		this.isOriginal = true;
 		this.traffic = traffic;
 
 		this.orginalPath = path;
@@ -55,7 +55,7 @@ public class Packet implements Comparable<Packet>
 		
 		this.dateOfBirth = currentTimeSlot;
 		
-		this.isFragment = true;
+		this.isOriginal = false;
 		
 		if(currentNode == this.destination) {
 			this.isReceived = true;
@@ -98,9 +98,9 @@ public class Packet implements Comparable<Packet>
 	{
 		return isReceived;
 	}
-	public boolean isFragment()
+	public boolean isOrginalPacket()
 	{
-		return isFragment;
+		return isOriginal;
 	}
 	public Link getCurrentLink()
 	{
@@ -155,7 +155,7 @@ public class Packet implements Comparable<Packet>
 	    Packet p = (Packet)o;
 		if(		this.source == p.getSource() 
 				&& this.destination == p.getDestination() 
-				&& this.getOriginalPath() == p.getOriginalPath())
+				&& this.getOriginalPath() == p.getOriginalPath() && this.dateOfBirth == p.dateOfBirth)
 			return true;
 		return false;
 	}

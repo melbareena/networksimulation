@@ -16,6 +16,12 @@ import dataStructure.TCUnit;
 
 public abstract class DynamicAbstract
 {
+	
+	public DynamicAbstract()
+	{
+		averageDelayPerTimeSlot = new Vector<Double>();
+		totalDelayPerTimeSlot = new Vector<Double>();
+	}
 	protected int instanceIndex;
 	protected int k = 3;
 	protected BufferMap sourceBuffers;
@@ -27,13 +33,13 @@ public abstract class DynamicAbstract
 	protected Vector<Double> throughput;
 	protected Vector<Double> trafficSource;
 	protected Vector<Double> trafficTransit;
-	protected Vector<Integer> packetsDelay;
 	protected double totalTrafficGenerated;
 	protected String trafficGenerator = "Dynamic";
 	protected double maxTrafficSource;
 	protected double maxTrafficTransmit;
-	
+	protected static int _totalpacketNumber = 0;
 	protected Vector<Double> averageDelayPerTimeSlot;
+	protected Vector<Double> totalDelayPerTimeSlot;
 	
 	protected int _redoTimeSlot = ApplicationSettingFacade.getInterval();
 	
@@ -76,11 +82,7 @@ public abstract class DynamicAbstract
 		results.setTransmitBufferData(trafficTransit);
 		results.setTotalTrafficGenerated(totalTrafficGenerated);
 		results.setAverageDelayPerTimeSlot(averageDelayPerTimeSlot);
-		double sum = 0;
-		for(int i = 0; i < packetsDelay.size() && i < ApplicationSettingFacade.Traffic.getDuration(); i++) {
-			sum += packetsDelay.get(i);
-		}
-		results.setAveragePacketDelay(sum );
+		results.setTotalDelay(totalDelayPerTimeSlot);
 		return results;
 	}
 	
@@ -144,6 +146,14 @@ public abstract class DynamicAbstract
 		}
 		
 		return  (double)Math.round(accu * 100000) / 100000;	
+	}
+	
+	protected void AddAverageDelay(int numberOfOriginalReceivedPacket,double delayTS)
+	{
+		if(numberOfOriginalReceivedPacket > 0)
+			averageDelayPerTimeSlot.add(delayTS / numberOfOriginalReceivedPacket);
+		else
+			averageDelayPerTimeSlot.add(0d);
 	}
 	
 	public abstract SchedulingResult doDeliveryPackets() ;

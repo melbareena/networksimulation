@@ -3,6 +3,7 @@ package dataStructure;
 import java.util.Vector;
 
 import setting.ApplicationSettingFacade;
+import trafficEstimating.TrafficEstimatingFacade;
 
 public class SchedulingResult
 {
@@ -26,19 +27,8 @@ public class SchedulingResult
 	private String trafficGenerator;
 	
 	private double totalTrafficGenerated;
+		
 	
-	private double averagePacketDelay;
-
-	
-	public Vector<Double> getAverageDelayPerTimeSlot()
-	{
-		return averageDelayPerTimeSlot;
-	}
-
-	public void setAverageDelayPerTimeSlot(Vector<Double> averageDelayPerTimeSlot)
-	{
-		this.averageDelayPerTimeSlot = averageDelayPerTimeSlot;
-	}
 	
 	public void setThroughputData(Vector<Double> throughputData) 
 	
@@ -166,30 +156,92 @@ public class SchedulingResult
 	public double getTotalTrafficGenerated() {
 		return totalTrafficGenerated;
 	}
-
-	public double getAveragePacketDelay() {
-		return averagePacketDelay;
-	}
-
-	public void setAveragePacketDelay(double averagePacketsDelay) 
-	{
-		this.averagePacketDelay = (int)(averagePacketsDelay);
-	}
 	
-	public double getAverageThroughputInSteadyState() {
-		double sum = 0.0;
-        for(int i = 0; i < ApplicationSettingFacade.Traffic.getDuration(); i++) {
-        	sum += throughputData.get(i);
-        }
-        return sum / ApplicationSettingFacade.Traffic.getDuration();
-	}
-	public double getDelay()
+	
+	public double getNetworkDelay()
 	{
 		long actualStopTime = getThroughputPerTimeSlot().size();
 		long stopTime = ApplicationSettingFacade.Traffic.getDuration();
 		
 		long delaySlot = actualStopTime - stopTime;
 		return (double) delaySlot / 50;
+	}
+	
+	
+	
+	/**
+	 * get end-to-end of received of packets over number of them for <b>a second</b>
+	 * @return
+	 */
+	public Vector<Double> averageDelayPerSecond()
+	{
+		Vector<Double> dSecond = new Vector<Double>();
+		int slotCounter = 0;
+		for (Double slotT : averageDelayPerTimeSlot)
+		{
+			slotCounter++;
+			if(slotCounter == 49)
+			{
+				dSecond.add(slotT);
+				slotCounter = 0;
+			}
+		}
+		return dSecond;
+	}
+	
+	
+	
+	private Vector<Double> totalDelay;
+	
+	/**
+	 * end-to-end delay of packets in each time slot
+	 * @return
+	 */
+ 	public  Vector<Double> getTotalDelay()
+	{
+		return totalDelay;
+	}
+ 	
+ 	
+ 	public void setTotalDelay( Vector<Double> value)
+	{
+		this.totalDelay = value;
+	}
+ 	
+ 	
+ 	/**
+ 	 * Get end-to-end delay of received packets over number of them for each time slot
+ 	 * @param value
+ 	 */
+ 	public Vector<Double> getAverageDelayPerTimeSlot()
+	{
+		return averageDelayPerTimeSlot;
+	}
+
+ 	
+ 	/**
+ 	 * Set end-to-end delay of received packets over number of them for each time slot
+ 	 * @param value
+ 	 */
+	public void setAverageDelayPerTimeSlot(Vector<Double> value)
+	{
+		this.averageDelayPerTimeSlot = value;
+	}
+	
+	
+	/**
+	 * summation of end-to-end delay over number of packets 
+	 * @return
+	 */
+	public double getAverageDelayOfPacket()
+	{
+		double sum = 0d;
+		for (Double d1 : totalDelay)
+		{
+			sum += d1;
+		}
+		double average = sum / TrafficEstimatingFacade.totalGeneratedPackets;
+		return  (double) Math.round( average * 10 ) / 10 ;
 	}
 
 

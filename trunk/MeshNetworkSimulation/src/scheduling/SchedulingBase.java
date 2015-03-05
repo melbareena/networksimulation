@@ -35,12 +35,12 @@ public abstract class SchedulingBase
 	protected Vector<Double> throughput;
 	protected Vector<Double> trafficSource;
 	protected Vector<Double> trafficTransit;
-	protected Vector<Integer> packetsDelay;
 	protected double totalTrafficGenerated;
 	protected String trafficGenerator;
 	protected double maxTrafficSource;
 	protected double maxTrafficTransmit;
-	
+	protected static int _totalpacketNumber = 0;
+	protected Vector<Double> averageDelayPerTimeSlot;
 	protected int instanceIndex;
 
 	/**Creates a new SchedulingBase. Initiates all the buffers in the network.
@@ -56,7 +56,7 @@ public abstract class SchedulingBase
 		this.throughput = new Vector<Double>();
 		this.trafficSource = new Vector<Double>();
 		this.trafficTransit = new Vector<Double>();
-		this.packetsDelay = new Vector<Integer>();
+		this.averageDelayPerTimeSlot = new Vector<Double>();
 		this.maxTrafficSource = -1.0;
 		this.maxTrafficTransmit = -1.0;
 		this.instanceIndex = instanceIndex;
@@ -73,7 +73,9 @@ public abstract class SchedulingBase
 		Vector<Link> selectedBuffers = null;
 		Vector<TCUnit> transmissionConfiguraions = null;
 		int timeSlot = 0;
-		
+		double slotThroughtput = 0;
+		int numberOfOriginalReceivedPacket = 0;
+		double delayTS = 0;
 		totalTrafficGenerated = sourceBuffers.trafficSize();
 		
 		while( sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 )
@@ -81,8 +83,9 @@ public abstract class SchedulingBase
 			this.calcWeight(true);
 			selectedBuffers = getBufferStrategy(true);
 			
-			double slotThroughtput = 0;
-
+			slotThroughtput = 0;
+			numberOfOriginalReceivedPacket = 0;
+			delayTS = 0;
 			if(selectedBuffers.size() > 0)
  			{
 	 			transmissionConfiguraions = matching(selectedBuffers);
@@ -90,7 +93,8 @@ public abstract class SchedulingBase
 	 			for (TCUnit tcunit : transmissionConfiguraions)
 				{
 					slotThroughtput = 0;
-				
+					numberOfOriginalReceivedPacket = 0;
+					delayTS = 0;
 					
 					for (Link link : tcunit.getLinks())
 					{
@@ -102,13 +106,18 @@ public abstract class SchedulingBase
 								if(moved.isReceived())
 								{
 									double movedTraffic = moved.getTraffic();
-									if(!moved.isFragment())
-										packetsDelay.add(moved.getDelay());
+									if(moved.isOrginalPacket())
+									{
+										_totalpacketNumber++;
+										numberOfOriginalReceivedPacket++;
+										delayTS += moved.getDelay();
+									}
 									slotThroughtput += movedTraffic;
 									tcunit.addThroughput(movedTraffic);
 								}						
 						}
 					}
+					AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
 					timeSlot++;
 					updateProgress(timeSlot);
 					throughput.add(slotThroughtput);
@@ -125,7 +134,9 @@ public abstract class SchedulingBase
 	 			transmissionConfiguraions = matching(selectedBuffers);
 	 			for (TCUnit tcunit : transmissionConfiguraions)
 				{
-					slotThroughtput = 0;
+	 				slotThroughtput = 0;
+					numberOfOriginalReceivedPacket = 0;
+					delayTS = 0;
 					
 					for (Link link : tcunit.getLinks())
 					{
@@ -139,8 +150,12 @@ public abstract class SchedulingBase
 								if(moved.isReceived()) 
 								{
 									double movedTraffic = moved.getTraffic();
-									if(!moved.isFragment()) 
-										packetsDelay.add(moved.getDelay());
+									if(moved.isOrginalPacket()) 
+									{
+										_totalpacketNumber++;
+										numberOfOriginalReceivedPacket++;
+										delayTS += moved.getDelay();
+									}
 									slotThroughtput += movedTraffic;
 									tcunit.addThroughput(movedTraffic);
 								}
@@ -148,6 +163,8 @@ public abstract class SchedulingBase
 							
 						}
 					}
+					
+					AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
 					timeSlot++;
 					updateProgress(timeSlot);
 					throughput.add(slotThroughtput);
@@ -165,6 +182,15 @@ public abstract class SchedulingBase
 		FileGenerator.Throughput(throughput);
 		
 		return getResults();
+	}
+
+	protected void AddAverageDelay(int numberOfOriginalReceivedPacket,double delayTS)
+	{
+		if(numberOfOriginalReceivedPacket > 0)
+			averageDelayPerTimeSlot.add(delayTS / numberOfOriginalReceivedPacket);
+		else
+			averageDelayPerTimeSlot.add(0d);
+		
 	}
 
 	/**Schedules the different transmission configurations to dispose of the traffic
@@ -197,7 +223,9 @@ public abstract class SchedulingBase
 		Vector<TCUnit> transmissionConfigurations = null;
 		
 		int timeSlot = -1; // Current number of time slot
-		
+		double slotThroughtput = 0;
+		int numberOfOriginalReceivedPacket = 0;
+		double delayTS = 0;
 		sourceBuffers = null;
 		do 
 		{
@@ -208,14 +236,15 @@ public abstract class SchedulingBase
 
 		while(sourceBuffers.trafficSize() > 0 || transmitBuffers.trafficSize() > 0 || timeSlot < durationOfTrafficGenerating) 
 		{
-			double slotThroughtput = 0;
-			int slotDelay = 0;
+			slotThroughtput = 0;
+			numberOfOriginalReceivedPacket = 0;
+			delayTS = 0;
 			//both of buffers are empty 
 			if(sourceBuffers.trafficSize() == 0 && transmitBuffers.trafficSize() == 0)
 			{
 				timeSlot++;
 				throughput.add(0d);
-				packetsDelay.add(0);
+				averageDelayPerTimeSlot.add(0d);
 				trafficSource.add(sourceBuffers.trafficSize());
 				trafficTransit.add(transmitBuffers.trafficSize());
 				if(timeSlot < durationOfTrafficGenerating)
@@ -234,7 +263,10 @@ public abstract class SchedulingBase
 		 			transmissionConfigurations = matching(selectedBuffers);
 		 			for (TCUnit tcunit : transmissionConfigurations) 
 		 			{
-						slotThroughtput = 0;
+		 				
+		 				slotThroughtput = 0;
+		 				numberOfOriginalReceivedPacket = 0;
+		 				delayTS = 0;
 						for (Link link : tcunit.getLinks()) 
 						{
 							if(sourceBuffers.containsKey(link)) 
@@ -245,15 +277,19 @@ public abstract class SchedulingBase
 									if(moved.isReceived())
 									{
 										double movedTraffic = moved.getTraffic();
-										if(!moved.isFragment())
-											slotDelay += moved.getDelay();
+										if(moved.isOrginalPacket())
+										{
+											_totalpacketNumber++;
+											numberOfOriginalReceivedPacket++;
+											delayTS += moved.getDelay();
+										}
 										slotThroughtput += movedTraffic;
 										tcunit.addThroughput(movedTraffic);
 									}						
 							}
 						}
 						throughput.add(slotThroughtput);
-						packetsDelay.add(slotDelay);
+						AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
 						trafficSource.add(sourceBuffers.trafficSize());
 						trafficTransit.add(transmitBuffers.trafficSize());
 						timeSlot++;
@@ -277,8 +313,9 @@ public abstract class SchedulingBase
 		 			transmissionConfigurations = matching(selectedBuffers);
 		 			for (TCUnit tcunit : transmissionConfigurations)
 		 			{
-						slotThroughtput = 0;
-						slotDelay = 0;
+		 				slotThroughtput = 0;
+		 				numberOfOriginalReceivedPacket = 0;
+		 				delayTS = 0;
 						for (Link link : tcunit.getLinks())
 						{
 							if(transmitBuffers.containsKey(link)) 
@@ -291,8 +328,12 @@ public abstract class SchedulingBase
 									if(moved.isReceived()) 
 									{
 										double movedTraffic = moved.getTraffic();
-										if(!moved.isFragment()) 
-											slotDelay +=moved.getDelay();
+										if(moved.isOrginalPacket())
+										{
+											_totalpacketNumber++;
+											numberOfOriginalReceivedPacket++;
+											delayTS += moved.getDelay();
+										}
 										slotThroughtput += movedTraffic;
 										tcunit.addThroughput(movedTraffic);
 									}
@@ -301,7 +342,7 @@ public abstract class SchedulingBase
 							}
 						}
 						throughput.add(slotThroughtput);
-						packetsDelay.add(slotDelay);
+						AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
 						trafficSource.add(sourceBuffers.trafficSize());
 						trafficTransit.add(transmitBuffers.trafficSize());
 						timeSlot++;
@@ -466,7 +507,8 @@ public abstract class SchedulingBase
 	 * the results collected are not guaranteed.
 	 * @return The results of the scheduling.
 	 */
-	protected SchedulingResult getResults() {
+	protected SchedulingResult getResults() 
+	{
 		SchedulingResult results = new SchedulingResult(ApplicationSettingFacade.Channel.getChannel().size() == 11);
 		results.setSchedulingStrategy(getName());
 		results.setTrafficGenerator(trafficGenerator);
@@ -474,11 +516,6 @@ public abstract class SchedulingBase
 		results.setSourceBufferData(trafficSource);
 		results.setTransmitBufferData(trafficTransit);
 		results.setTotalTrafficGenerated(totalTrafficGenerated);
-		double sum = 0;
-		for(int i = 0; i < packetsDelay.size(); i++) {
-			sum += packetsDelay.get(i);
-		}
-		results.setAveragePacketDelay(sum );
 		return results;
 	}
 	
