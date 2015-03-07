@@ -86,7 +86,7 @@ public class SchedulingResultGraph extends JFrame
 		final XYDataset dataSet = createDataSet();
         chart = createChart(dataSet);
         chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(1670	, 1045));
+        chartPanel.setPreferredSize(new java.awt.Dimension(1670	, 980));
         contentPane.add(chartPanel, BorderLayout.CENTER);
         
         
@@ -353,6 +353,8 @@ public class SchedulingResultGraph extends JFrame
 		double maxSeries =  getMax() + (getMax() / 10);
 		System.err.println("Max: " + maxSeries);
 		return maxSeries;
+		
+		/*return 57.70;*/
 	}
 	private double getMax()
 	{

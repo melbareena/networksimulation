@@ -63,7 +63,7 @@ public class DynamicRRStrategy extends DynamicAbstract
 			
 			
 			int numberOfOriginalReceivedPacket = 0;
-			double delayTS = 0;
+			double totalDelayInTS = 0;
 			double slotThroughtput = 0;
 
 			//both of buffers are empty 
@@ -91,7 +91,7 @@ public class DynamicRRStrategy extends DynamicAbstract
 		 			for (TCUnit tcunit : transmissionConfigurations) 
 		 			{
 		 				numberOfOriginalReceivedPacket = 0;
-		 				delayTS = 0;
+		 				totalDelayInTS = 0;
 						slotThroughtput = 0;
 						for (Link link : tcunit.getLinks()) 
 						{
@@ -107,7 +107,7 @@ public class DynamicRRStrategy extends DynamicAbstract
 										{
 											_totalpacketNumber++;
 											numberOfOriginalReceivedPacket++;
-											delayTS += moved.getDelay();
+											totalDelayInTS += moved.getDelay();
 										}
 										slotThroughtput += movedTraffic;
 										tcunit.addThroughput(movedTraffic);
@@ -115,7 +115,8 @@ public class DynamicRRStrategy extends DynamicAbstract
 							}
 						}
 						throughput.add(slotThroughtput);
-						AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
+						AddAverageDelay(numberOfOriginalReceivedPacket, totalDelayInTS);
+						super.totalDelayPerTimeSlot.add(totalDelayInTS);
 						trafficSource.add(sourceBuffers.trafficSize());
 						trafficTransit.add(transmitBuffers.trafficSize());
 						timeSlot++;
@@ -141,7 +142,7 @@ public class DynamicRRStrategy extends DynamicAbstract
 		 			{
 						slotThroughtput = 0;
 						numberOfOriginalReceivedPacket = 0;
-		 				delayTS = 0;
+		 				totalDelayInTS = 0;
 						for (Link link : tcunit.getLinks())
 						{
 							if(transmitBuffers.containsKey(link)) 
@@ -158,7 +159,7 @@ public class DynamicRRStrategy extends DynamicAbstract
 										{
 											_totalpacketNumber++;
 											numberOfOriginalReceivedPacket++;
-											delayTS += moved.getDelay();
+											totalDelayInTS += moved.getDelay();
 										}
 										slotThroughtput += movedTraffic;
 										tcunit.addThroughput(movedTraffic);
@@ -168,7 +169,8 @@ public class DynamicRRStrategy extends DynamicAbstract
 							}
 						}
 						throughput.add(slotThroughtput);
-						AddAverageDelay(numberOfOriginalReceivedPacket, delayTS);
+						AddAverageDelay(numberOfOriginalReceivedPacket, totalDelayInTS);
+						super.totalDelayPerTimeSlot.add(totalDelayInTS);
 						trafficSource.add(sourceBuffers.trafficSize());
 						trafficTransit.add(transmitBuffers.trafficSize());
 						timeSlot++;

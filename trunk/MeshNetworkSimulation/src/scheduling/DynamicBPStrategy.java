@@ -112,7 +112,8 @@ public class DynamicBPStrategy extends DynamicAbstract
 		double totalDelayInTS = 0;
 		double slotThroughtput = 0;
 		TCUnit tcu = getMatchingTC(getOptimalWeightMap());
-		for (Link link : tcu.getLinks()) {
+		for (Link link : tcu.getLinks()) 
+		{
 			// Source buffers
 			calcWeight(true);
 			if (sourceBuffers.containsKey(link))
