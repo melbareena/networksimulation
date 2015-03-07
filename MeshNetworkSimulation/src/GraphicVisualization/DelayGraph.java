@@ -170,10 +170,10 @@ public class DelayGraph extends JFrame
 		        
 		       	
 		       
-
+		        //delayAxis.setRange(0, 356.54);
 		        
 		        delayAxis.setRange(0, maxDelay + (maxDelay / 100)*10 );
-		        System.err.println("Delay Max Range:" + maxDelay + (maxDelay / 100)*10);
+		     //   System.err.println("Delay Max Range:" + maxDelay + (maxDelay / 100)*10);
 		        plot.setRangeAxis(0,delayAxis);
 		              
 
