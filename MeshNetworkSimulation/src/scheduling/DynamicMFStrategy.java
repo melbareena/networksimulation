@@ -84,7 +84,7 @@ public class DynamicMFStrategy extends DynamicAbstract
 		 			{
 		 				dResult = delivery(tcunit, timeSlot, true);
 		 				
-						if(dResult.remainedRate > 0) // we still have some capacities which are not used , so we use it to transfer transmit buffer 
+						if(dResult.remainedRate > 0) // we still have some capacities which are not used , so we use it to transfer packets in transmit buffer 
 						{
 							if(transmitBuffers.trafficSize() > 0)
 							   dResult =	delivery(tcunit, timeSlot, dResult.remainedRate , dResult.numberOfOriginalPakcets,dResult.delayInTs, dResult.throughputInTS, false);				
