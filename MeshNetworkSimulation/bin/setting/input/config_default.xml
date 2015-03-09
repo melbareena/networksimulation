@@ -2,9 +2,6 @@
 <AppConfiguration AlgorithmMode="Dynamic" Interval="50" Mode="Single">
   <ChannelAssignment Strategy="OriginalSterategy"/>
   <Channels Mode="All">
-    <Add Value="1" />
-    <Add Value="6" />
-    <Add Value="11" />
   </Channels>
   <DataRate>
     <Add Rate="24" SINR="53.7"/>
@@ -44,9 +41,9 @@
   </IFactor>
   <OutputFolder GenerateFileAsOutput="false" IntermidiateConsoleOutput="false" Path="bin\output\"/>
   <Routers MinDistance="50" Number="80" Radio="2" SaftyTest="500" Seed="2680932533302035868" TransmissionRate="200" TypeOfGeneration="Random"/>
-  <Scheduling Strategy="BPStrategy"/>
+  <Scheduling Strategy="MFStrategy"/>
   <SINR Alpha="2" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
-  <Traffic Duration="200" Lambda_max=".5" Lambda_min="0.05" Ratio="2" Seed="7556842943631078075" Type="Dynamic"/>
-  <PowerControl Enable="true"/>
-  <TranmissionConfiguration Strategy="Greedy" downOverUpRatio="2"/>
+  <Traffic Duration="25000" Lambda_max=".6" Lambda_min="0.05" Ratio="2" Seed="7556842943631078075" Type="Dynamic"/>
+  <PowerControl Enable="false"/>
+  <TranmissionConfiguration Strategy="PatternBased" downOverUpRatio="2"/>
 </AppConfiguration>
