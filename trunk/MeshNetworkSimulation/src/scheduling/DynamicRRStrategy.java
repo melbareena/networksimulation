@@ -202,8 +202,9 @@ public class DynamicRRStrategy extends DynamicAbstract
 	
 	
 
-	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) {
-		if (sourcePositionIndex >= super.sourceBuffers.size()) {
+	protected Vector<Link> getBufferStrategy(boolean isSourceBuffer) 
+	{
+		/*if (sourcePositionIndex >= super.sourceBuffers.size()) {
 			sourcePositionIndex = 0;
 		}
 		if (tranmissionPositionIndex >= super.transmitBuffers.size()) {
@@ -242,6 +243,31 @@ public class DynamicRRStrategy extends DynamicAbstract
 				break;
 			}
 			index++;
+		}
+		return selectedLinks;*/
+		BufferMap targetBuffer;
+		
+		if(isSourceBuffer)
+			targetBuffer = super.sourceBuffers;
+		else
+			targetBuffer = super.transmitBuffers;
+		
+		
+		Vector<Link> selectedLinks = new Vector<>();
+		
+		
+		TreeMap<Link, Buffer> sortedBuffer = targetBuffer.sortByTraffic();
+		int index = 0;
+		for (Entry<Link, Buffer> lb : sortedBuffer.entrySet())
+		{
+			index++;
+			
+			
+			selectedLinks.add(lb.getKey() );
+			
+			if(super.k == index)
+				break;
+
 		}
 		return selectedLinks;
 	}
