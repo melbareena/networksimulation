@@ -121,9 +121,7 @@ public class DynamicBPStrategy extends DynamicAbstract
 				double dataRate = tcu.getRate(link);
 				List<Packet> movedPackets = sourceBuffers.sendPacket(link, dataRate,	transmitBuffers, timeSlot);
 				for (Packet moved : movedPackets)
-				{
-					
-				
+				{			
 					if (moved.isReceived())
 					{
 						double movedTraffic = moved.getTraffic();
@@ -238,14 +236,16 @@ public class DynamicBPStrategy extends DynamicAbstract
 	{
 		TCUnit selectedTCU = null;
 		double matchingFactor = 0.0;
-		for (TCUnit tcu : this.configurations) {
+		for (TCUnit tcu : this.configurations) 
+		{
 			double sum = 0.0;
-			for (Link l : weightsMap.keySet()) {
+			for (Link l : weightsMap.keySet())
+			{
 				/* Only add optimal path links */
-				if (this.sourceBuffers.containsKey(l) || this.transmitBuffers.containsKey(l)) {
-					if (tcu.containsKey(l)) {
+				if (this.sourceBuffers.containsKey(l) || this.transmitBuffers.containsKey(l))
+				{
+					if (tcu.containsKey(l))
 						sum += weightsMap.get(l) * tcu.getRate(l);
-					}
 				}
 			}
 			if (sum >= matchingFactor) {
