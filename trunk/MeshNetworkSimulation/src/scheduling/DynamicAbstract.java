@@ -23,7 +23,7 @@ public abstract class DynamicAbstract
 		totalDelayPerTimeSlot = new Vector<Double>();
 	}
 	protected int instanceIndex;
-	protected int k = 3;
+	protected int k = 1;
 	protected BufferMap sourceBuffers;
 	protected BufferMap transmitBuffers;
 	protected List<TCUnit> configurations;
