@@ -2,6 +2,9 @@
 <AppConfiguration AlgorithmMode="Dynamic" Interval="50" Mode="Single">
   <ChannelAssignment Strategy="OriginalSterategy"/>
   <Channels Mode="All">
+    <Add Value="1" />
+    <Add Value="6" />
+    <Add Value="11" />
   </Channels>
   <DataRate>
     <Add Rate="24" SINR="53.7"/>
@@ -15,10 +18,10 @@
   </DataRate>
   <Environment X="1000" Y="1000"/>
   <Gateways Number="5" Radio="4" TypeOfGeneration="Static">
-    <Add x="250" y="250"/>
-    <Add x="250" y="750"/>
-    <Add x="750" y="250"/>
-    <Add x="750" y="750"/>
+    <Add x="200" y="200"/>
+    <Add x="200" y="800"/>
+    <Add x="800" y="200"/>
+    <Add x="800" y="800"/>
     <Add x="500" y="500"/>
   </Gateways>
 
@@ -40,6 +43,6 @@
   <Scheduling Strategy="BPStrategy"/>
   <SINR Alpha="2" Beta="8.51" Mue="1.0E-9" Power="25" W="20"/>
   <Traffic Duration="25000" Lambda_max=".8" Lambda_min="0.05" Ratio="2" Seed="7556842943631078075" Type="Dynamic"/>
-  <PowerControl Enable="true"/>
+  <PowerControl Enable="false"/>
   <TranmissionConfiguration Strategy="Greedy" downOverUpRatio="2"/>
 </AppConfiguration>
