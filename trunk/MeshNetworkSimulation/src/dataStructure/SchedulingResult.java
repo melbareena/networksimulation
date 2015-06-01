@@ -94,7 +94,7 @@ public class SchedulingResult
 	public Vector<Double> getSourceData() 
 	{
 		Vector<Double> mbps = new Vector<Double>();
-		mbps.add(0d);
+		mbps.add(sourceData.get(0));
 		int slotCounter = 0;
 		for (Double slotT : sourceData)
 		{
@@ -131,7 +131,7 @@ public class SchedulingResult
 		
 		
 		Vector<Double> mbps = new Vector<Double>();
-		mbps.add(0d);
+		mbps.add(transmitData.get(0));
 		int slotCounter = 0;
 		for (Double slotT : transmitData)
 		{

@@ -13,6 +13,7 @@ import common.PrintConsole;
 import scheduling.SchedulingFacade;
 import setting.ApplicationSettingFacade;
 import setting.BaseConfiguration.AppExecMode;
+import transConf.TCFacade;
 import GraphicVisualization.DelayGraph;
 import GraphicVisualization.GraphViewer;
 import GraphicVisualization.LoadingDialog;
@@ -20,6 +21,7 @@ import GraphicVisualization.SchedulingResultGraph;
 import GraphicVisualization.StartOptionsDialog;
 import dataStructure.Channel;
 import dataStructure.SchedulingResult;
+import dataStructure.TCUnit;
 
 public class Luncher {
 
@@ -182,7 +184,7 @@ public class Luncher {
 					
 					FileGenerator.SchedulingResult(result);
 					
-					
+					System.out.println(getAverageTCCapacity());
 					
 					long stopTime = System.currentTimeMillis();
 				    long elapsedTime = stopTime - startTime;
@@ -216,6 +218,25 @@ public class Luncher {
 			System.exit(0);
 		}
 
+	}
+	
+	private static double getAverageTCCapacity()
+	{
+		double sum = 0;
+		double counter = 0;
+		double average = 0;
+		for (List<TCUnit> tcCollection : TCFacade._all)
+		{
+			sum = 0;
+			counter ++;
+			for (TCUnit tc : tcCollection)
+			{
+				sum+= tc.getTCAP();
+			}
+			average += sum / tcCollection.size();
+		}
+		return  average/counter;
+		
 	}
 	private static void createDiagrams(SchedulingResult result)
 	{

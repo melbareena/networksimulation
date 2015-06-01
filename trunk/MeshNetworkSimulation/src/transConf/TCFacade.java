@@ -1,5 +1,6 @@
 package transConf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import setting.ApplicationSettingFacade;
@@ -49,6 +50,8 @@ public class TCFacade
 		return (double) sum / configurations.size();
 	}
 
+	
+	public static ArrayList<List<TCUnit>> _all = new ArrayList<List<TCUnit>>();
 	private static int _startTime = -1;
 	public static List<TCUnit> getConfigurations(int startTime, int stopTime, BufferMap sourceBuffer, BufferMap transmitBuffer)
 	{
@@ -58,11 +61,13 @@ public class TCFacade
 			{
 				DynamicGreedyBased gBased = new DynamicGreedyBased();
 				configurations = gBased.createConfigurations(startTime, stopTime, sourceBuffer, transmitBuffer);
+				_all.add(configurations);
 			}
 			else
 			{
 				DynamicPatternBased pBased = new DynamicPatternBased();
 				configurations = pBased.createConfigurations(startTime, stopTime, sourceBuffer, transmitBuffer);
+				_all.add(configurations);
 			}
 			
 			
